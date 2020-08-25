@@ -44,19 +44,19 @@ let addLeft90 = () => {
     var { x, y, dir } = currentRoadPos;
     switch(dir) {
         case 0: 
-            roads.push(Curve(x+gameContext.x+100, y+gameContext.y, dir+90));
+            roads.push(Curve(x+gameContext.x+100, y+gameContext.y, 90));
             currentRoadPos = {x: x, y: y, dir: 270};
             break;
         case 90: 
-            roads.push(Curve(x+gameContext.x, y+gameContext.y+100, dir+90));
+            roads.push(Curve(x+gameContext.x, y+gameContext.y+100, 180));
             currentRoadPos = {x: x, y: y, dir: 0};
             break;
         case 180: 
-            roads.push(Curve(x+gameContext.x-100, y+gameContext.y, dir+90));
+            roads.push(Curve(x+gameContext.x-100, y+gameContext.y, 270));
             currentRoadPos = {x: x, y: y, dir: 90};
             break;
         case 270: 
-            roads.push(Curve(x+gameContext.x, y+gameContext.y-100, dir+90));
+            roads.push(Curve(x+gameContext.x, y+gameContext.y-100, 0));
             currentRoadPos = {x: x, y: y, dir: 180};
             break;
     }

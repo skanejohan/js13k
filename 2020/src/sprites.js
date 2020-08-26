@@ -120,6 +120,8 @@ let Curve = (x, y, rotation) => {
 let Car = (x, y) => kontra.Sprite({
     x: x,
     y: y,
+    xf: x,
+    yf: y,
     width: 120,
     height: 60,
     rotationDeg: 0, 
@@ -178,16 +180,18 @@ let Car = (x, y) => kontra.Sprite({
         const cos = Math.cos(this.rotation);
         const sin = Math.sin(this.rotation);
 
-        var nextX = Math.round(this.x + 3 * cos);
-        //var nextX = gameContext.scrollX;
+        this.xf = this.xf + 3 * cos;
+        var nextX = Math.round(this.xf);
         if (nextX > maxX) {
             gameContext.scrollX = maxX - nextX;
             gameContext.x += gameContext.scrollX;
+            this.xf = maxX;
             this.x = maxX;
         }
         else if (nextX < minX) {
             gameContext.scrollX = minX - nextX;
             gameContext.x += gameContext.scrollX;
+            this.xf = minX;
             this.x = minX;
         }
         else {
@@ -195,16 +199,18 @@ let Car = (x, y) => kontra.Sprite({
             this.x = nextX;
         }
 
-        var nextY = Math.round(this.y + 3 * sin);
-        //var nextY = gameContext.scrollY;
+        this.yf = this.yf + 3 * sin;
+        var nextY = Math.round(this.yf);
         if (nextY > maxY) {
             gameContext.scrollY = maxY - nextY;
             gameContext.y += gameContext.scrollY;
+            this.yf = maxY;
             this.y = maxY;
         }
         else if (nextY < minY) {
             gameContext.scrollY = minY - nextY;
             gameContext.y += gameContext.scrollY;
+            this.yf = minY;
             this.y = minY;
         }
         else {

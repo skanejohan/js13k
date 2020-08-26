@@ -138,23 +138,15 @@ let Car = (x, y) => kontra.Sprite({
         let y3 = this.y - diag * Math.sin(angle2 + this.rotation);
         let x4 = this.x + diag * Math.cos(angle2 + this.rotation);
         let y4 = this.y + diag * Math.sin(angle2 + this.rotation);
-        return { p1: {x: x1, y: y1}, p2: {x: x2, y: y2} , p3: {x: x3, y: y3} , p4: {x: x4, y: y4} }
+        return [ {x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3}, {x: x4, y: y4} ];
     },
     renderCollisionPoints() {
-        var cp = this.collisionPoints();
         this.context.fillStyle = "red";
-        this.context.beginPath();
-        this.context.arc(cp.p1.x, cp.p1.y, 3, 0, Math.PI*2);
-        this.context.fill();
-        this.context.beginPath();
-        this.context.arc(cp.p2.x, cp.p2.y, 3, 0, Math.PI*2);
-        this.context.fill();
-        this.context.beginPath();
-        this.context.arc(cp.p3.x, cp.p3.y, 3, 0, Math.PI*2);
-        this.context.fill();
-        this.context.beginPath();
-        this.context.arc(cp.p4.x, cp.p4.y, 3, 0, Math.PI*2);
-        this.context.fill();
+        this.collisionPoints().forEach(p => {
+            this.context.beginPath();
+            this.context.arc(p.x, p.y, 3, 0, Math.PI*2);
+            this.context.fill();
+        });
     },
     render() {
         this.context.fillStyle = "green";

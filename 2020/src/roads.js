@@ -132,3 +132,13 @@ let generate = () => {
     }
     addRight270();
 }
+
+getCoveredRoadSegments = points => {
+    var segments = [];
+    roads.forEach(r => {
+        if (points.some(p => r.inside(p.x, p.y))) {
+            segments.push(r);
+        }
+    });
+    return segments;
+}

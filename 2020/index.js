@@ -13,32 +13,15 @@ var gameContext = {
     y: 0,
 }
 
-var carRoadCollisions = [];
-
 let car = Car(300, 250);
 currentRoadPos = {x:0, y:200, dir: 0};
 for (var i = 0; i < 10; i++) {    
     addStraight();
 }
 
-updateRoadCollisions = () => {
-    var rc = [];
-    roads.forEach(r => {
-        var rr = r.rectangle();
-        var cp = car.collisionPoints();
-        if (r.inside(cp.p1.x, cp.p1.y) ||
-            r.inside(cp.p2.x, cp.p2.y) ||
-            r.inside(cp.p3.x, cp.p3.y) ||
-            r.inside(cp.p4.x, cp.p4.y)) {
-            rc.push(r);
-        }
-    });
-    carRoadCollisions = rc;
-}
-
-updateRoadCollisions();
-
 let debug = Debug();
+
+var coveredRoadSegments = [];
 
 updateRoadNet = () => {
     while(true) {
@@ -55,7 +38,7 @@ updateRoadNet = () => {
 renderRectangles = () => {
     car.renderCollisionPoints();
     roads.forEach(r => r.renderRectangle("green"));
-    carRoadCollisions.forEach(r => r.renderRectangle("red"));
+    coveredRoadSegments.forEach(r => r.renderRectangle("red"));
 }
 
 kontra.initKeys();
@@ -65,7 +48,7 @@ let loop = kontra.GameLoop({
         updateRoadNet();
         roads.forEach(r => r.update());
         car.update();
-        updateRoadCollisions();
+        coveredRoadSegments = getCoveredRoadSegments(car.collisionPoints());
         debug.update();
     },
     render() {

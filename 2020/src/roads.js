@@ -136,7 +136,7 @@ let generate = () => {
 getCoveredRoadSegments = points => {
     var segments = [];
     roads.forEach(r => {
-        if (points.some(p => r.inside(p.x, p.y))) {
+        if (points.some(p => r.inside(p))) {
             segments.push(r);
         }
     });

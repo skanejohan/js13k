@@ -23,6 +23,8 @@ let debug = Debug();
 
 var coveredRoadSegments = [];
 
+var energy = 0;
+
 updateRoadNet = () => {
     while(true) {
         if (currentRoadPos.x > maxX - gameContext.x + 20 * margin || 
@@ -49,7 +51,13 @@ let loop = kontra.GameLoop({
         roads.forEach(r => r.update());
         car.update();
         coveredRoadSegments = getCoveredRoadSegments(car.collisionPoints());
+        var pointsOutside = detectPointsOutside(car.collisionPoints(), coveredRoadSegments);
+        if (pointsOutside.some(p => p.outside)) {
+            energy += 1;
+        }
         debug.update();
+
+        console.log(energy);
     },
     render() {
         roads.forEach(r => r.render());

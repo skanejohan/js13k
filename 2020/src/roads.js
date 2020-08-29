@@ -142,3 +142,13 @@ getCoveredRoadSegments = points => {
     });
     return segments;
 }
+
+detectPointsOutside = (points, roadSegments) => {
+    result = [];
+    points.forEach(p => {
+        var point = p;
+        point.outside = roadSegments.some(s => s.outside(p.x, p.y));
+        result.push(point);
+    });
+    return result;
+}

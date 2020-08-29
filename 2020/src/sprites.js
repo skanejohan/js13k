@@ -1,5 +1,4 @@
 let Straight = (x, y, rotation) => {
-    console.log(`Straight at ${x},${y} with rotation ${rotation}`)
     return kontra.Sprite({
         x: x,
         y: y,
@@ -37,12 +36,21 @@ let Straight = (x, y, rotation) => {
         inside(x, y) {
             var rr = this.rectangle();
             return !(x < rr.x || x > rr.x + rr.w || y < rr.y || y > rr.y + rr.h);
+        },
+        outside(x, y) {
+            var rr = this.rectangle();
+            if (rotation == 0 || rotation == 180) {
+                return !(x < rr.x || x > rr.x + rr.w) && (y < rr.y || y > rr.y + rr.h);
+
+            }
+            else {
+                return (x < rr.x || x > rr.x + rr.w) && !(y < rr.y || y > rr.y + rr.h);
+            }
         }
     });
 }
 
 let Curve = (x, y, rotation) => {
-    console.log(`Curve at ${x},${y} with rotation ${rotation}`)
     return kontra.Sprite({
         x: x,
         y: y,
@@ -113,6 +121,9 @@ let Curve = (x, y, rotation) => {
                 return dist < 100;
             }
             return false;
+        },
+        outside(x, y) {
+            return false; // TODO
         }
     });
 }

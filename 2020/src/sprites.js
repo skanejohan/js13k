@@ -15,11 +15,6 @@ let Straight = (x, y, rotation) => {
                     return { x: this.x, y: this.y-100, w: 100, h: 100 };
             }
         },
-        renderRectangle(color) {
-            this.context.strokeStyle = color;
-            var {x, y, w, h} = this.rectangle();
-            this.context.strokeRect(x, y, w, h);
-        },
         render() {
             this.context.strokeStyle = "#aaaaaa";
             this.context.fillStyle = "#aaaaaa";
@@ -37,16 +32,6 @@ let Straight = (x, y, rotation) => {
             var r = this.rectangle();
             return !(p.x < r.x || p.x > r.x + r.w || p.y < r.y || p.y > r.y + r.h);
         },
-        outside(x, y) {
-            var rr = this.rectangle();
-            if (rotation == 0 || rotation == 180) {
-                return !(x < rr.x || x > rr.x + rr.w) && (y < rr.y || y > rr.y + rr.h);
-
-            }
-            else {
-                return (x < rr.x || x > rr.x + rr.w) && !(y < rr.y || y > rr.y + rr.h);
-            }
-        }
     });
 }
 
@@ -66,11 +51,6 @@ let Curve = (x, y, rotation) => {
                 default:
                     return { x: this.x, y: this.y-100, w: 100, h: 100 };
             }
-        },
-        renderRectangle(color) {
-            this.context.strokeStyle = color;
-            var {x, y, w, h} = this.rectangle();
-            this.context.strokeRect(x, y, w, h);
         },
         render() {
             this.context.fillStyle = "#aaaaaa";
@@ -122,9 +102,6 @@ let Curve = (x, y, rotation) => {
             }
             return false;
         },
-        outside(x, y) {
-            return false; // TODO
-        }
     });
 }
 
@@ -137,50 +114,11 @@ let Car = (x, y) => kontra.Sprite({
     height: 60,
     rotationDeg: 0, 
     anchor: {x: 0.5, y: 0.5},
-    collisionPoints() { // let update() calculate this!
-        let diag = Math.sqrt(60*60+30*30);
-        let angle1 = Math.atan(60/120);
-        let angle2 = Math.PI/2 + Math.atan(120/60);
-        let x1 = this.x - diag * Math.cos(angle1 + this.rotation);
-        let y1 = this.y - diag * Math.sin(angle1 + this.rotation);
-        let x2 = this.x + diag * Math.cos(angle1 + this.rotation);
-        let y2 = this.y + diag * Math.sin(angle1 + this.rotation);
-        let x3 = this.x - diag * Math.cos(angle2 + this.rotation);
-        let y3 = this.y - diag * Math.sin(angle2 + this.rotation);
-        let x4 = this.x + diag * Math.cos(angle2 + this.rotation);
-        let y4 = this.y + diag * Math.sin(angle2 + this.rotation);
-        return [ {x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3}, {x: x4, y: y4} ];
-    },
-    frontLeft() {
-        return this.collisionPoints()[2];
-    },
-    frontRight() {
-        return this.collisionPoints()[1];
-    },
-    rearLeft() {
-        return this.collisionPoints()[0];
-    },
-    rearRight() {
-        return this.collisionPoints()[3];
-    },
-    renderCollisionPoints() {
-        this.renderCollisionPoint(this.frontLeft(), "red");
-        this.renderCollisionPoint(this.frontRight(), "white");
-        this.renderCollisionPoint(this.rearRight(), "green");
-        this.renderCollisionPoint(this.rearLeft(), "blue");
-        // this.context.fillStyle = "red";
-        // this.collisionPoints().forEach(p => {
-        //     this.context.beginPath();
-        //     this.context.arc(p.x, p.y, 3, 0, Math.PI*2);
-        //     this.context.fill();
-        // });
-    },
-    renderCollisionPoint(p, color) {
-        this.context.fillStyle = color;
-        this.context.beginPath();
-        this.context.arc(p.x, p.y, 3, 0, Math.PI*2);
-        this.context.fill();
-    },
+    frontLeft: {},
+    frontRight: {},
+    rearLeft: {},
+    rearRight: {},
+
     render() {
         this.context.fillStyle = "green";
         this.context.fillRect(0, 0, 120, 60);
@@ -242,6 +180,25 @@ let Car = (x, y) => kontra.Sprite({
         }
     },
     update() {
+        let diag = Math.sqrt(60*60+30*30);
+        let angle1 = Math.atan(60/120);
+        let angle2 = Math.PI/2 + Math.atan(120/60);
+        this.frontLeft = {
+            x: this.x - diag * Math.cos(angle2 + this.rotation),
+            y: this.y - diag * Math.sin(angle2 + this.rotation),
+        };
+        this.frontRight = {
+            x: this.x + diag * Math.cos(angle1 + this.rotation),
+            y: this.y + diag * Math.sin(angle1 + this.rotation),
+        };
+        this.rearRight = {
+            x: this.x + diag * Math.cos(angle2 + this.rotation),
+            y: this.y + diag * Math.sin(angle2 + this.rotation),
+        };
+        this.rearLeft = {
+            x: this.x - diag * Math.cos(angle1 + this.rotation),
+            y: this.y - diag * Math.sin(angle1 + this.rotation),
+        };
         if (kontra.keyPressed('left')) {
             this.rotationDeg -= 2;
         }
@@ -250,7 +207,6 @@ let Car = (x, y) => kontra.Sprite({
         }
         this.rotation = kontra.degToRad(this.rotationDeg);
         this.drive(3);
-        //return;
     }
 });
 
@@ -260,6 +216,17 @@ let EnergyBar = (x, y, w, h) => kontra.Sprite({
     w: w,
     h: h,
     value: 500,
+    tickCount: 0,
+    ticksBetweenUpdates: 10,
+
+    update() {
+        this.tickCount++;
+        console.log(this.tickCount);
+        if (this.tickCount % this.ticksBetweenUpdates == 0 && gameContext.energyBar.value < 500) {
+            this.value++;
+        }
+    },
+
     render() {
         if (this.value > 300) {
             this.context.fillStyle = "green";
@@ -277,10 +244,11 @@ let EnergyBar = (x, y, w, h) => kontra.Sprite({
 let Overlay = () => kontra.Sprite({
     render() {
         this.context.fillStyle = "white";
-        this.context.font = "24px Arial";        
+        this.context.font = "24px Arial";      
+        this.context.textAlign = "center";  
         if (gameContext.gameState == GameState.IDLE) {
-            this.context.fillText("404", 325, 170);
-            this.context.fillText("Click to play", 200, 250);
+            this.context.fillText("404", cx, 170);
+            this.context.fillText("Click to play", cx, 250);
         }
         if (gameContext.gameState == GameState.LIFELOST) {
             this.context.fillText("GET READY", 325, 300);

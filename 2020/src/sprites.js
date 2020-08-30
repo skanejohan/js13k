@@ -110,8 +110,8 @@ let Car = (x, y) => kontra.Sprite({
     y: y,
     xf: x,
     yf: y,
-    width: 120,
-    height: 60,
+    width: 60,
+    height: 30,
     rotationDeg: 0, 
     anchor: {x: 0.5, y: 0.5},
     frontLeft: {},
@@ -121,15 +121,15 @@ let Car = (x, y) => kontra.Sprite({
 
     render() {
         this.context.fillStyle = "green";
-        this.context.fillRect(0, 0, 120, 60);
+        this.context.fillRect(0, 0, 60, 30);
         this.context.fillStyle = "white";
-        this.context.fillRect(0, 21, 120, 8);
-        this.context.fillRect(0, 31, 120, 8);
+        this.context.fillRect(0, 10, 60, 4);
+        this.context.fillRect(0, 16, 60, 4);
         this.context.fillStyle = "#222222";
-        this.context.fillRect(20, 2, 15, 56);
-        this.context.fillRect(60, 2, 25, 56);
-        this.context.fillRect(110, 4, 8, 15);
-        this.context.fillRect(110, 41, 8, 15);
+        this.context.fillRect(10, 2, 8, 26);
+        this.context.fillRect(30, 2, 12, 26);
+        this.context.fillRect(53, 2, 5, 8);
+        this.context.fillRect(53, 20, 5, 8);
     },
     rotateLeft() {
         this.rotationDeg -= 2;
@@ -180,9 +180,9 @@ let Car = (x, y) => kontra.Sprite({
         }
     },
     update() {
-        let diag = Math.sqrt(60*60+30*30);
-        let angle1 = Math.atan(60/120);
-        let angle2 = Math.PI/2 + Math.atan(120/60);
+        let diag = Math.sqrt(30*30+15*15);
+        let angle1 = Math.atan(1/2);
+        let angle2 = Math.PI/2 + Math.atan(2);
         this.frontLeft = {
             x: this.x - diag * Math.cos(angle2 + this.rotation),
             y: this.y - diag * Math.sin(angle2 + this.rotation),
@@ -245,12 +245,51 @@ let Overlay = () => kontra.Sprite({
         this.context.fillStyle = "white";
         this.context.font = "24px Arial";      
         this.context.textAlign = "center";  
-        if (gameContext.gameState == GameState.IDLE) {
-            this.context.fillText("404", cx, 170);
-            this.context.fillText("Click to play", cx, 250);
+        
+        switch(gameContext.gameState) {
+            case GameState.IDLE:
+                this.context.fillText("404", cx, 170);
+                this.context.fillText("Click to play", cx, 250);
+                break;
+            case GameState.GAMEOVER:
+                this.context.fillText("GAME OVER", cx, 300);
+                break;
+            case GameState.PLAYING:
+                this.context.textAlign = "left";  
+                this.context.fillText(`TARGET SCORE: 404`, 100, 100);
+                this.context.fillText(`SCORE: ${gameContext.score}`, 500, 100);
+                this.context.fillText(`TIME: ${Date.now() - gameContext.startTime}`, 900, 100);
+                //best time
+                break;
         }
-        if (gameContext.gameState == GameState.GAMEOVER) {
-            this.context.fillText("GAME OVER", cx, 300);
-        }
+    }
+});
+
+let Coin = (x, y, value) => kontra.Sprite({
+    x: x,
+    y: y,
+    anchor: {x: 0.5, y: 0.5},
+    value: value,
+
+    render() {
+        this.context.fillStyle = this.value < 0 ? "red" : "green";
+        this.context.beginPath();
+        this.context.arc(0, 0, 30, 0, Math.PI*2);
+        this.context.fill();
+
+        this.context.font = "24px Arial";      
+        this.context.textAlign = "center";  
+        this.context.fillStyle = this.value < 0 ? "white" : "black";
+        this.context.fillText(Math.abs(value), 0, 8);
     },
+
+    update() {
+        this.x += gameContext.scrollX;
+        this.y += gameContext.scrollY;
+    },
+
+    inside(p) {
+        return (p.x-this.x) * (p.x-this.x) + (p.y-this.y) * (p.y-this.y) < 900;
+    },
+
 });

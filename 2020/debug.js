@@ -31,8 +31,10 @@ let Debug = (context, gameContext) => {
             _offsetText.render();
             _scrollText.render();
             _visibleText.render();
-            renderCollisionPoints();
-            renderRoadRectangles();
+            if (gameContext.gameState == GameState.PLAYING) {
+                renderCollisionPoints();
+                renderRoadRectangles();
+            }
         },
         update() {
             _offsetText.text = `Offset: ${gameContext.x}, ${gameContext.y}`;

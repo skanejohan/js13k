@@ -216,12 +216,10 @@ let EnergyBar = (x, y, w, h) => kontra.Sprite({
     w: w,
     h: h,
     value: 500,
-    tickCount: 0,
     ticksBetweenUpdates: 10,
 
     update() {
-        this.tickCount++;
-        if (this.tickCount % this.ticksBetweenUpdates == 0 && gameContext.energyBar.value < 500) {
+        if (gameContext.tick % this.ticksBetweenUpdates == 0 && gameContext.energyBar.value < 500) {
             this.value++;
         }
     },
@@ -265,11 +263,12 @@ let Overlay = () => kontra.Sprite({
     }
 });
 
-let Coin = (x, y, value) => kontra.Sprite({
+let Coin = (x, y, value, ticksToLive) => kontra.Sprite({
     x: x,
     y: y,
     anchor: {x: 0.5, y: 0.5},
     value: value,
+    ticksToLive: ticksToLive,
 
     render() {
         this.context.fillStyle = this.value < 0 ? "red" : "green";
@@ -286,6 +285,11 @@ let Coin = (x, y, value) => kontra.Sprite({
     update() {
         this.x += gameContext.scrollX;
         this.y += gameContext.scrollY;
+        this.ticksToLive--;
+    },
+
+    alive() {
+        return this.ticksToLive > 0;
     },
 
     inside(p) {

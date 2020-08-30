@@ -82,71 +82,89 @@ let addLeft270 = () => {
     addLeft90();
 }
 
-let statistics = {
-    s : 300,
-    r90 : 10,
-    r180: 5,
-    r270: 5,
-    l90 : 10,
-    l180 : 5,
-    l270 : 5,
-}
+buildCourse = level => {
+    gameContext.currentRoadPos = {x:0, y:200, dir: 0};
 
-let statSum = 340;
-
-let generate = () => {
-    var rnd = Math.round(Math.random() * statSum);
-    var ack = statistics.s;
-    if (rnd < ack) {
-        addStraight();
-        return;
-    }
-    ack += statistics.r90;
-    if (rnd < ack) {
-        addRight90();
-        return;
-    }
-    ack += statistics.r180;
-    if (rnd < ack) {
-        addRight180();
-        return;
-    }
-    ack += statistics.r270;
-    if (rnd < ack) {
-        addRight270();
-        return;
-    }
-    ack += statistics.l90;
-    if (rnd < ack) {
-        addLeft90();
-        return;
-    }
-    ack += statistics.l180;
-    if (rnd < ack) {
-        addLeft180();
-        return;
-    }
-    addRight270();
-}
-
-updateRoadNet = () => {
-    while(true) {
-        if (gameContext.currentRoadPos.x > maxX - gameContext.x + 20 * margin || 
-            gameContext.currentRoadPos.x < minX - gameContext.x - 20 * margin ||
-            gameContext.currentRoadPos.y > maxY - gameContext.y + 20 * margin ||
-            gameContext.currentRoadPos.y < minY - gameContext.y - 20 * margin) {
-                return;
-            }
-        generate();
-    }
-}
-
-getCoveredRoadSegments = points => {
-    var segments = [];
-    gameContext.roads.forEach(r => {
-        if (points.some(p => r.inside(p))) {
-            segments.push(r);
-        }
-    });
-    return segments;
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addLeft90();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addLeft180();
+    addStraight();
+    addStraight();
+    addRight90();
+    addStraight();
+    addStraight();
+    addRight90();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addRight90();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addRight90();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addLeft90();
+    addRight90();
+    addLeft90();
+    addRight90();
+    addStraight();
+    addRight90();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addRight90();
+    addStraight();
+    addStraight();
+    addLeft90();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addRight90();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addStraight();
+    addRight90();
 }

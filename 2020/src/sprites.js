@@ -221,7 +221,6 @@ let EnergyBar = (x, y, w, h) => kontra.Sprite({
 
     update() {
         this.tickCount++;
-        console.log(this.tickCount);
         if (this.tickCount % this.ticksBetweenUpdates == 0 && gameContext.energyBar.value < 500) {
             this.value++;
         }
@@ -250,11 +249,8 @@ let Overlay = () => kontra.Sprite({
             this.context.fillText("404", cx, 170);
             this.context.fillText("Click to play", cx, 250);
         }
-        if (gameContext.gameState == GameState.LIFELOST) {
-            this.context.fillText("GET READY", 325, 300);
-        }
         if (gameContext.gameState == GameState.GAMEOVER) {
-            this.context.fillText("GAME OVER", 325, 300);
+            this.context.fillText("GAME OVER", cx, 300);
         }
     },
 });

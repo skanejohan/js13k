@@ -10,8 +10,7 @@ let cx = canvas.clientWidth / 2;
 const GameState = {
     IDLE: 1,
     PLAYING: 2,
-    LIFELOST: 3,
-    GAMEOVER: 4
+    GAMEOVER: 3
 }
 
 var gameContext = {
@@ -22,12 +21,33 @@ var gameContext = {
     gameState: GameState.IDLE,
 
     reset() {
+        this.x = 0;
+        this.y = 0;
         this.roads = [];
         this.car = Car(300, 250);
-        this.currentRoadPos = {x:0, y:200, dir: 0};
         this.energyBar = EnergyBar(minX, 700, maxX, 20);
-        for (var i = 0; i < 10; i++) {    
-            addStraight();
+        buildCourse(1);
+    },
+
+    update() {
+        if (this.gameState == GameState.PLAYING) {
+            this.roads.forEach(r => r.update());
+            this.car.update();
+            if (!this.carInsideRoad()) {
+                gameContext.energyBar.value--;
+                if (gameContext.energyBar.value == 0) {
+                    gameContext.setGameState(GameState.GAMEOVER);
+                }
+            }
+            this.energyBar.update();
+        }
+    },
+
+    render() {
+        if (this.gameState == GameState.PLAYING) {
+            this.roads.forEach(r => r.render());
+            this.car.render();
+            this.energyBar.render();
         }
     },
 
@@ -45,56 +65,25 @@ var gameContext = {
                 this.gameState = GameState.IDLE;
                 break;
         }
+    },
+
+    carInsideRoad() {
+        flInside = false;
+        frInside = false;
+        rrInside = false;
+        rlInside = false;
+        for (var i=0; i < this.roads.length; i++) {
+            var r = this.roads[i];
+            flInside = flInside || r.inside(this.car.frontLeft); 
+            frInside = frInside || r.inside(this.car.frontRight); 
+            rrInside = rrInside || r.inside(this.car.rearRight); 
+            rlInside = rlInside || r.inside(this.car.rearLeft);
+            if (flInside && frInside && rrInside && rlInside) {
+                return true;
+            } 
+        }
+        return false;
     }
-}
-
-
-
-
-var coveredRoadSegments = [];
-
-handleCollisions = () => {
-    /* TODO but use individual points instead of collisionPoints
-    coveredRoadSegments = getCoveredRoadSegments(gameContext.car.collisionPoints());
-    frontLeftInside = false;
-    frontRightInside = false;
-    rearLeftInside = false;
-    rearRightInside = false;
-    coveredRoadSegments.forEach(s => {
-        if (s.inside(gameContext.car.frontLeft())) {
-            frontLeftInside = true;
-        }
-        if (s.inside(gameContext.car.frontRight())) {
-            frontRightInside = true;
-        }
-        if (s.inside(gameContext.car.rearLeft)) {
-            rearLeftInside = true;
-        }
-        if (s.inside(gameContext.car.rearRight())) {
-            rearRightInside = true;
-        }
-    });
-    if (!(frontLeftInside && frontRightInside && rearLeftInside && rearRightInside)) {
-        gameContext.energyBar.value--;
-        if (gameContext.energyBar.value == 0) {
-            gameContext.setGameState(GameState.GAMEOVER);
-        }
-    }
-    // if (frontLeftInside && frontRightInside) { // && rearLeftInside && rearRightInside) {
-    //     return;
-    // }
-    coveredRoadSegments.forEach(s => {
-        if (s.inside(gameContext.car.frontLeft()) && !(s.inside(gameContext.car.frontRight()))) {
-            gameContext.car.rotateLeft();
-        }
-        if (s.inside(gameContext.car.frontRight()) && !(s.inside(gameContext.car.frontLeft()))) {
-            gameContext.car.rotateRight();
-        }
-        // if (!(s.inside(car.frontRight().x, car.frontRight().y)) && !(s.inside(car.frontLeft().x, car.frontLeft().y))) {
-        //     car.drive(-7);
-        // }
-    })
-    */
 }
 
 let overlay = Overlay();
@@ -111,24 +100,14 @@ kontra.onPointerUp(function(e, object) {
 let loop = kontra.GameLoop({
 
     update() {
-        if (gameContext.gameState == GameState.PLAYING) {
-            updateRoadNet();
-            gameContext.roads.forEach(r => r.update());
-            gameContext.car.update();
-            gameContext.energyBar.update();
-            handleCollisions();
-            debug.update();
-        }
+        gameContext.update();
+        //debug.update();
     },
 
     render() {
-        if (gameContext.gameState == GameState.PLAYING) {
-            gameContext.roads.forEach(r => r.render());
-            gameContext.car.render();
-            gameContext.energyBar.render();
-            debug.render();
-        }
+        gameContext.render();
         overlay.render();
+        //debug.render();
     }
 });
 

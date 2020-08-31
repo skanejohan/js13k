@@ -143,17 +143,17 @@ let Car = (x, y) => kontra.Sprite({
 
         this.xf = this.xf + steps * cos;
         var nextX = Math.round(this.xf);
-        if (nextX > maxX) {
-            gameContext.scrollX = maxX - nextX;
+        if (nextX > dimensions.maxX) {
+            gameContext.scrollX = dimensions.maxX - nextX;
             gameContext.x += gameContext.scrollX;
-            this.xf = maxX;
-            this.x = maxX;
+            this.xf = dimensions.maxX;
+            this.x = dimensions.maxX;
         }
-        else if (nextX < minX) {
-            gameContext.scrollX = minX - nextX;
+        else if (nextX < dimensions.minX) {
+            gameContext.scrollX = dimensions.minX - nextX;
             gameContext.x += gameContext.scrollX;
-            this.xf = minX;
-            this.x = minX;
+            this.xf = dimensions.minX;
+            this.x = dimensions.minX;
         }
         else {
             gameContext.scrollX = 0;
@@ -162,17 +162,17 @@ let Car = (x, y) => kontra.Sprite({
 
         this.yf = this.yf + steps * sin;
         var nextY = Math.round(this.yf);
-        if (nextY > maxY) {
-            gameContext.scrollY = maxY - nextY;
+        if (nextY > dimensions.maxY) {
+            gameContext.scrollY = dimensions.maxY - nextY;
             gameContext.y += gameContext.scrollY;
-            this.yf = maxY;
-            this.y = maxY;
+            this.yf = dimensions.maxY;
+            this.y = dimensions.maxY;
         }
-        else if (nextY < minY) {
-            gameContext.scrollY = minY - nextY;
+        else if (nextY < dimensions.minY) {
+            gameContext.scrollY = dimensions.minY - nextY;
             gameContext.y += gameContext.scrollY;
-            this.yf = minY;
-            this.y = minY;
+            this.yf = dimensions.minY;
+            this.y = dimensions.minY;
         }
         else {
             gameContext.scrollY = 0;
@@ -210,54 +210,40 @@ let Car = (x, y) => kontra.Sprite({
     }
 });
 
-let EnergyBar = (x, y, w, h) => kontra.Sprite({
-    x: x,
-    y: y,
-    w: w,
-    h: h,
-    value: 500,
-    ticksBetweenUpdates: 10,
-
-    update() {
-        if (gameContext.tick % this.ticksBetweenUpdates == 0 && gameContext.energyBar.value < 500) {
-            this.value++;
-        }
-    },
-
-    render() {
-        if (this.value > 300) {
-            this.context.fillStyle = "green";
-        }
-        else if (this.value > 100) {
-            this.context.fillStyle = "yellow";
-        }
-        else {
-            this.context.fillStyle = "red";
-        }        
-        this.context.fillRect(0, 0, w * this.value / 500, h);
-    },
-});
-
 let Overlay = () => kontra.Sprite({
     render() {
-        this.context.fillStyle = "white";
-        this.context.font = "24px Arial";      
-        this.context.textAlign = "center";  
         
         switch(gameContext.gameState) {
             case GameState.IDLE:
-                this.context.fillText("404", cx, 170);
-                this.context.fillText("Click to play", cx, 250);
+                this.context.fillStyle = "black";
+                this.context.fillRect(0, 0, dimensions.w, dimensions.h);
+                this.context.fillStyle = "white";
+                this.context.font = "24px Arial";      
+                this.context.textAlign = "center";  
+                this.context.fillText("404", dimensions.cx, 170);
+                this.context.fillText("Click to play", dimensions.cx, 250);
                 break;
             case GameState.GAMEOVER:
-                this.context.fillText("GAME OVER", cx, 300);
+                this.context.fillStyle = "black";
+                this.context.fillRect(0, 0, dimensions.w, dimensions.h);
+                this.context.fillStyle = "white";
+                this.context.font = "24px Arial";      
+                this.context.textAlign = "center";  
+                this.context.fillText("GAME OVER", dimensions.cx, 300);
                 break;
             case GameState.PLAYING:
-                this.context.textAlign = "left";  
-                this.context.fillText(`TARGET SCORE: 404`, 100, 100);
-                this.context.fillText(`SCORE: ${gameContext.score}`, 500, 100);
-                this.context.fillText(`TIME: ${Date.now() - gameContext.startTime}`, 900, 100);
-                //best time
+                this.context.fillStyle = "black";
+                this.context.fillRect(0, 0, dimensions.w, topRowHeight);
+                this.context.fillStyle = "white";
+                this.context.font = "24px Arial";      
+                this.context.textAlign = "center";  
+                this.context.fillText(`SCORE: ${gameContext.score}`, dimensions.cx, topRowHeight/2+10);
+
+                this.context.fillStyle = "black";
+                this.context.fillRect(0, dimensions.h - bottomRowHeight, dimensions.w, bottomRowHeight);
+                this.context.fillStyle = gameContext.energy > 300 ? "green" : (gameContext.energy > 100) ? "yellow" : "red";
+                this.context.fillRect(10, dimensions.h - bottomRowHeight +10, (dimensions.w - 20) * gameContext.energy / 500, 30);
+        
                 break;
         }
     }

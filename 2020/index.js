@@ -1,4 +1,5 @@
 /*
+    More coins - test with "all values" between 1 and 500
     When hitting score 404, go to the next level
     When all levels are cleared, game over. 
 
@@ -12,15 +13,34 @@
 
 let { canvas, context } = kontra.init();
 
-let margin = 200;
-let minX = margin;
-let minY = margin;
-let maxX = canvas.clientWidth - 2 * margin;
-let maxY = canvas.clientHeight - 2 * margin;
-let cx = canvas.clientWidth / 2;
+let topRowHeight = 50;
+let bottomRowHeight = 50;
+let scrollMargin = 200;
+
+var dimensions = {
+    minX: scrollMargin,
+    minY: scrollMargin,
+    maxX: 0,
+    maxY: 0,
+    cx: 0,
+
+    update(w, h) {
+        this.w = w,
+        this.h = h,
+        this.maxX = w - 2 * scrollMargin;
+        this.maxY = h - 2 * scrollMargin;
+        this.cx = w / 2;
+    }
+}
 
 let overlay = Overlay();
 let debug = Debug(context, gameContext);
+
+handleResize = (w, h) => {
+    canvas.width = w;
+    canvas.height = h;
+    dimensions.update(canvas.clientWidth, canvas.clientHeight);
+}
 
 kontra.initKeys();
 kontra.initPointer();

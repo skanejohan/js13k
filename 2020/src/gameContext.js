@@ -24,7 +24,7 @@ var gameContext = {
         this.roads = [];
         this.coins = [];
         this.car = Car(300, 250);
-        this.energyBar = EnergyBar(minX, 700, maxX, 20);
+        this.energy = 500;
         buildCourse(1);
     },
 
@@ -38,10 +38,7 @@ var gameContext = {
             this.coins.forEach(c => c.update());
             this.car.update();
             if (!this.carInsideRoad()) {
-                gameContext.energyBar.value--;
-                if (gameContext.energyBar.value == 0) {
-                    gameContext.setGameState(GameState.GAMEOVER);
-                }
+                this.removeEnergy(1);
             }
             var coinHit = this.coins.find(c => this.carInsideCoin(c));
             if (coinHit) {
@@ -51,12 +48,11 @@ var gameContext = {
                 }
                 coinHit.road.hasCoin = false;
                 this.coins = this.coins.filter(c => c != coinHit);
-                gameContext.energyBar.value += 10;
-                if (gameContext.energyBar.value > 500) {
-                    gameContext.energyBar.value = 500;
-                }
+                this.addEnergy(10);
             }
-            this.energyBar.update();
+            if (this.tick % 10 == 0) {
+                this.addEnergy(1);
+            }
         }
     },
 
@@ -65,7 +61,20 @@ var gameContext = {
             this.roads.forEach(r => r.render());
             this.coins.forEach(c => c.render());
             this.car.render();
-            this.energyBar.render();
+        }
+    },
+
+    addEnergy(value) {
+        this.energy += value;
+        if (this.energy > 500) {
+            this.energy = 500;
+        }
+    },
+
+    removeEnergy(value) {
+        this.energy -= value;
+        if (this.energy <= 0) {
+            this.setGameState(GameState.GAMEOVER);
         }
     },
 

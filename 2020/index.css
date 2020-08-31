@@ -1,7 +1,9 @@
 body {
-    background: black;
+    background: green;
+    overflow: hidden;
+    margin: 0px;
 }
  
 canvas {
-    border: 1px solid white;  
+    overflow: hidden;
 }

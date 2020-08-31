@@ -7,9 +7,9 @@ let Debug = (context, gameContext) => {
         context.fill();
     }
 
-    var _offsetText = createText(30, 750);
-    var _scrollText = createText(230, 750);
-    var _visibleText = createText(430, 750);
+    var _offsetText = createText(100, 100);
+    var _scrollText = createText(100, 200);
+    var _visibleText = createText(100, 300);
 
     var renderCollisionPoints = () => {
         renderPoint(gameContext.car.frontLeft, "red");
@@ -28,6 +28,7 @@ let Debug = (context, gameContext) => {
 
     var obj = {
         render() {
+            context.fillStyle = "white";
             _offsetText.render();
             _scrollText.render();
             _visibleText.render();
@@ -39,10 +40,10 @@ let Debug = (context, gameContext) => {
         update() {
             _offsetText.text = `Offset: ${gameContext.x}, ${gameContext.y}`;
             _scrollText.text = `Scroll: ${gameContext.scrollX}, ${gameContext.scrollY}`;
-            var l = minX - gameContext.x;
-            var t = minY - gameContext.y;
-            var r = maxX - gameContext.x;
-            var b = maxY - gameContext.y;
+            var l = dimensions.minX - gameContext.x;
+            var t = dimensions.minY - gameContext.y;
+            var r = dimensions.maxX - gameContext.x;
+            var b = dimensions.maxY - gameContext.y;
             _visibleText.text = `Visible area: (${l}, ${t}) - (${r}, ${b})`;
         },
     

@@ -1,21 +1,27 @@
 /*
-    More coins - test with "all values" between 1 and 500
     When hitting score 404, go to the next level
-    When all levels are cleared, game over. 
+    When all levels are cleared, rotate back to the first one, but with higher speed. 
 
    Polish:
    - green and blue around the road
    - possibly "fog of war when too far from the road"
    - when hitting a coin, display its value and possibly the status code
    - sliding when turning
+
+   Instructions
+    - target score is 404
+    - use left and right arrow to steer, space to boost
+    - hit coins for positive (green) or negative (red) score
+    - preserve energy by staying on the road, and by hitting coins
+
 */
 
 
 let { canvas, context } = kontra.init();
 
-let topRowHeight = 50;
-let bottomRowHeight = 50;
-let scrollMargin = 200;
+let topRowHeight = 100;
+let bottomRowHeight = 0;
+let scrollMargin = 400;
 
 var dimensions = {
     minX: scrollMargin,
@@ -27,11 +33,13 @@ var dimensions = {
     update(w, h) {
         this.w = w,
         this.h = h,
-        this.maxX = w - 2 * scrollMargin;
-        this.maxY = h - 2 * scrollMargin;
+        this.maxX = w - scrollMargin;
+        this.maxY = h - scrollMargin;
         this.cx = w / 2;
     }
 }
+
+gameContext.setGameState(GameState.IDLE);
 
 let overlay = Overlay();
 let debug = Debug(context, gameContext);

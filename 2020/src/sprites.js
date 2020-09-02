@@ -130,6 +130,9 @@ let Car = (x, y) => kontra.Sprite({
         this.context.fillRect(30, 2, 12, 26);
         this.context.fillRect(53, 2, 5, 8);
         this.context.fillRect(53, 20, 5, 8);
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = "black";
+        this.context.strokeRect(0, 0, 60, 30);
     },
     rotateLeft() {
         this.rotationDeg -= 2;
@@ -206,7 +209,12 @@ let Car = (x, y) => kontra.Sprite({
             this.rotationDeg += 2;
         }
         this.rotation = kontra.degToRad(this.rotationDeg);
-        this.drive(3);
+        if (kontra.keyPressed('space')) {
+            this.drive(10);
+        }
+        else {
+            this.drive(3);
+        }
     }
 });
 
@@ -231,19 +239,40 @@ let Overlay = () => kontra.Sprite({
                 this.context.textAlign = "center";  
                 this.context.fillText("GAME OVER", dimensions.cx, 300);
                 break;
-            case GameState.PLAYING:
+            case GameState.WELLDONE:
                 this.context.fillStyle = "black";
-                this.context.fillRect(0, 0, dimensions.w, topRowHeight);
+                this.context.fillRect(0, 0, dimensions.w, dimensions.h);
                 this.context.fillStyle = "white";
                 this.context.font = "24px Arial";      
                 this.context.textAlign = "center";  
-                this.context.fillText(`SCORE: ${gameContext.score}`, dimensions.cx, topRowHeight/2+10);
+                this.context.fillText("WELL DONE - ANOTHER MISSING LINK FOUND", dimensions.cx, 300);
+                break;
+            case GameState.PLAYING:
+                this.context.fillStyle = "black";
+                this.context.fillRect(0, 0, dimensions.w, topRowHeight);
+
+                var gradient = this.context.createLinearGradient(0, 0, dimensions.w, 0);
+                gradient.addColorStop(0, "red");
+                gradient.addColorStop(0.5, "yellow");
+                gradient.addColorStop(1, "green");
+                this.context.fillStyle = gradient;
+                this.context.fillRect(10, 20, (dimensions.w - 20) * gameContext.energy / 500, 60);
 
                 this.context.fillStyle = "black";
-                this.context.fillRect(0, dimensions.h - bottomRowHeight, dimensions.w, bottomRowHeight);
-                this.context.fillStyle = gameContext.energy > 300 ? "green" : (gameContext.energy > 100) ? "yellow" : "red";
-                this.context.fillRect(10, dimensions.h - bottomRowHeight +10, (dimensions.w - 20) * gameContext.energy / 500, 30);
-        
+                this.context.beginPath();
+                this.context.arc(dimensions.cx, 50, 50, 0, Math.PI*2);
+                this.context.fill();
+
+                this.context.fillStyle = gameContext.score > 404 ? "red" : "green";
+                this.context.beginPath();
+                this.context.arc(dimensions.cx, 50, 40, 0, Math.PI*2);
+                this.context.fill();
+
+                this.context.font = "28px Arial";      
+                this.context.textAlign = "center";  
+                this.context.fillStyle = gameContext.score > 404 ? "white" : "black";
+                this.context.fillText(404 - gameContext.score, dimensions.cx, 60);
+            
                 break;
         }
     }
@@ -257,9 +286,12 @@ let Coin = (x, y, value, ticksToLive) => kontra.Sprite({
     ticksToLive: ticksToLive,
 
     render() {
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = this.value < 0 ? "white" : "black";
         this.context.fillStyle = this.value < 0 ? "red" : "green";
         this.context.beginPath();
-        this.context.arc(0, 0, 30, 0, Math.PI*2);
+        this.context.arc(0, 0, 25, 0, Math.PI*2);
+        this.context.stroke();
         this.context.fill();
 
         this.context.font = "24px Arial";      

@@ -31,7 +31,7 @@ var gameContext = {
         this.roads = [];
         this.coins = [];
         this.environment = [];
-        this.car = Car(300, 250);
+        this.car = createCar(300, 250);
         this.energy = 500;
         buildCourse(1);
     },
@@ -44,7 +44,7 @@ var gameContext = {
             this.roads.forEach(r => r.update());
             this.environment.forEach(e => e.update());
             this.coins.forEach(c => updateCoin(c));
-            this.car.update();
+            updateCar(this.car, turnLeft(), turnRight(), fastForward());
             var coveredRoad = this.coveredRoad();
             if (coveredRoad == -1) {
                 this.removeEnergy(2);
@@ -72,7 +72,7 @@ var gameContext = {
             this.environment.forEach(r => r.render());
             this.roads.forEach(r => r.render());
             this.coins.forEach(c => drawCoin(c, context));
-            this.car.render();
+            drawCar(this.car, context);
         }
     },
 
@@ -142,4 +142,3 @@ var gameContext = {
         }
     },
 }
-

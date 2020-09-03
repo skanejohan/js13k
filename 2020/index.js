@@ -58,6 +58,10 @@ kontra.onPointerUp(function(e, object) {
     }
 });
 
+let turnLeft = () => kontra.keyPressed('left');
+let turnRight = () => kontra.keyPressed('right');
+let fastForward = () => kontra.keyPressed('space');
+
 let loop = kontra.GameLoop({
 
     update() {

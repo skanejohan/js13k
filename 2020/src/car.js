@@ -40,10 +40,10 @@ let updateCar = (car, turnLeft, turnRight, driveFast) => {
         y: car.y + 15 - _diag * Math.sin(_angle1 + car.rotation),
     };
     if (turnLeft) {
-        car.rotation -= _degToRad(2);
+        car.rotation -= degToRad(2);
     }
     else if (turnRight) {
-        car.rotation += _degToRad(2);
+        car.rotation += degToRad(2);
     }
     if (driveFast) {
         _driveForward(car, 10);
@@ -56,8 +56,6 @@ let updateCar = (car, turnLeft, turnRight, driveFast) => {
 let _diag = Math.sqrt(30*30+15*15);
 let _angle1 = Math.atan(1/2);
 let _angle2 = Math.PI/2 + Math.atan(2);
-
-let _degToRad = deg=> deg * Math.PI / 180;
 
 let _driveForward = (car, steps) => {
     const cos = Math.cos(car.rotation);

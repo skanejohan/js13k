@@ -19,6 +19,8 @@
 
 let { canvas, context } = kontra.init();
 
+let degToRad = deg => deg * Math.PI / 180;
+
 let topRowHeight = 100;
 let bottomRowHeight = 0;
 let scrollMargin = 400;

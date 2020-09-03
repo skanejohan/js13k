@@ -7,7 +7,7 @@ let addCoinToRoad = (coins, roads, indexOfRoadSegmentCoveredByCar) => {
     }
 
     var coinX, coinY;
-    var { x, y, w, h } = road.rectangle(); 
+    var { x, y, w, h } = getRoadRectangle(road); 
     switch(Math.floor(Math.random() * 4)) {
         case 0: 
             coinX = x + w / 4;

@@ -15,4 +15,4 @@ let updateCoin = coin => {
 
 let coinIsAlive = coin => coin.ticksToLive > 0;
 
-let isInsideCoin = (p, coin) => (p.x-coin.x) * (p.x-coin.x) + (p.y-coin.y) * (p.y-coin.y) < 900;
+let isInsideCoin = (p, coin) => (p.x-coin.x) * (p.x-coin.x) + (p.y-coin.y) * (p.y-coin.y) < 25 * 25;

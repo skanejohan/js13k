@@ -41,7 +41,7 @@ var gameContext = {
             this.tick++;
             this.coins.filter(c => !coinIsAlive(c)).forEach(c => c.road.hasCoin = false);
             this.coins = this.coins.filter(c => coinIsAlive(c));
-            this.roads.forEach(r => r.update());
+            this.roads.forEach(r => updateRoad(r));
             this.environment.forEach(e => e.update());
             this.coins.forEach(c => updateCoin(c));
             updateCar(this.car, turnLeft(), turnRight(), fastForward());
@@ -70,7 +70,7 @@ var gameContext = {
     render() {
         if (this.gameState == GameState.PLAYING) {
             this.environment.forEach(r => r.render());
-            this.roads.forEach(r => r.render());
+            this.roads.forEach(r => drawRoad(r, context));
             this.coins.forEach(c => drawCoin(c, context));
             drawCar(this.car, context);
         }
@@ -118,10 +118,10 @@ var gameContext = {
         rlInside = false;
         for (var i=0; i < this.roads.length; i++) {
             var r = this.roads[i];
-            flInside = flInside || r.inside(this.car.frontLeft); 
-            frInside = frInside || r.inside(this.car.frontRight); 
-            rrInside = rrInside || r.inside(this.car.rearRight); 
-            rlInside = rlInside || r.inside(this.car.rearLeft);
+            flInside = flInside || isInsideRoad(this.car.frontLeft, r); 
+            frInside = frInside || isInsideRoad(this.car.frontRight, r); 
+            rrInside = rrInside || isInsideRoad(this.car.rearRight, r); 
+            rlInside = rlInside || isInsideRoad(this.car.rearLeft, r);
             if (flInside && frInside && rrInside && rlInside) {
                 return i;
             } 

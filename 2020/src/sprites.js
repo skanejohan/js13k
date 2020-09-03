@@ -278,40 +278,23 @@ let Overlay = () => kontra.Sprite({
     }
 });
 
-let Coin = (x, y, value, ticksToLive) => kontra.Sprite({
+let Environment = (x, y, col1, col2, radius) => kontra.Sprite({
     x: x,
     y: y,
     anchor: {x: 0.5, y: 0.5},
-    value: value,
-    ticksToLive: ticksToLive,
 
     render() {
-        this.context.lineWidth = 2;
-        this.context.strokeStyle = this.value < 0 ? "white" : "black";
-        this.context.fillStyle = this.value < 0 ? "red" : "green";
+        var grd = this.context.createRadialGradient(0, 0, 0, 0, 0, radius);
+        grd.addColorStop(0, col1);
+        grd.addColorStop(1, col2);
+        this.context.fillStyle = grd;
         this.context.beginPath();
-        this.context.arc(0, 0, 25, 0, Math.PI*2);
-        this.context.stroke();
+        this.context.arc(0, 0, radius, 0, Math.PI*2);
         this.context.fill();
-
-        this.context.font = "24px Arial";      
-        this.context.textAlign = "center";  
-        this.context.fillStyle = this.value < 0 ? "white" : "black";
-        this.context.fillText(Math.abs(value), 0, 8);
     },
 
     update() {
         this.x += gameContext.scrollX;
         this.y += gameContext.scrollY;
-        this.ticksToLive--;
     },
-
-    alive() {
-        return this.ticksToLive > 0;
-    },
-
-    inside(p) {
-        return (p.x-this.x) * (p.x-this.x) + (p.y-this.y) * (p.y-this.y) < 900;
-    },
-
 });

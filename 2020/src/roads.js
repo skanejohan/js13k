@@ -167,4 +167,10 @@ buildCourse = level => {
     addStraight();
     addStraight();
     addRight90();
+
+    gameContext.environment.push(Environment(100, 100, "blue", "green", 200));
+    gameContext.environment.push(Environment(500, 500, "brown", "green", 300));
+    gameContext.environment.push(Environment(800, 1200, "brown", "green", 300));
+    gameContext.environment.push(Environment(1200, 1000, "blue", "green", 150));
+    gameContext.environment.push(Environment(1500, 500, "brown", "green", 300));
 }

@@ -41,7 +41,6 @@ var dimensions = {
 
 gameContext.setGameState(GameState.IDLE);
 
-let overlay = Overlay();
 let debug = Debug(context, gameContext);
 
 handleResize = (w, h) => {
@@ -71,7 +70,7 @@ let loop = kontra.GameLoop({
 
     render() {
         gameContext.render();
-        overlay.render();
+        drawOverlay(gameContext, context);
         //debug.render();
     }
 });

@@ -14,3 +14,8 @@ let fillText = (text, x, y, font, textAlign, fillStyle, ctx) => {
     ctx.fillStyle = fillStyle;
     ctx.fillText(text, x, y);
 }
+
+let fillRect = (x, y, w, h, fillStyle, ctx) => {
+    ctx.fillStyle = fillStyle;
+    ctx.fillRect(x, y, w, h);
+}

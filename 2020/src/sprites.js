@@ -105,66 +105,6 @@ let Curve = (x, y, rotation) => {
     });
 }
 
-let Overlay = () => kontra.Sprite({
-    render() {
-        
-        switch(gameContext.gameState) {
-            case GameState.IDLE:
-                this.context.fillStyle = "black";
-                this.context.fillRect(0, 0, dimensions.w, dimensions.h);
-                this.context.fillStyle = "white";
-                this.context.font = "24px Arial";      
-                this.context.textAlign = "center";  
-                this.context.fillText("404", dimensions.cx, 170);
-                this.context.fillText("Click to play", dimensions.cx, 250);
-                break;
-            case GameState.GAMEOVER:
-                this.context.fillStyle = "black";
-                this.context.fillRect(0, 0, dimensions.w, dimensions.h);
-                this.context.fillStyle = "white";
-                this.context.font = "24px Arial";      
-                this.context.textAlign = "center";  
-                this.context.fillText("GAME OVER", dimensions.cx, 300);
-                break;
-            case GameState.WELLDONE:
-                this.context.fillStyle = "black";
-                this.context.fillRect(0, 0, dimensions.w, dimensions.h);
-                this.context.fillStyle = "white";
-                this.context.font = "24px Arial";      
-                this.context.textAlign = "center";  
-                this.context.fillText("WELL DONE - ANOTHER MISSING LINK FOUND", dimensions.cx, 300);
-                break;
-            case GameState.PLAYING:
-                this.context.fillStyle = "black";
-                this.context.fillRect(0, 0, dimensions.w, topRowHeight);
-
-                var gradient = this.context.createLinearGradient(0, 0, dimensions.w, 0);
-                gradient.addColorStop(0, "red");
-                gradient.addColorStop(0.5, "yellow");
-                gradient.addColorStop(1, "green");
-                this.context.fillStyle = gradient;
-                this.context.fillRect(10, 20, (dimensions.w - 20) * gameContext.energy / 500, 60);
-
-                this.context.fillStyle = "black";
-                this.context.beginPath();
-                this.context.arc(dimensions.cx, 50, 50, 0, Math.PI*2);
-                this.context.fill();
-
-                this.context.fillStyle = gameContext.score > 404 ? "red" : "green";
-                this.context.beginPath();
-                this.context.arc(dimensions.cx, 50, 40, 0, Math.PI*2);
-                this.context.fill();
-
-                this.context.font = "28px Arial";      
-                this.context.textAlign = "center";  
-                this.context.fillStyle = gameContext.score > 404 ? "white" : "black";
-                this.context.fillText(404 - gameContext.score, dimensions.cx, 60);
-            
-                break;
-        }
-    }
-});
-
 let Environment = (x, y, col1, col2, radius) => kontra.Sprite({
     x: x,
     y: y,

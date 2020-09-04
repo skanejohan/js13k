@@ -42,7 +42,7 @@ var gameContext = {
             this.coins.filter(c => !coinIsAlive(c)).forEach(c => c.road.hasCoin = false);
             this.coins = this.coins.filter(c => coinIsAlive(c));
             this.roads.forEach(r => updateRoad(r));
-            this.environment.forEach(e => e.update());
+            this.environment.forEach(e => updateEnvironment(e));
             this.coins.forEach(c => updateCoin(c));
             updateCar(this.car, turnLeft(), turnRight(), fastForward());
             var coveredRoad = this.coveredRoad();
@@ -69,7 +69,7 @@ var gameContext = {
 
     render() {
         if (this.gameState == GameState.PLAYING) {
-            this.environment.forEach(r => r.render());
+            this.environment.forEach(e => drawEnvironment(e, context));
             this.roads.forEach(r => drawRoad(r, context));
             this.coins.forEach(c => drawCoin(c, context));
             drawCar(this.car, context);

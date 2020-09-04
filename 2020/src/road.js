@@ -62,4 +62,7 @@ let updateRoad = road => {
     road.y += gameContext.scrollY;
 }
 
-let isInsideRoad = (p, r) => !(p.x < r.x || p.x > r.x + r.w || p.y < r.y || p.y > r.y + r.h);
+let isInsideRoad = (p, r) => {
+    var rr = getRoadRectangle(r);
+    return !(p.x < rr.x || p.x > rr.x + rr.w || p.y < rr.y || p.y > rr.y + rr.h);
+}

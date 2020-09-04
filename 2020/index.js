@@ -1,4 +1,5 @@
 /*
+    Fix flickering on small canvas
     When hitting score 404, go to the next level
     When all levels are cleared, rotate back to the first one, but with higher speed. 
 
@@ -7,13 +8,6 @@
    - possibly "fog of war when too far from the road"
    - when hitting a coin, display its value and possibly the status code
    - sliding when turning
-
-   Instructions
-    - target score is 404
-    - use left and right arrow to steer, space to boost
-    - hit coins for positive (green) or negative (red) score
-    - preserve energy by staying on the road, and by hitting coins
-
 */
 
 

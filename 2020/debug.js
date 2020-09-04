@@ -21,7 +21,7 @@ let Debug = (context, gameContext) => {
     var renderRoadRectangles = () => {
         gameContext.roads.forEach(r => {
             context.strokeStyle = "white";
-            var {x, y, w, h} = r.rectangle();
+            var {x, y, w, h} = getRoadRectangle(r);
             context.strokeRect(x, y, w, h);
         });
     }

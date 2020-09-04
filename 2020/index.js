@@ -45,17 +45,12 @@ handleResize = (w, h) => {
     dimensions.update(canvas.clientWidth, canvas.clientHeight);
 }
 
-kontra.initKeys();
 kontra.initPointer();
 kontra.onPointerUp(function(e, object) {
     if (gameContext.gameState == GameState.IDLE) {
         gameContext.setGameState(GameState.PLAYING);
     }
 });
-
-let turnLeft = () => kontra.keyPressed('left');
-let turnRight = () => kontra.keyPressed('right');
-let fastForward = () => kontra.keyPressed('space');
 
 let loop = kontra.GameLoop({
 
@@ -69,6 +64,10 @@ let loop = kontra.GameLoop({
         drawOverlay(gameContext, context);
         //debug.render();
     }
+});
+
+window.addEventListener('load', () => {
+    initInput(document);
 });
 
 loop.start();

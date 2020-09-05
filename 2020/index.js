@@ -10,8 +10,8 @@
    - sliding when turning
 */
 
-
-let { canvas, context } = kontra.init();
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
 
 let degToRad = deg => deg * Math.PI / 180;
 
@@ -35,9 +35,22 @@ var dimensions = {
     }
 }
 
-gameContext.setGameState(GameState.IDLE);
+let lastTime = Date.now();
 
-let debug = Debug(context, gameContext);
+gameLoop = () => {
+    let now = Date.now();
+    let dt = (now - lastTime);
+
+    gameContext.update(dt);
+
+    fillRect(0, 0, dimensions.w, dimensions.h, "green", context);
+    gameContext.render();
+    drawOverlay(gameContext, context);
+    //drawDebugInfo();
+
+    requestAnimationFrame(gameLoop);
+    lastTime = now;
+}
 
 handleResize = (w, h) => {
     canvas.width = w;
@@ -45,29 +58,19 @@ handleResize = (w, h) => {
     dimensions.update(canvas.clientWidth, canvas.clientHeight);
 }
 
-kontra.initPointer();
-kontra.onPointerUp(function(e, object) {
-    if (gameContext.gameState == GameState.IDLE) {
-        gameContext.setGameState(GameState.PLAYING);
-    }
-});
-
-let loop = kontra.GameLoop({
-
-    update() {
-        gameContext.update();
-        //debug.update();
-    },
-
-    render() {
-        gameContext.render();
-        drawOverlay(gameContext, context);
-        //debug.render();
-    }
-});
-
-window.addEventListener('load', () => {
+initialize = () => {
+    handleResize(window.innerWidth, window.innerHeight);
+    window.addEventListener('resize', () => {
+        handleResize(window.innerWidth, window.innerHeight);
+    });
+    canvas.addEventListener('click', () => {
+        if (gameContext.gameState == GameState.IDLE) {
+            gameContext.setGameState(GameState.PLAYING);
+        }
+    });
+    gameContext.setGameState(GameState.IDLE);
     initInput(document);
-});
+    gameLoop();
+}
 
-loop.start();
+window.addEventListener('load', () => initialize()); 

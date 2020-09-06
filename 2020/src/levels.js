@@ -13,7 +13,7 @@ buildLevel = level => {
         }
     });
     _levels[level].environments.forEach(e => {
-        gameContext.environment.push(createEnvironment(e.x, e.y, e.startColor, e.endColor, e.radius));
+        gameContext.environment.push(e.create());
     });
     return { x: _levels[level].carX, y: _levels[level].carY, dir: _levels[level].carDir };
 }
@@ -28,11 +28,11 @@ _levels = [
         startDir: 0,
         roads: "s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,l,s,l,s,s,r,s,s,r,s,s,s,s,s,r,s,s,s,s,s,s,s,r,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,r,l,r,s,r,s,s,s,s,s,s,r,s,s,l,s,s,s,s,s,s,s,s,r,s,s,s,s,s,r",
         environments: [
-            { x: 100, y: 100, startColor: "blue", endColor: "green", radius: 200 },
-            { x: 500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
-            { x: 800, y: 1200, startColor: "brown", endColor: "green", radius: 300 },
-            { x: 1200, y: 1000, startColor: "blue", endColor: "green", radius: 150 },
-            { x: 1500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
+            { create: () => createEnvironment(100, 100, "blue", "green", 200) },
+            { create: () => createEnvironment(500, 500, "brown", "green", 300) },
+            { create: () => createEnvironment(800, 1200, "brown", "green", 300) },
+            { create: () => createEnvironment(1200, 1000, "blue", "green", 150) },
+            { create: () => createEnvironment(1500, 500, "brown", "green", 300) },
         ]
     },
     {
@@ -44,11 +44,12 @@ _levels = [
         startDir: 0,
         roads: "s,s,s,s,s,c,s,s,s,s,s,r,s,s,s,s,r,s,s,s,s,s,r,s,s,s,s,c,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,l,s,s,s,s",
         environments: [
-            { x: 100, y: 100, startColor: "blue", endColor: "green", radius: 200 },
-            { x: 500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
-            { x: 800, y: 1200, startColor: "brown", endColor: "green", radius: 300 },
-            { x: 1200, y: 1000, startColor: "blue", endColor: "green", radius: 150 },
-            { x: 1500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
+            { create: () => createTree(100, 100) },
+            { create: () => createHouse(200, 100) },
+            { create: () => createEnvironment(500, 500, "brown", "green", 300) },
+            { create: () => createEnvironment(800, 1200, "brown", "green", 300) },
+            { create: () => createEnvironment(1200, 1000, "blue", "green", 150) },
+            { create: () => createEnvironment(1500, 500, "brown", "green", 300) },
         ]
     },
     {
@@ -60,11 +61,11 @@ _levels = [
         startDir: 90,
         roads: "s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,l,s,l,s,s,r,s,s,r,s,s,s,s,s,r,s,s,s,s,s,s,s,r,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,r,l,r,s,r,s,s,s,s,s,s,r,s,s,l,s,s,s,s,s,s,s,s,r,s,s,s,s,s,r",
         environments: [
-            { x: 100, y: 100, startColor: "blue", endColor: "green", radius: 200 },
-            { x: 500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
-            { x: 800, y: 1200, startColor: "brown", endColor: "green", radius: 300 },
-            { x: 1200, y: 1000, startColor: "blue", endColor: "green", radius: 150 },
-            { x: 1500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
+            { create: () => createEnvironment(100, 100, "blue", "green", 200) },
+            { create: () => createEnvironment(500, 500, "brown", "green", 300) },
+            { create: () => createEnvironment(800, 1200, "brown", "green", 300) },
+            { create: () => createEnvironment(1200, 1000, "blue", "green", 150) },
+            { create: () => createEnvironment(1500, 500, "brown", "green", 300) },
         ]
     },
 ]

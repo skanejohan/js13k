@@ -7,7 +7,7 @@ drawOverlay = (gameContext, ctx) => {
             _overlayText("use left and right arrow to steer, space to boost", 340, ctx);
             _overlayText("hit coins for positive (green) or negative (red) score", 380, ctx);
             _overlayText("preserve energy by staying on the road and by hitting coins", 420, ctx);
-            _overlayText("Click to play", 550, ctx);
+            _overlayText("click to play", 550, ctx);
             break;
         case GameState.GAMEOVER:
             _background(ctx);

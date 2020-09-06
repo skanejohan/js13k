@@ -4,6 +4,7 @@
     When all levels are cleared, rotate back to the first one, but with higher speed. 
 
    Polish:
+   - tree, house, spectator stand, lake, gravel road...
    - when hitting a coin, display its value and possibly the status code
    - sliding when turning
 */

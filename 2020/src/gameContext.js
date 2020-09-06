@@ -27,10 +27,21 @@ var gameContext = {
         this.roads = [];
         this.coins = [];
         this.environment = [];
-        this.car = createCar(300, 250);
         this.energy = 500;
         this.speedFactor = 1;
         this.level = 0;
+    },
+
+    resetlevel() {
+        this.x = 0;
+        this.y = 0;
+        this.tick = 0;
+        this.energy = 500;
+        this.score = 0;
+        this.coins = [];
+        var {x, y, dir } = buildLevel(this.level);
+        this.car = createCar(x, y, dir);
+        resetInput();
     },
 
     update() {
@@ -89,7 +100,7 @@ var gameContext = {
     setGameState(newState) {
         switch(newState) {
             case GameState.PLAYING:
-                buildLevel(this.level);
+                this.resetlevel();
                 this.gameState = GameState.PLAYING;
                 break;
             case GameState.GAMEOVER:
@@ -98,8 +109,9 @@ var gameContext = {
                 break;
             case GameState.WELLDONE:
                 this.gameState = GameState.WELLDONE;
+                this.energy = 500;
                 this.level++;
-                if (this.level == levels.count) {
+                if (this.level == _levels.length) {
                     this.level = 0;
                     this.speedFactor *= 1.5;
                 }

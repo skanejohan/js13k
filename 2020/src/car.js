@@ -1,5 +1,5 @@
-let createCar = (x, y) => { 
-    return { x: x, y: y, xf: x, yf: y, rotation: 0 }; 
+let createCar = (x, y, dir) => { 
+    return { x: x, y: y, xf: x, yf: y, rotation: degToRad(dir) }; 
 }
 
 let drawCar = (car, ctx) => {

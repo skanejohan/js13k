@@ -3,6 +3,12 @@ initInput = doc => {
     doc.addEventListener('keyup', _keyUpHandler, false);
 }
 
+resetInput = () => {
+    _turnLeft = false;
+    _turnRight = false;
+    _fastForward = false;
+}
+
 let turnLeft = () => _turnLeft;
 let turnRight = () => _turnRight;
 let fastForward = () => _fastForward;

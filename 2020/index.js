@@ -1,6 +1,6 @@
 /*
+    Add pause
     Fix flickering on small canvas
-    When hitting score 404, go to the next level
     When all levels are cleared, rotate back to the first one, but with higher speed. 
 
    Polish:

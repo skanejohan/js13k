@@ -23,6 +23,8 @@ drawOverlay = (gameContext, ctx) => {
             drawCircle(dimensions.cx, 50, 50, 0, "", "black", ctx)
             drawCircle(dimensions.cx, 50, 40, 0, "", gameContext.scoreNeeded() < 0 ? "red" : "green", ctx)
             fillText(gameContext.scoreNeeded(), dimensions.cx, 60, "28px Arial", "center", gameContext.score > 404 ? "white" : "black", ctx);
+            fillText(`${gameContext.linksFound} links found`, 100, 60, "24px Arial", "left", "white", ctx);
+            fillText(`${gameContext.linksFound} links found`, dimensions.w-100, 60, "24px Arial", "right", "white", ctx);
             break;
     }
 }

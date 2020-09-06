@@ -5,10 +5,6 @@ const GameState = {
     GAMEOVER: 4
 }
 
-const MAXCOINS = 40;
-const MAXCOINTICKS = 500;
-const MINCOINTICKS = 100;
-
 var gameContext = {
     x: 0,
     y: 0,
@@ -49,7 +45,7 @@ var gameContext = {
             if (coveredRoad == -1) {
                 this.removeEnergy(2);
             }
-            this.addCoin(coveredRoad);
+            addCoin(coveredRoad);
             var coinHit = this.coins.find(c => this.carInsideCoin(c));
             if (coinHit) {
                 this.score += coinHit.value;
@@ -57,8 +53,7 @@ var gameContext = {
                     this.linksFound++;
                     this.setGameState(GameState.WELLDONE);
                 }
-                coinHit.road.hasCoin = false;
-                this.coins = this.coins.filter(c => c != coinHit);
+                removeCoin(coinHit);
                 this.addEnergy(10);
             }
             if (this.tick % 20 == 0) {
@@ -134,11 +129,5 @@ var gameContext = {
             isInsideCoin(this.car.frontRight, coin) || 
             isInsideCoin(this.car.rearRight, coin) || 
             isInsideCoin(this.car.rearLeft, coin);
-    },
-
-    addCoin(coveredRoad) {
-        if (this.coins.length < MAXCOINS) {
-            addCoinToRoad(this.coins, this.roads, coveredRoad);
-        }
     },
 }

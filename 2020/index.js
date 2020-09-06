@@ -4,8 +4,6 @@
     When all levels are cleared, rotate back to the first one, but with higher speed. 
 
    Polish:
-   - green and blue around the road
-   - possibly "fog of war when too far from the road"
    - when hitting a coin, display its value and possibly the status code
    - sliding when turning
 */

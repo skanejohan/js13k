@@ -29,7 +29,8 @@ var gameContext = {
         this.environment = [];
         this.car = createCar(300, 250);
         this.energy = 500;
-        buildCourse(1);
+        this.speedFactor = 1;
+        this.level = 0;
     },
 
     update() {
@@ -88,6 +89,7 @@ var gameContext = {
     setGameState(newState) {
         switch(newState) {
             case GameState.PLAYING:
+                buildLevel(this.level);
                 this.gameState = GameState.PLAYING;
                 break;
             case GameState.GAMEOVER:
@@ -96,7 +98,11 @@ var gameContext = {
                 break;
             case GameState.WELLDONE:
                 this.gameState = GameState.WELLDONE;
-                // TODO build next course
+                this.level++;
+                if (this.level == levels.count) {
+                    this.level = 0;
+                    this.speedFactor *= 1.5;
+                }
                 setTimeout(() => this.setGameState(GameState.PLAYING), 3000);
                 break;
             case GameState.IDLE:

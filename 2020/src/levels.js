@@ -9,6 +9,7 @@ buildLevel = level => {
             case "s": _straight(); break;
             case "l": _left(); break;
             case "r": _right(); break;
+            case "c": _cross(); break;
         }
     });
     _levels[level].environments.forEach(e => {
@@ -26,6 +27,22 @@ _levels = [
         startY: 200,
         startDir: 0,
         roads: "s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,l,s,l,s,s,r,s,s,r,s,s,s,s,s,r,s,s,s,s,s,s,s,r,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,r,l,r,s,r,s,s,s,s,s,s,r,s,s,l,s,s,s,s,s,s,s,s,r,s,s,s,s,s,r",
+        environments: [
+            { x: 100, y: 100, startColor: "blue", endColor: "green", radius: 200 },
+            { x: 500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
+            { x: 800, y: 1200, startColor: "brown", endColor: "green", radius: 300 },
+            { x: 1200, y: 1000, startColor: "blue", endColor: "green", radius: 150 },
+            { x: 1500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
+        ]
+    },
+    {
+        carX: 200,
+        carY: 240,
+        carDir: 0,
+        startX: 200,
+        startY: 200,
+        startDir: 0,
+        roads: "s,s,s,s,s,c,s,s,s,s,s,r,s,s,s,s,r,s,s,s,s,s,r,s,s,s,s,c,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,l,s,s,s,s",
         environments: [
             { x: 100, y: 100, startColor: "blue", endColor: "green", radius: 200 },
             { x: 500, y: 500, startColor: "brown", endColor: "green", radius: 300 },
@@ -58,6 +75,16 @@ var _currDir;
 
 let _straight = () => {
     gameContext.roads.push(createStraightRoad(_currX, _currY, _currDir));
+    switch(_currDir) {
+        case   0: _currX += 100; break; 
+        case  90: _currY -= 100; break; 
+        case 180: _currX -= 100; break; 
+        case 270: _currY += 100; break; 
+    }
+}
+
+let _cross = () => {
+    gameContext.roads.push(createCrossRoad(_currX, _currY, _currDir));
     switch(_currDir) {
         case   0: _currX += 100; break; 
         case  90: _currY -= 100; break; 

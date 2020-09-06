@@ -12,7 +12,7 @@ let removeCoin = coin => {
 }
 
 let _canAddCoin = (targetSegment, targetIndex, indexOfRoadSegmentCoveredByCar) => {
-    if (gameContext.coins.length >= MAXCOINS) {
+    if (gameContext.coins.length >= _maxCoins()) {
         return false;
     } 
     if (targetSegment.hasCoin) {
@@ -34,12 +34,13 @@ let _getCoinPosition = segment => {
     return { x: Math.round(x + Math.random() * w), y: Math.round(y + Math.random() * h) };
 }
 
-let _getCoinValue = () => {
-    value = 1 + Math.floor(Math.random() * Math.abs(gameContext.score - 404));
-    if (gameContext.score > 0 && Math.random() < 0.6) {
-        value = -value;
-    }
-    return value;
+let _getCoinValue = () => {    
+    let value1 = gameContext.scoreNeeded();
+    let value2 = value1 / 4;
+    let length = Math.abs(value1 + value2);
+    let min = value1 > 0 ? -value2 : value1;
+    let value = Math.floor(min + Math.random() * length);
+    return value == 0 ? 1 : value;
 }
 
 let _getCoinTicksToLive = () => MINCOINTICKS + (MAXCOINTICKS-MINCOINTICKS) * Math.random();
@@ -51,6 +52,14 @@ let _addCoin = (x, y, road) => {
     road.hasCoin = true;    
 }
 
-const MAXCOINS = 40;
+
+let _maxCoins = () => {
+    let score = Math.abs(gameContext.scoreNeeded());
+    if (score < 10) return 40;
+    if (score < 50) return 30;
+    if (score < 100) return 20;
+    return 10;
+}
+
 const MAXCOINTICKS = 500;
 const MINCOINTICKS = 100;

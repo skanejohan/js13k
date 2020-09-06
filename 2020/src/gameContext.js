@@ -130,4 +130,8 @@ var gameContext = {
             isInsideCoin(this.car.rearRight, coin) || 
             isInsideCoin(this.car.rearLeft, coin);
     },
+
+    scoreNeeded() {
+        return 404 - this.score;
+    },
 }

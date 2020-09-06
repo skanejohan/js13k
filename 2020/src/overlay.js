@@ -21,8 +21,8 @@ drawOverlay = (gameContext, ctx) => {
             fillRect(0, 0, dimensions.w, topRowHeight, "black", ctx);
             fillRect(10, 20, (dimensions.w - 20) * gameContext.energy / 500, 60, _energyBarGradient(ctx), ctx);
             drawCircle(dimensions.cx, 50, 50, 0, "", "black", ctx)
-            drawCircle(dimensions.cx, 50, 40, 0, "", gameContext.score > 404 ? "red" : "green", ctx)
-            fillText(404 - gameContext.score, dimensions.cx, 60, "28px Arial", "center", gameContext.score > 404 ? "white" : "black", ctx);
+            drawCircle(dimensions.cx, 50, 40, 0, "", gameContext.scoreNeeded() < 0 ? "red" : "green", ctx)
+            fillText(gameContext.scoreNeeded(), dimensions.cx, 60, "28px Arial", "center", gameContext.score > 404 ? "white" : "black", ctx);
             break;
     }
 }

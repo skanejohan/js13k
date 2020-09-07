@@ -13,7 +13,7 @@ buildLevel = level => {
         }
     });
     _levels[level].environments.forEach(e => {
-        gameContext.environment.push(e.create());
+        gameContext.environment.push(e());
     });
     return { x: _levels[level].carX, y: _levels[level].carY, dir: _levels[level].carDir };
 }
@@ -28,11 +28,6 @@ _levels = [
         startDir: 0,
         roads: "s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,l,s,l,s,s,r,s,s,r,s,s,s,s,s,r,s,s,s,s,s,s,s,r,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,r,l,r,s,r,s,s,s,s,s,s,r,s,s,l,s,s,s,s,s,s,s,s,r,s,s,s,s,s,r",
         environments: [
-            { create: () => createEnvironment(100, 100, "blue", "green", 200) },
-            { create: () => createEnvironment(500, 500, "brown", "green", 300) },
-            { create: () => createEnvironment(800, 1200, "brown", "green", 300) },
-            { create: () => createEnvironment(1200, 1000, "blue", "green", 150) },
-            { create: () => createEnvironment(1500, 500, "brown", "green", 300) },
         ]
     },
     {
@@ -44,12 +39,68 @@ _levels = [
         startDir: 0,
         roads: "s,s,s,s,s,c,s,s,s,s,s,r,s,s,s,s,r,s,s,s,s,s,r,s,s,s,s,c,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,l,s,s,s,s",
         environments: [
-            { create: () => createTree(100, 100) },
-            { create: () => createHouse(200, 100) },
-            { create: () => createEnvironment(500, 500, "brown", "green", 300) },
-            { create: () => createEnvironment(800, 1200, "brown", "green", 300) },
-            { create: () => createEnvironment(1200, 1000, "blue", "green", 150) },
-            { create: () => createEnvironment(1500, 500, "brown", "green", 300) },
+            () => tree(0, -300),
+            () => tree(100, -300),
+            () => tree(200, -300),
+            () => tree(300, -300),
+            () => tree(400, -300),
+            () => tree(500, -300),
+            () => tree(600, -300),
+            () => tree(600, -200),
+            () => tree(-100, -300),
+            () => tree(-100, -200),
+            () => tree(-100, -100),
+            () => tree(-100, 0),
+            () => tree(-100, 100),
+            () => pond(150, -150),
+            () => tree(0, 100),
+            () => tree(100, 100),
+            () => propertyType1(200, 0, 0),
+            () => propertyType1(900, 0, 0),
+            () => tree(900, 370),
+            () => tree(1050, 370),
+            () => tree(1200, 370),
+
+            () => tree(0, 400),
+            () => tree(100, 400),
+            () => tree(200, 400),
+            () => tree(300, 400),
+            () => tree(400, 400),
+            () => tree(500, 400),
+            () => tree(600, 400),
+            () => straightGravelRoad(0, 500, 700, 40, 0),
+            () => tree(100, 600),
+            () => tree(200, 600),
+            () => tree(300, 600),
+            () => tree(400, 600),
+            () => tree(500, 600),
+            () => tree(600, 600),
+
+            () => straightGravelRoad(0, 500, 40, 700, 0),
+
+            () => propertyType1(900, 500, 0),
+
+            () => house(-400, 200),
+            () => house(-400, 50),
+            () => house(-400, -100),
+            () => house(-400, -250),
+            () => house(-400, -400),
+
+            () => house(-150, 400),
+
+            () => house(-200, -600, 90),
+            () => house(-50, -600, 90),
+            () => house(100, -600, 90),
+            () => house(250, -600, 90),
+            () => house(400, -600, 90),
+            () => house(550, -600, 90),
+            () => house(700, -600, 90),
+
+            () => house(1500, 300, 0),
+            () => house(1500, 400, 0),
+            () => house(1500, 500, 0),
+            () => house(1500, 600, 0),
+            () => house(1500, 700, 0),
         ]
     },
     {
@@ -61,11 +112,6 @@ _levels = [
         startDir: 90,
         roads: "s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,l,s,l,s,s,r,s,s,r,s,s,s,s,s,r,s,s,s,s,s,s,s,r,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,r,l,r,s,r,s,s,s,s,s,s,r,s,s,l,s,s,s,s,s,s,s,s,r,s,s,s,s,s,r",
         environments: [
-            { create: () => createEnvironment(100, 100, "blue", "green", 200) },
-            { create: () => createEnvironment(500, 500, "brown", "green", 300) },
-            { create: () => createEnvironment(800, 1200, "brown", "green", 300) },
-            { create: () => createEnvironment(1200, 1000, "blue", "green", 150) },
-            { create: () => createEnvironment(1500, 500, "brown", "green", 300) },
         ]
     },
 ]

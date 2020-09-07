@@ -1,103 +1,196 @@
-createTree = (x, y) => {
+let tree = (x, y) => {
+    return { x: x, y: y, rot: Math.random() * 2 * Math.PI, draw: () => { 
+        context.translate(-50, -50); 
+        context.drawImage(_getCanvas("tree"), 0, 0); 
+        context.translate(50, 50); 
+    }};
+}
 
+let pond = (x, y) => {
+    return { x: x, y: y, rot: Math.random() * 2 * Math.PI, draw: () => { 
+        context.translate(-50, -50); 
+        context.drawImage(_getCanvas("pond"), 0, 0); 
+        context.translate(50, 50); 
+    }};
+}
+
+let house = (x, y, rot) => {
+    return { x: x, y: y, rot: degToRad(rot), draw: () => { 
+        context.translate(-50, -50); 
+        context.drawImage(_getCanvas("house"), 0, 0); 
+        context.translate(50, 50); 
+    }};
+}
+
+let propertyType1 = (x, y, rot) => {
+    return { x: x, y: y, rot: degToRad(rot), draw: () => { 
+        context.translate(-50, -50); 
+        context.drawImage(_getCanvas("propertyType1"), 0, 0); 
+        context.translate(50, 50); 
+    }};
+}
+
+let straightGravelRoad = (x, y, w, h, rot) => {
+     return { x: x, y: y, rot: degToRad(rot), draw: () => { 
+        context.rotate(rot);
+        context.lineWidth = h;
+        context.strokeStyle = "#d6ae3e";
+        context.fillStyle = "#d6ae3e";
+        context.fillRect(0, 0, w, h); 
+        context.rotate(-rot);
+        } 
+    };
+}
+
+let blobShape = (x, y, col) => {
     let rot = Math.random() * Math.PI * 2;
 
-    return { 
-        x: x, 
-        y: y,
+    return { x: x, y: y,
         draw: () => {
             context.rotate(rot);
-            drawCircle(0, 0, 40, 2, "#166e16", "#166e16", context);
-            drawCircle(10, 20, 30, 2, "#166e16", "#166e16", context);
-            drawCircle(35, 10, 15, 2, "#166e16", "#166e16", context);
-            drawCircle(5, -35, 15, 2, "#166e16", "#166e16", context);
-            drawCircle(-15, 0, 30, 2, "#166e16", "#166e16", context);
+            drawCircle(0, 0, 40, 2, col, col, context);
+            drawCircle(10, 20, 30, 2, col, col, context);
+            drawCircle(35, 10, 15, 2, col, col, context);
+            drawCircle(5, -35, 15, 2, col, col, context);
+            drawCircle(-15, 0, 30, 2, col, col, context);
             context.rotate(-rot);
         } 
     };
 }
 
-createHouse = (x, y) => {
+let _getCanvas = name => {
 
-    let drawPane = (x, y) => {
-        context.fillRect(x, y, 14, 6);
-        context.strokeRect(x, y, 14, 6);
+    let _createCanvas = (w, h, fn) => {
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        fn(canvas.getContext("2d"));
+        return canvas;
     }
+    
+    let _createBlob = col => _createCanvas(100, 100, ctx => {
+        drawCircle(50, 40, 40, 2, col, col, ctx);
+        drawCircle(60, 60, 30, 2, col, col, ctx);
+        drawCircle(85, 55, 15, 2, col, col, ctx);
+        drawCircle(55, 25, 15, 2, col, col, ctx);
+        drawCircle(35, 60, 30, 2, col, col, ctx);
+        console.log("canvas created for blob with color " + col);
+    });
 
-    let drawSmallPane = (x, y) => {
-        context.fillRect(x, y, 7, 6);
-        context.strokeRect(x, y, 7, 6);
-    }
+    let _createTree = () => _createBlob("#166e16");
 
-    let drawEvenRow = (x, y) => {
-        drawPane(x+0, y);
-        drawPane(x+14, y);
-        drawPane(x+28, y);
-        drawSmallPane(x+42, y);
-    }
+    let _createPond = () => _createBlob("blue");
 
-    let drawOddRow = (x, y) => {
-        drawSmallPane(x+0, y);
-        drawPane(x+7, y);
-        drawPane(x+21, y);
-        drawPane(x+35, y);
-    }
+    let _createFence = () => _createCanvas(100, 8, ctx => {
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "white";
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.moveTo(0, 4);
+        ctx.lineTo(100, 4);
+        ctx.stroke();
+        ctx.fillRect(22, 0, 6, 8);
+        ctx.fillRect(72, 0, 6, 8);
+        console.log("canvas created for fence");
+    });
 
-    let drawHalf = (x) => {
-        drawEvenRow(x, 0);
-        drawOddRow(x, 7);
-        drawEvenRow(x, 14);
-        drawOddRow(x, 21);
-        drawEvenRow(x, 28);
-        drawOddRow(x, 35);
-        drawEvenRow(x, 42);
-        drawOddRow(x, 49);
-        drawEvenRow(x, 56);
-        drawOddRow(x, 63);
-        drawEvenRow(x, 70);
-        drawOddRow(x, 77);
-        drawEvenRow(x, 84);
-        drawOddRow(x, 91);
-   }
-
-    return {
-        x: x,
-        y: y,
-        draw: () => {
-            context.lineWidth = 2;
-            context.strokeStyle = "#2c2c2c";
-            context.fillStyle = "#585858";
-            drawHalf(0);
-            context.strokeStyle = "#111111";
-            context.fillStyle = "#444444";
-            drawHalf(50);
-            context.lineWidth = 2;
-            context.strokeStyle = "black";
-            context.strokeRect(0, 0, 49, 97);
-            context.strokeRect(50, 0, 49, 97);
+    let _createHouse = () => _createCanvas(100, 100, ctx => {
+        let drawPane = (x, y, ctx) => {
+            ctx.fillRect(x, y, 14, 6);
+            ctx.strokeRect(x, y, 14, 6);
         }
+    
+        let drawSmallPane = (x, y, ctx) => {
+            ctx.fillRect(x, y, 7, 6);
+            ctx.strokeRect(x, y, 7, 6);
+        }
+    
+        let drawEvenRow = (x, y, ctx) => {
+            drawPane(x+0, y, ctx);
+            drawPane(x+14, y, ctx);
+            drawPane(x+28, y, ctx);
+            drawSmallPane(x+42, y, ctx);
+        }
+    
+        let drawOddRow = (x, y, ctx) => {
+            drawSmallPane(x+0, y, ctx);
+            drawPane(x+7, y, ctx);
+            drawPane(x+21, y, ctx);
+            drawPane(x+35, y, ctx);
+        }
+    
+        let drawHalf = (x) => {
+            drawEvenRow(x, 0, ctx);
+            drawOddRow(x, 7, ctx);
+            drawEvenRow(x, 14, ctx);
+            drawOddRow(x, 21, ctx);
+            drawEvenRow(x, 28, ctx);
+            drawOddRow(x, 35, ctx);
+            drawEvenRow(x, 42, ctx);
+            drawOddRow(x, 49, ctx);
+            drawEvenRow(x, 56, ctx);
+            drawOddRow(x, 63, ctx);
+            drawEvenRow(x, 70, ctx);
+            drawOddRow(x, 77, ctx);
+            drawEvenRow(x, 84, ctx);
+            drawOddRow(x, 91, ctx);
+       }
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#2c2c2c";
+        ctx.fillStyle = "#585858";
+        drawHalf(0);
+        ctx.strokeStyle = "#111111";
+        ctx.fillStyle = "#444444";
+        drawHalf(50);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(0, 0, 49, 97);
+        ctx.strokeRect(50, 0, 49, 97);
+        
+        console.log("canvas created for house");
+    });
+    
+    let _createProperty1 = () => _createCanvas(520, 320, ctx => {
+        ctx.drawImage(_getCanvas("fence"), 10, 10);
+        ctx.drawImage(_getCanvas("fence"), 110, 10);
+        ctx.drawImage(_getCanvas("fence"), 210, 10);
+        ctx.drawImage(_getCanvas("fence"), 310, 10);
+        ctx.drawImage(_getCanvas("fence"), 10, 206);
+        ctx.drawImage(_getCanvas("fence"), 110, 206);
+        ctx.drawImage(_getCanvas("fence"), 310, 206);
+        
+        ctx.rotate(degToRad(90));
+        ctx.drawImage(_getCanvas("fence"), 12, -12);        
+        ctx.drawImage(_getCanvas("fence"), 112, -12);        
+        ctx.drawImage(_getCanvas("fence"), 12, -412);        
+        ctx.drawImage(_getCanvas("fence"), 112, -412);        
+        ctx.rotate(-degToRad(90));
+
+        ctx.drawImage(_getCanvas("tree"), 50, 80);
+        ctx.drawImage(_getCanvas("house"), 200, 50);
+
+        console.log("canvas created for property 1");
+    });
+
+    if (typeof _getCanvas.canvases == "undefined") {
+        _getCanvas.canvases = {};
+        _getCanvas.canvases.tree = _createTree();
+        _getCanvas.canvases.pond = _createPond();
+        _getCanvas.canvases.fence = _createFence();
+        _getCanvas.canvases.house = _createHouse();
+        _getCanvas.canvases.propertyType1 = _createProperty1();
+
     }
+
+    return _getCanvas.canvases[name];
 }
 
-createEnvironment = (x, y, col1, col2, radius) => {
-    return { 
-        x: x, 
-        y: y, 
-        draw: () => {
-            var grd = context.createRadialGradient(0, 0, 0, 0, 0, radius);
-            grd.addColorStop(0, col1);
-            grd.addColorStop(1, col2);
-            context.fillStyle = grd;
-            context.beginPath();
-            context.arc(0, 0, radius, 0, Math.PI*2);
-            context.fill();
-        }
-    }
-}
-
-drawEnvironment = (e) => {
+drawEnvironment = e => {
     context.translate(e.x, e.y);
+    context.rotate(e.rot);
     e.draw();
+    context.rotate(-e.rot);
     context.translate(-e.x, -e.y);
 }
 

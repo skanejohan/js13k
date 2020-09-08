@@ -28,6 +28,23 @@ _levels = [
         startDir: 0,
         roads: "s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,l,s,l,s,s,r,s,s,r,s,s,s,s,s,r,s,s,s,s,s,s,s,r,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,r,l,r,s,r,s,s,s,s,s,s,r,s,s,l,s,s,s,s,s,s,s,s,r,s,s,s,s,s,r",
         environments: [
+            () => forest(-300, -900, 10, 11),
+            () => forest(700, -900, 16, 2),
+            () => forest(700, 100, 5, 1),
+            () => forest(1700, -700, 6, 15),
+            () => forest(1800, 800, 5, 1),
+            () => forest(1900, 900, 4, 4),
+            () => forest(1000, 1300, 13, 6),
+            () => forest(-300, 1000, 13, 9),
+            () => forest(-300, 200, 4, 8),
+
+            () => forest(300, 400, 12, 4),
+            () => forest(1400, -500, 1, 9),
+            () => forest(900, -500, 5, 1),
+            () => forest(900, -400, 1, 3),
+
+            () => forest(1200, 800, 3, 3),
+            () => forest(1500, 1000, 1, 1),
         ]
     },
     {

@@ -6,6 +6,27 @@ let tree = (x, y) => {
     }};
 }
 
+let forest = (x, y, xcount, ycount) => {
+    let rots = [];
+    for (var i = 0; i < xcount * ycount; i++) {
+        rots.push(Math.random() * 2 * Math.PI);
+    }
+    return { x: x, y: y, rot: 0, draw: () => { 
+        for (var xc=0; xc < xcount; xc++) {
+            for (var yc=0; yc < ycount; yc++) {
+                var rot = rots[yc + xc*ycount];
+                context.translate(xc * 100, yc * 100);
+                context.rotate(rot);
+                context.translate(-50, -50); 
+                context.drawImage(_getCanvas("tree"), 0, 0); 
+                context.translate(50, 50); 
+                context.rotate(-rot);
+                context.translate(-(xc * 100), -(yc * 100));
+            }     
+        } 
+    }};
+}
+
 let pond = (x, y) => {
     return { x: x, y: y, rot: Math.random() * 2 * Math.PI, draw: () => { 
         context.translate(-50, -50); 

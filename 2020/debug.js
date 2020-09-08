@@ -17,6 +17,13 @@ drawDebugInfo = () => {
             var {x, y, w, h} = getRoadRectangle(r);
             context.strokeRect(x, y, w, h);
         });
+        gameContext.environment.forEach(e => {
+            var r = getEnvironmentRectangle(e);
+            if (r) {
+                context.strokeStyle = "red";
+                context.strokeRect(r.x, r.y, r.w, r.h);
+            }    
+        });
     }
 }
 

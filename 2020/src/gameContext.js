@@ -52,7 +52,15 @@ var gameContext = {
             this.roads.forEach(r => updateRoad(r));
             this.environment.forEach(e => updateEnvironment(e));
             this.coins.forEach(c => updateCoin(c));
-            updateCar(this.car, turnLeft(), turnRight(), fastForward());
+            updateCar(this.car, turnLeft(), turnRight(), fastForward(), () => {
+                for (var i = 0; i < this.environment.length; i++) {
+                    var r = getEnvironmentRectangle(this.environment[i]);
+                    if (r && this.carInsideRect(r)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
             var coveredRoad = this.coveredRoad();
             if (coveredRoad == -1) {
                 this.removeEnergy(2);
@@ -152,4 +160,15 @@ var gameContext = {
     scoreNeeded() {
         return 404 - this.score;
     },
+
+    carInsideRect(r) {
+        return this.pointInsideRect(this.car.frontLeft, r) || 
+            this.pointInsideRect(this.car.frontRight, r) || 
+            this.pointInsideRect(this.car.rearRight, r) || 
+            this.pointInsideRect(this.car.rearLeft, r);
+    },
+
+    pointInsideRect(p, r) {
+        return !(p.x < r.x || p.x > r.x + r.w || p.y < r.y || p.y > r.y + r.h);
+    }
 }

@@ -1,10 +1,12 @@
 /*
     Add pause
+    No getting stuck in environment
     Fix flickering on small canvas
+    Eight levels
     When all levels are cleared, rotate back to the first one, but with higher speed. 
 
    Polish:
-   - tree, house, spectator stand, lake, gravel road...
+   - spectator stand, lake...
    - when hitting a coin, display its value and possibly the status code
    - sliding when turning
 */

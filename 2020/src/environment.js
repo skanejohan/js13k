@@ -1,5 +1,5 @@
 let tree = (x, y) => {
-    return { x: x, y: y, rot: Math.random() * 2 * Math.PI, draw: () => { 
+    return { x: x, y: y, rot: Math.random() * 2 * Math.PI, size: {x: -40, y: -40, w: 80, h: 80}, draw: () => { 
         context.translate(-50, -50); 
         context.drawImage(_getCanvas("tree"), 0, 0); 
         context.translate(50, 50); 
@@ -11,7 +11,7 @@ let forest = (x, y, xcount, ycount) => {
     for (var i = 0; i < xcount * ycount; i++) {
         rots.push(Math.random() * 2 * Math.PI);
     }
-    return { x: x, y: y, rot: 0, draw: () => { 
+    return { x: x, y: y, rot: 0, size: {x: -40, y: -40, w: 100 * (xcount-1) + 80, h: 100 * (ycount-1)+80}, draw: () => { 
         for (var xc=0; xc < xcount; xc++) {
             for (var yc=0; yc < ycount; yc++) {
                 var rot = rots[yc + xc*ycount];
@@ -36,7 +36,7 @@ let pond = (x, y) => {
 }
 
 let house = (x, y, rot) => {
-    return { x: x, y: y, rot: degToRad(rot), draw: () => { 
+    return { x: x, y: y, rot: degToRad(rot), size: {x: -50, y: -50, w: 100, h: 100}, draw: () => { 
         context.translate(-50, -50); 
         context.drawImage(_getCanvas("house"), 0, 0); 
         context.translate(50, 50); 
@@ -44,7 +44,14 @@ let house = (x, y, rot) => {
 }
 
 let propertyType1 = (x, y, rot) => {
-    return { x: x, y: y, rot: degToRad(rot), draw: () => { 
+    var size;
+    if (rot==0) {
+        size = {x: -42, y: -37, w: 400, h: 195};
+    }
+    else {
+        size = {x: -357, y: -160, w: 400, h: 195};
+    }
+    return { x: x, y: y, rot: degToRad(rot), size: size, draw: () => { 
         context.translate(-50, -50); 
         context.drawImage(_getCanvas("propertyType1"), 0, 0); 
         context.translate(50, 50); 
@@ -218,4 +225,11 @@ drawEnvironment = e => {
 updateEnvironment = e => {
     e.x += gameContext.scrollX;
     e.y += gameContext.scrollY;
+}
+
+getEnvironmentRectangle = e => {
+    if (e.size) {
+        return {x: e.x+e.size.x, y: e.y+e.size.y, w: e.size.w, h: e.size.h};
+    }
+    return undefined;
 }

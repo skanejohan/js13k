@@ -22,7 +22,9 @@ let drawCar = (car, ctx) => {
     ctx.translate(-(car.x+30), -(car.y+15));
 }
 
-let updateCar = (car, turnLeft, turnRight, driveFast) => {
+let updateCar = (car, turnLeft, turnRight, driveFast, undo) => {
+    var oldInfo = _getPositionInfo(car);
+
     car.frontLeft = {
         x: car.x + 30 - _diag * Math.cos(_angle2 + car.rotation),
         y: car.y + 15 - _diag * Math.sin(_angle2 + car.rotation),
@@ -51,6 +53,32 @@ let updateCar = (car, turnLeft, turnRight, driveFast) => {
     else {
         _driveForward(car, 3);
     }
+
+    if (undo()) {
+        _applyPositionInfo(car, oldInfo);
+    }
+}
+
+let _getPositionInfo = car => {
+    return {
+        oldXf: car.xf,
+        oldYf: car.yf,
+        oldX: car.x,
+        oldY: car.y,
+        oldGcX: gameContext.x,
+        oldGcY: gameContext.y,
+    }
+}
+
+let _applyPositionInfo = (car, info) => {
+    car.xf = info.oldXf;
+    car.yf = info.oldYf;
+    car.x = info.oldX;
+    car.y = info.oldY;
+    gameContext.scrollX = 0,
+    gameContext.scrollY = 0,
+    gameContext.x = info.oldGcX;
+    gameContext.y = info.oldGcY;
 }
 
 let _diag = Math.sqrt(30*30+15*15);

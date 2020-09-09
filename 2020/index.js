@@ -1,10 +1,11 @@
 /*
-    Fix flickering on small canvas
     Eight levels
     When all levels are cleared, rotate back to the first one, but with higher speed. 
     Add pause
+    When resizing below 800 * 800 (window.innerWidth, window.innerHeight), pause and display message
 
    Polish:
+   - don't rotate around the center (another pivot point)
    - spectator stand, lake...
    - when hitting a coin, display its value and possibly the status code
    - sliding when turning
@@ -20,7 +21,7 @@ let degToRad = deg => deg * Math.PI / 180;
 
 let topRowHeight = 100;
 let bottomRowHeight = 0;
-let scrollMargin = 400;
+let scrollMargin = 395;
 
 var dimensions = {
     minX: scrollMargin,

@@ -1,13 +1,19 @@
 drawOverlay = (gameContext, ctx) => {
     switch(gameContext.gameState) {
         case GameState.IDLE: 
+        case GameState.PAUSED:
             _background(ctx);
             fillText("404", dimensions.cx, 170, "40px Arial", "center", "white", ctx);
             _overlayText("target score is 404", 300, ctx);
             _overlayText("use left and right arrow to steer, space to boost", 340, ctx);
             _overlayText("hit coins for positive (green) or negative (red) score", 380, ctx);
             _overlayText("preserve energy by staying on the road and by hitting coins", 420, ctx);
-            _overlayText("click to play", 550, ctx);
+            if (gameContext.gameState == GameState.IDLE) {
+                _overlayText("click to play", 550, ctx);
+            }
+            else {
+                _overlayText("paused - click to continue", 550, ctx);
+            }
             break;
         case GameState.GAMEOVER:
             _background(ctx);

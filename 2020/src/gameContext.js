@@ -1,8 +1,11 @@
 const GameState = {
     IDLE: 1,
     PLAYING: 2,
-    WELLDONE: 3,
-    GAMEOVER: 4
+    PAUSED: 3,
+    PAUSED_FOR_RESIZE: 4,
+    CONTINUING: 5,
+    WELLDONE: 6,
+    GAMEOVER: 7
 }
 
 var gameContext = {
@@ -46,6 +49,10 @@ var gameContext = {
 
     update() {
         if (this.gameState == GameState.PLAYING) {
+            if (pause()) {
+                this.setGameState(GameState.PAUSED);
+                return;
+            }
             this.tick++;
             this.coins.filter(c => !coinIsAlive(c)).forEach(c => c.road.hasCoin = false);
             this.coins = this.coins.filter(c => coinIsAlive(c));
@@ -108,6 +115,9 @@ var gameContext = {
                 this.resetlevel();
                 this.gameState = GameState.PLAYING;
                 break;
+            case GameState.CONTINUING:
+                this.gameState = GameState.PLAYING;
+                break;
             case GameState.GAMEOVER:
                 this.gameState = GameState.GAMEOVER;
                 setTimeout(() => this.setGameState(GameState.IDLE), 3000);
@@ -126,6 +136,8 @@ var gameContext = {
                 this.gameState = GameState.IDLE;
                 this.reset();
                 break;
+            default:
+                this.gameState = newState;
         }
     },
 

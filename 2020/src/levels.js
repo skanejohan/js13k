@@ -20,6 +20,40 @@ buildLevel = level => {
 
 _levels = [
     {
+        name: "a simple course",
+        carX: 200,
+        carY: 240,
+        carDir: 0,
+        startX: 200,
+        startY: 200,
+        startDir: 0,
+        roads: "s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,l",
+        environments: []
+    },
+    {
+        name: "paragraph",
+        carX: 200,
+        carY: 240,
+        carDir: 270,
+        startX: 200,
+        startY: 200,
+        startDir: 90,
+        roads: "s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,l,s,s,l,s,s,s,c,s,s,r,s,s,s,r,s,s,c,s,s,l,s,s,s,l,s,s,c,s,s,r,s,s,s,s,s,s,r,s,s,r,s",
+        environments: []
+    },
+    {
+        name: "labyrinth",
+        carX: 200,
+        carY: 240,
+        carDir: 270,
+        startX: 200,
+        startY: 200,
+        startDir: 90,
+        roads: "s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,l,s,s,s,l,s,s,s,c,s,l,s,s,s,s,s,l,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,l,s,s,s,s,s,c,s,s,r,s,s,r,s,s,c,s,r,s,s,c,s,s,c,s,s,s,c,s,c,s,l,s,s,s,s,s,l,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,c,s,s,r,s,s,s,s,r,s,s,r",
+        environments: []
+    },
+    {
+        name: "trees everywhere",
         carX: 200,
         carY: 240,
         carDir: 0,
@@ -48,6 +82,7 @@ _levels = [
         ]
     },
     {
+        name: "residential",
         carX: 200,
         carY: 240,
         carDir: 0,
@@ -103,6 +138,7 @@ _levels = [
         ]
     },
     {
+        name: "???",
         carX: 200,
         carY: 200,
         carDir: 270,

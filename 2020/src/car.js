@@ -40,16 +40,16 @@ let updateCar = (car, turnLeft, turnRight, driveFast) => {
         y: car.y + 15 - _diag * Math.sin(_angle1 + car.rotation),
     };
     if (turnLeft) {
-        car.rotation -= degToRad(2);
+        car.rotation -= degToRad(2*gameContext.speedFactor);
     }
     else if (turnRight) {
-        car.rotation += degToRad(2);
+        car.rotation += degToRad(2*gameContext.speedFactor);
     }
     if (driveFast) {
-        _driveForward(car, 10);
+        _driveForward(car, 10*gameContext.speedFactor);
     }
     else {
-        _driveForward(car, 3);
+        _driveForward(car, 3*gameContext.speedFactor);
     }
 }
 

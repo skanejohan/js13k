@@ -15,7 +15,20 @@ drawOverlay = (gameContext, ctx) => {
                 _overlayText("paused - click to continue", 550, ctx);
             }
             break;
-        case GameState.GAMEOVER:
+        case GameState.PAUSED_FOR_RESIZE:
+            _background(ctx);
+            fillText("404", dimensions.cx, 170, "40px Arial", "center", "white", ctx);
+            _overlayText("requires a canvas area of at least 800 by 800 pixels", 300, ctx);
+            if (!canvasIsLargeEnough()) {
+                var {w, h} = getCanvasSize();
+                _overlayText(`current size is ${w} by ${h} pixels`, 340, ctx);
+                _overlayText("please resize your browser", 550, ctx);
+            }
+            else {
+                _overlayText("ok - click to continue", 550, ctx);
+            }
+        break;
+            case GameState.GAMEOVER:
             _background(ctx);
             _overlayText("GAME OVER", 300, ctx);
             break;

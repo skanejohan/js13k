@@ -1,9 +1,9 @@
 /*
-    Eight levels
-    When resizing below 800 * 800 (window.innerWidth, window.innerHeight), pause and display message
-
-   Polish:
+   - eight levels
+   - environments on all eight
+   - high score
    - don't rotate around the center (another pivot point)
+   - from "well done", go to a state this displays the current level (i.e. number of times we have rotated levels) and the of the level
    - spectator stand, lake...
    - when hitting a coin, display its value and possibly the status code
    - sliding when turning
@@ -38,6 +38,7 @@ var dimensions = {
 }
 
 let lastTime = Date.now();
+var gameStateToResumeAfterResize;
 
 gameLoop = () => {
     let now = Date.now();
@@ -59,26 +60,50 @@ gameLoop = () => {
 handleResize = (w, h) => {
     canvas.width = w;
     canvas.height = h;
-    dimensions.update(canvas.clientWidth, canvas.clientHeight);
+    var cw = canvas.clientWidth;
+    var ch = canvas.clientHeight;
+    dimensions.update(cw, ch);
+    if (!canvasIsLargeEnough()) {
+        if (gameContext.gameState == GameState.PLAYING) {
+            gameStateToResumeAfterResize = GameState.CONTINUING;
+        }
+        else if (gameContext.gameState != GameState.PAUSED_FOR_RESIZE) {
+            gameStateToResumeAfterResize = gameContext.gameState;
+        }
+        gameContext.setGameState(GameState.PAUSED_FOR_RESIZE);
+    }
 }
 
 initialize = () => {
-    handleResize(window.innerWidth, window.innerHeight);
     window.addEventListener('resize', () => {
         handleResize(window.innerWidth, window.innerHeight);
     });
     canvas.addEventListener('click', () => {
-        if (gameContext.gameState == GameState.IDLE) {
-            gameContext.setGameState(GameState.PLAYING);
-        }
-        else if (gameContext.gameState == GameState.PAUSED ||
-                gameContext.gameState == GameState.PAUSED_FOR_RESIZE) {
-            gameContext.setGameState(GameState.CONTINUING);
+        if (canvasIsLargeEnough()) {
+            if (gameContext.gameState == GameState.IDLE) {
+                gameContext.setGameState(GameState.PLAYING);
+            }
+            else if (gameContext.gameState == GameState.PAUSED) {
+                gameContext.setGameState(GameState.CONTINUING);
+            }
+            else if (gameContext.gameState == GameState.PAUSED_FOR_RESIZE) {
+                gameContext.setGameState(gameStateToResumeAfterResize);
+            }
         }
     });
     gameContext.setGameState(GameState.IDLE);
+    handleResize(window.innerWidth, window.innerHeight);
     initInput(document);
     gameLoop();
+}
+
+getCanvasSize = () => {
+    return { w: canvas.clientWidth, h: canvas.clientHeight };
+}
+
+canvasIsLargeEnough = () => {
+    var { w, h } = getCanvasSize();
+    return w >= 800 && h >= 800;
 }
 
 window.addEventListener('load', () => initialize()); 

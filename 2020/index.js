@@ -1,7 +1,5 @@
 /*
     Eight levels
-    When all levels are cleared, rotate back to the first one, but with higher speed. 
-    Add pause
     When resizing below 800 * 800 (window.innerWidth, window.innerHeight), pause and display message
 
    Polish:
@@ -72,6 +70,10 @@ initialize = () => {
     canvas.addEventListener('click', () => {
         if (gameContext.gameState == GameState.IDLE) {
             gameContext.setGameState(GameState.PLAYING);
+        }
+        else if (gameContext.gameState == GameState.PAUSED ||
+                gameContext.gameState == GameState.PAUSED_FOR_RESIZE) {
+            gameContext.setGameState(GameState.CONTINUING);
         }
     });
     gameContext.setGameState(GameState.IDLE);

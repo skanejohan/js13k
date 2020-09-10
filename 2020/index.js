@@ -1,12 +1,7 @@
 /*
-   - eight levels
-   - environments on all eight
-   - high score
+   - environment on level 5 - race track?
    - don't rotate around the center (another pivot point)
    - from "well done", go to a state this displays the current level (i.e. number of times we have rotated levels) and the of the level
-   - spectator stand, lake...
-   - when hitting a coin, display its value and possibly the status code
-   - sliding when turning
 */
 
 const CHEAT = false;

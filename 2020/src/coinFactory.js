@@ -35,7 +35,7 @@ let _getCoinPosition = segment => {
 }
 
 let _getCoinValue = () => {    
-    let value1 = gameContext.scoreNeeded();
+    let value1 = gameContext.valueNeeded();
     let value2 = value1 / 4;
     let length = Math.abs(value1 + value2);
     let min = value1 > 0 ? -value2 : value1;
@@ -52,9 +52,8 @@ let _addCoin = (x, y, road) => {
     road.hasCoin = true;    
 }
 
-
 let _maxCoins = () => {
-    let score = Math.abs(gameContext.scoreNeeded());
+    let score = Math.abs(gameContext.valueNeeded());
     if (score < 10) return 40;
     if (score < 50) return 30;
     if (score < 100) return 20;

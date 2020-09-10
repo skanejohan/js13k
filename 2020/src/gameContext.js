@@ -8,6 +8,8 @@ const GameState = {
     GAMEOVER: 7
 }
 
+const HIGHSCORESTRING = "johan.ahlgren.404.highscore";
+
 var gameContext = {
     x: 0,
     y: 0,
@@ -16,6 +18,7 @@ var gameContext = {
     gameState: GameState.IDLE,
     tick: 0,
     score: 0,
+    value: 0, 
     startTime: 0,
     linksFound: 0,
     bestTime: null,
@@ -24,7 +27,7 @@ var gameContext = {
         this.x = 0;
         this.y = 0;
         this.tick = 0;
-        this.score = 0;
+        this.score = 1;
         this.linksFound = 0;
         this.startTime = Date.now();
         this.roads = [];
@@ -33,6 +36,8 @@ var gameContext = {
         this.energy = 500;
         this.speedFactor = 1;
         this.level = 0;
+        this.getHighScore();
+        this.highScoreSet = false;
     },
 
     resetlevel() {
@@ -40,7 +45,7 @@ var gameContext = {
         this.y = 0;
         this.tick = 0;
         this.energy = 500;
-        this.score = 0;
+        this.value = 0;
         this.coins = [];
         var {x, y, dir } = buildLevel(this.level);
         this.car = createCar(x, y, dir);
@@ -70,9 +75,10 @@ var gameContext = {
             addCoin(coveredRoad);
             var coinHit = this.coins.find(c => this.carInsideCoin(c));
             if (coinHit) {
-                this.score += coinHit.value;
-                if (this.score == 404) {
+                this.value += coinHit.value;
+                if (this.valueNeeded() == 0) {
                     this.linksFound++;
+                    this.score += this.energy;
                     this.setGameState(GameState.WELLDONE);
                 }
                 removeCoin(coinHit);
@@ -102,9 +108,12 @@ var gameContext = {
 
     removeEnergy(value) {
         if (!CHEAT) {
-            this.energy -= value;
-            if (this.energy <= 0) {
-                this.setGameState(GameState.GAMEOVER);
+            if (this.energy > 0) {
+                this.energy -= value;
+                if (this.energy <= 0) {
+                    this.highScoreSet = this.setHighScore(this.score);
+                    this.setGameState(GameState.GAMEOVER);
+                }
             }
         }
     },
@@ -166,8 +175,8 @@ var gameContext = {
             isInsideCoin(this.car.rearLeft, coin);
     },
 
-    scoreNeeded() {
-        return 404 - this.score;
+    valueNeeded() {
+        return 404 - this.value;
     },
 
     carInsideRect(r) {
@@ -187,6 +196,19 @@ var gameContext = {
             if (r && this.carInsideRect(r)) {
                 return true;
             }
+        }
+        return false;
+    },
+
+    getHighScore() {
+        this.highScore = parseInt(localStorage.getItem(HIGHSCORESTRING)) || 0;
+    },
+
+    setHighScore() {
+        if (this.score > this.highScore) {
+            this.highScore = this.score;
+            localStorage.setItem(HIGHSCORESTRING, this.score);
+            return true;
         }
         return false;
     },

@@ -4,10 +4,12 @@ drawOverlay = (gameContext, ctx) => {
         case GameState.PAUSED:
             _background(ctx);
             fillText("404", dimensions.cx, 170, "40px Arial", "center", "white", ctx);
-            _overlayText("target score is 404", 300, ctx);
+            _overlayText("target coin value is 404", 300, ctx);
             _overlayText("use left and right arrow to steer, space to boost", 340, ctx);
-            _overlayText("hit coins for positive (green) or negative (red) score", 380, ctx);
+            _overlayText("hit coins for positive (green) or negative (red) value", 380, ctx);
             _overlayText("preserve energy by staying on the road and by hitting coins", 420, ctx);
+
+            _overlayText("current high score: " + gameContext.highScore, 480, ctx);
             if (gameContext.gameState == GameState.IDLE) {
                 _overlayText("click to play", 550, ctx);
             }
@@ -30,18 +32,23 @@ drawOverlay = (gameContext, ctx) => {
         break;
             case GameState.GAMEOVER:
             _background(ctx);
-            _overlayText("GAME OVER", 300, ctx);
+            _overlayText("game over", 300, ctx);
+            _overlayText("final score: " + gameContext.score, 480, ctx);
+            if (gameContext.highScoreSet) {
+                _overlayText("new high score: " + gameContext.score, 520, ctx);
+            }
             break;
         case GameState.WELLDONE:
             _background(ctx);
-            _overlayText("WELL DONE - ANOTHER MISSING LINK FOUND", 300, ctx);
+            _overlayText("well done - another missing link found", 300, ctx);
+            _overlayText("current score: " + gameContext.score, 480, ctx);
             break;
         case GameState.PLAYING:
             fillRect(0, 0, dimensions.w, topRowHeight, "black", ctx);
             fillRect(10, 20, (dimensions.w - 20) * gameContext.energy / 500, 60, _energyBarGradient(ctx), ctx);
             drawCircle(dimensions.cx, 50, 50, 0, "", "black", ctx)
-            drawCircle(dimensions.cx, 50, 40, 0, "", gameContext.scoreNeeded() < 0 ? "red" : "green", ctx)
-            fillText(gameContext.scoreNeeded(), dimensions.cx, 60, "28px Arial", "center", gameContext.score > 404 ? "white" : "black", ctx);
+            drawCircle(dimensions.cx, 50, 40, 0, "", gameContext.valueNeeded() < 0 ? "red" : "green", ctx)
+            fillText(gameContext.valueNeeded(), dimensions.cx, 60, "28px Arial", "center", gameContext.score > 404 ? "white" : "black", ctx);
             fillText(`${gameContext.linksFound} links found`, 100, 60, "24px Arial", "left", "white", ctx);
             fillText(`${gameContext.linksFound} links found`, dimensions.w-100, 60, "24px Arial", "right", "white", ctx);
             break;

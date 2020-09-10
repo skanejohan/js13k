@@ -22,7 +22,9 @@ let drawCar = (car, ctx) => {
     ctx.translate(-(car.x+30), -(car.y+15));
 }
 
-let updateCar = (car, turnLeft, turnRight, driveFast) => {
+let updateCar = (car, turnLeft, turnRight, driveFast, dt) => {
+    var delayFactor = 17/dt;
+
     car.frontLeft = {
         x: car.x + 30 - _diag * Math.cos(_angle2 + car.rotation),
         y: car.y + 15 - _diag * Math.sin(_angle2 + car.rotation),
@@ -40,16 +42,16 @@ let updateCar = (car, turnLeft, turnRight, driveFast) => {
         y: car.y + 15 - _diag * Math.sin(_angle1 + car.rotation),
     };
     if (turnLeft) {
-        car.rotation -= degToRad(2*gameContext.speedFactor);
+        car.rotation -= degToRad(2*gameContext.speedFactor*delayFactor);
     }
     else if (turnRight) {
-        car.rotation += degToRad(2*gameContext.speedFactor);
+        car.rotation += degToRad(2*gameContext.speedFactor*delayFactor);
     }
     if (driveFast) {
-        _driveForward(car, 10*gameContext.speedFactor);
+        _driveForward(car, 10*gameContext.speedFactor*delayFactor);
     }
     else {
-        _driveForward(car, 3*gameContext.speedFactor);
+        _driveForward(car, 3*gameContext.speedFactor*delayFactor);
     }
 }
 

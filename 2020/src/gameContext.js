@@ -54,7 +54,7 @@ var gameContext = {
         resetInput();
     },
 
-    update() {
+    update(dt) {
         if (this.gameState == GameState.PLAYING) {
             if (pause()) {
                 this.setGameState(GameState.PAUSED);
@@ -66,7 +66,7 @@ var gameContext = {
             this.roads.forEach(r => updateRoad(r));
             this.environment.forEach(e => updateEnvironment(e));
             this.coins.forEach(c => updateCoin(c));
-            updateCar(this.car, turnLeft(), turnRight(), fastForward());
+            updateCar(this.car, turnLeft(), turnRight(), fastForward(), dt);
             if (this.carHitsEnvironment()) {
                 this.removeEnergy(this.energy);
             }

@@ -1,10 +1,10 @@
-buildLevel = level => {
+buildCourse = course => {
     gameContext.roads = [];
     gameContext.environment = [];
-    _currX = _levels[level].startX;
-    _currY = _levels[level].startY;
-    _currDir = _levels[level].startDir;
-    _levels[level].roads.split(",").forEach(c => {
+    _currX = _courses[course].startX;
+    _currY = _courses[course].startY;
+    _currDir = _courses[course].startDir;
+    _courses[course].roads.split(",").forEach(c => {
         switch(c) {
             case "s": _straight(); break;
             case "l": _left(); break;
@@ -12,13 +12,13 @@ buildLevel = level => {
             case "c": _cross(); break;
         }
     });
-    _levels[level].environments.forEach(e => {
+    _courses[course].environments.forEach(e => {
         gameContext.environment.push(e());
     });
-    return { x: _levels[level].carX, y: _levels[level].carY, dir: _levels[level].carDir };
+    return { x: _courses[course].carX, y: _courses[course].carY, dir: _courses[course].carDir };
 }
 
-_levels = [
+_courses = [
     {
         name: "a simple course",
         carX: 200,

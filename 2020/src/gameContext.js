@@ -5,7 +5,8 @@ const GameState = {
     PAUSED_FOR_RESIZE: 4,
     CONTINUING: 5,
     WELLDONE: 6,
-    GAMEOVER: 7
+    PRESENTLEVEL: 7,
+    GAMEOVER: 8
 }
 
 const HIGHSCORESTRING = "johan.ahlgren.404.highscore";
@@ -35,19 +36,20 @@ var gameContext = {
         this.environment = [];
         this.energy = 500;
         this.speedFactor = 1;
-        this.level = 0;
+        this.level = 1;
+        this.course = 0;
         this.getHighScore();
         this.highScoreSet = false;
     },
 
-    resetlevel() {
+    resetcourse() {
         this.x = 0;
         this.y = 0;
         this.tick = 0;
         this.energy = 500;
         this.value = 0;
         this.coins = [];
-        var {x, y, dir } = buildLevel(this.level);
+        var {x, y, dir } = buildCourse(this.course);
         this.car = createCar(x, y, dir);
         resetInput();
     },
@@ -121,7 +123,7 @@ var gameContext = {
     setGameState(newState) {
         switch(newState) {
             case GameState.PLAYING:
-                this.resetlevel();
+                this.resetcourse();
                 this.gameState = GameState.PLAYING;
                 break;
             case GameState.CONTINUING:
@@ -134,10 +136,11 @@ var gameContext = {
             case GameState.WELLDONE:
                 this.gameState = GameState.WELLDONE;
                 this.energy = 500;
-                this.level++;
-                if (this.level == _levels.length) {
-                    this.level = 0;
+                this.course++;
+                if (this.course == _courses.length) {
+                    this.course = 0;
                     this.speedFactor *= 1.5;
+                    this.level++;
                 }
                 setTimeout(() => this.setGameState(GameState.PLAYING), 3000);
                 break;

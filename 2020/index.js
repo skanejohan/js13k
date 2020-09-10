@@ -1,7 +1,7 @@
 /*
-   - environment on level 5 - race track?
+   - environment on course 5 - race track?
    - don't rotate around the center (another pivot point)
-   - from "well done", go to a state this displays the current level (i.e. number of times we have rotated levels) and the of the level
+   - from "well done", go to a state this displays the current level and course name
 */
 
 const CHEAT = false;

@@ -54,7 +54,6 @@ let houses = (x, y, xcount, ycount, rot) => {
     return { x: x, y: y, rot: degToRad(rot), size: size, draw: () => { 
         for (var xc=0; xc < xcount; xc++) {
             for (var yc=0; yc < ycount; yc++) {
-                console.log(xc + "," + yc);
                 context.translate(xc * 100, yc * 100);
                 context.drawImage(_getCanvas("house"), 0, 0); 
                 context.translate(-(xc * 100), -(yc * 100));
@@ -125,7 +124,6 @@ let _getCanvas = name => {
         drawCircle(85, 55, 15, 2, col, col, ctx);
         drawCircle(55, 25, 15, 2, col, col, ctx);
         drawCircle(35, 60, 30, 2, col, col, ctx);
-        console.log("canvas created for blob with color " + col);
     });
 
     let _createTree = () => _createBlob("#166e16");
@@ -142,7 +140,6 @@ let _getCanvas = name => {
         ctx.stroke();
         ctx.fillRect(22, 0, 6, 8);
         ctx.fillRect(72, 0, 6, 8);
-        console.log("canvas created for fence");
     });
 
     let _createHouse = () => _createCanvas(100, 100, ctx => {
@@ -198,8 +195,6 @@ let _getCanvas = name => {
         ctx.strokeStyle = "black";
         ctx.strokeRect(0, 0, 49, 97);
         ctx.strokeRect(50, 0, 49, 97);
-        
-        console.log("canvas created for house");
     });
     
     let _createProperty1 = () => _createCanvas(520, 320, ctx => {
@@ -220,8 +215,6 @@ let _getCanvas = name => {
 
         ctx.drawImage(_getCanvas("tree"), 50, 80);
         ctx.drawImage(_getCanvas("house"), 200, 50);
-
-        console.log("canvas created for property 1");
     });
 
     if (typeof _getCanvas.canvases == "undefined") {

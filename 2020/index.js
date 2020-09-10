@@ -1,7 +1,6 @@
 /*
    - environment on course 5 - race track?
    - don't rotate around the center (another pivot point)
-   - from "well done", go to a state this displays the current level and course name
 */
 
 const CHEAT = false;
@@ -76,7 +75,7 @@ initialize = () => {
     canvas.addEventListener('click', () => {
         if (canvasIsLargeEnough()) {
             if (gameContext.gameState == GameState.IDLE) {
-                gameContext.setGameState(GameState.PLAYING);
+                gameContext.setGameState(GameState.PRESENTLEVEL);
             }
             else if (gameContext.gameState == GameState.PAUSED) {
                 gameContext.setGameState(GameState.CONTINUING);

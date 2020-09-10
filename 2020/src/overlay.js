@@ -29,8 +29,8 @@ drawOverlay = (gameContext, ctx) => {
             else {
                 _overlayText("ok - click to continue", 550, ctx);
             }
-        break;
-            case GameState.GAMEOVER:
+            break;
+        case GameState.GAMEOVER:
             _background(ctx);
             _overlayText("game over", 300, ctx);
             _overlayText("final score: " + gameContext.score, 480, ctx);
@@ -42,6 +42,10 @@ drawOverlay = (gameContext, ctx) => {
             _background(ctx);
             _overlayText("well done - another missing link found", 300, ctx);
             _overlayText("current score: " + gameContext.score, 480, ctx);
+            break;
+        case GameState.PRESENTLEVEL:
+            _background(ctx);
+            _overlayText(`level ${gameContext.level} - \"${_courses[gameContext.course].name}\"`, 300, ctx);
             break;
         case GameState.PLAYING:
             fillRect(0, 0, dimensions.w, topRowHeight, "black", ctx);

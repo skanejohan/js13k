@@ -28,7 +28,7 @@ var gameContext = {
         this.x = 0;
         this.y = 0;
         this.tick = 0;
-        this.score = 1;
+        this.score = 0;
         this.linksFound = 0;
         this.startTime = Date.now();
         this.roads = [];
@@ -142,6 +142,10 @@ var gameContext = {
                     this.speedFactor *= 1.5;
                     this.level++;
                 }
+                setTimeout(() => this.setGameState(GameState.PRESENTLEVEL), 3000);
+                break;
+            case GameState.PRESENTLEVEL:
+                this.gameState = GameState.PRESENTLEVEL;
                 setTimeout(() => this.setGameState(GameState.PLAYING), 3000);
                 break;
             case GameState.IDLE:

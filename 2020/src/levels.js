@@ -28,7 +28,22 @@ _levels = [
         startY: 200,
         startDir: 0,
         roads: "s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,l",
-        environments: []
+        environments: [
+            () => propertyType1(300, -50, 0),
+            () => propertyType1(900, -50, 0),
+            () => propertyType1(700, 550, 180),
+            () => propertyType1(1300, 550, 180),
+
+            () => propertyType1(2150, -250, 90),
+            () => propertyType1(500, -950, 0),
+            () => propertyType1(1100, -950, 0),
+
+            () => tree(300, -500, 0),
+            () => tree(450, -500, 0),
+            () => tree(280, -350, 0),
+            () => tree(430, -370, 0),
+            () => tree(330, -240, 0),
+        ]
     },
     {
         name: "paragraph",
@@ -39,7 +54,12 @@ _levels = [
         startY: 200,
         startDir: 90,
         roads: "s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,l,s,s,l,s,s,s,c,s,s,r,s,s,s,r,s,s,c,s,s,l,s,s,s,l,s,s,c,s,s,r,s,s,s,s,s,s,r,s,s,r,s",
-        environments: []
+        environments: [
+            () => forest(-300, -1500, 1, 21),
+            () => forest(-200, -1500, 10, 1),
+            () => forest(700, -1500, 1, 21),
+            () => forest(-300, 600, 11, 1),
+        ]
     },
     {
         name: "labyrinth",
@@ -50,7 +70,34 @@ _levels = [
         startY: 200,
         startDir: 90,
         roads: "s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,l,s,s,s,l,s,s,s,c,s,l,s,s,s,s,s,l,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,s,l,s,s,s,s,s,c,s,s,r,s,s,r,s,s,c,s,r,s,s,c,s,s,c,s,s,s,c,s,c,s,l,s,s,s,s,s,l,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,s,s,c,s,s,r,s,s,s,s,r,s,s,r",
-        environments: []
+        environments: [
+            () => houses(450, -50, 3, 1, 90),
+
+            () => houses(-550, -50, 7, 1, 0),
+            () => houses(-550, 100, 7, 1, 0),
+            () => houses(-550, 250, 7, 1, 0),
+
+            () => houses(-450, -550, 4, 1, 0),
+            () => houses(-450, -350, 4, 1, 0),
+
+            () => houses(-250, -850, 2, 1, 0),
+
+            () => houses(-650, -1750, 16, 1, 90),
+
+            () => houses(350, -850, 3, 1, 0),
+
+            () => house(400, -500, 90),
+
+            () => houses(650, -1550, 6, 1, 90),
+
+            () => houses(150, -1750, 3, 1, 0),
+
+            () => houses(-550, -1950, 6, 1, 0),
+
+            () => houses(750, -650, 10, 1, 90),
+
+            () => houses(250, 450, 3, 1, 0),
+        ]
     },
     {
         name: "trees everywhere",

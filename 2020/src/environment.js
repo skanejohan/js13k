@@ -43,6 +43,26 @@ let house = (x, y, rot) => {
     }};
 }
 
+let houses = (x, y, xcount, ycount, rot) => {
+    var size;
+    if (rot==0) {
+        size = {x: 0, y: 0, w: 100 * xcount, h: 100 * ycount};
+    }
+    else {
+        size = {x: -100, y: 0, w: 100 * ycount, h: 100 * xcount};
+    }
+    return { x: x, y: y, rot: degToRad(rot), size: size, draw: () => { 
+        for (var xc=0; xc < xcount; xc++) {
+            for (var yc=0; yc < ycount; yc++) {
+                console.log(xc + "," + yc);
+                context.translate(xc * 100, yc * 100);
+                context.drawImage(_getCanvas("house"), 0, 0); 
+                context.translate(-(xc * 100), -(yc * 100));
+            }     
+        } 
+    }};
+}
+
 let propertyType1 = (x, y, rot) => {
     var size;
     if (rot==0) {

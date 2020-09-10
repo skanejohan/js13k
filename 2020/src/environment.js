@@ -68,6 +68,9 @@ let propertyType1 = (x, y, rot) => {
     if (rot==0) {
         size = {x: -42, y: -37, w: 400, h: 195};
     }
+    else if (rot == 90) {
+        size = {x: -157, y: -44, w: 195, h: 400};
+    }
     else {
         size = {x: -357, y: -160, w: 400, h: 195};
     }

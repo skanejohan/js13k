@@ -3,7 +3,7 @@ drawOverlay = (gameContext, ctx) => {
         case GameState.IDLE: 
         case GameState.PAUSED:
             _background(ctx);
-            fillText("404", dimensions.cx, 170, "40px Arial", "center", "white", ctx);
+            fillText("track 404", dimensions.cx, 170, "40px Arial", "center", "white", ctx);
             _overlayText("target coin value is 404", 300, ctx);
             _overlayText("use left and right arrow to steer, space to boost", 340, ctx);
             _overlayText("hit coins for positive (green) or negative (red) value", 380, ctx);

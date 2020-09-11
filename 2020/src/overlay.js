@@ -40,7 +40,7 @@ drawOverlay = (gameContext, ctx) => {
             break;
         case GameState.WELLDONE:
             _background(ctx);
-            _overlayText("well done - another missing link found", 300, ctx);
+            _overlayText("well done", 300, ctx);
             _overlayText("current score: " + gameContext.score, 480, ctx);
             break;
         case GameState.PRESENTLEVEL:
@@ -52,9 +52,9 @@ drawOverlay = (gameContext, ctx) => {
             fillRect(10, 20, (dimensions.w - 20) * gameContext.energy / 500, 60, _energyBarGradient(ctx), ctx);
             drawCircle(dimensions.cx, 50, 50, 0, "", "black", ctx)
             drawCircle(dimensions.cx, 50, 40, 0, "", gameContext.valueNeeded() < 0 ? "red" : "green", ctx)
-            fillText(gameContext.valueNeeded(), dimensions.cx, 60, "28px Arial", "center", gameContext.score > 404 ? "white" : "black", ctx);
-            fillText(`${gameContext.linksFound} links found`, 100, 60, "24px Arial", "left", "white", ctx);
-            fillText(`${gameContext.linksFound} links found`, dimensions.w-100, 60, "24px Arial", "right", "white", ctx);
+            fillText(gameContext.value, dimensions.cx, 60, "28px Arial", "center", gameContext.score > 404 ? "white" : "black", ctx);
+            fillText(`coin value needed: ${gameContext.valueNeeded()}`, 100, 60, "24px Arial", "left", "white", ctx);
+            fillText(`coin value needed: ${gameContext.valueNeeded()}`, dimensions.w-100, 60, "24px Arial", "right", "white", ctx);
             break;
     }
 }

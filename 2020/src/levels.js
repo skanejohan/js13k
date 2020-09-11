@@ -185,15 +185,61 @@ _courses = [
         ]
     },
     {
-        name: "???",
-        carX: 200,
-        carY: 200,
-        carDir: 270,
-        startX: 200,
+        name: "at the beachfront",
+        carX: 300,
+        carY: 100,
+        carDir: 90,
+        startX: 300,
         startY: 200,
         startDir: 90,
-        roads: "s,s,s,s,s,s,s,s,s,s,l,s,s,s,s,s,l,s,l,s,s,r,s,s,r,s,s,s,s,s,r,s,s,s,s,s,s,s,r,s,s,s,s,s,s,s,s,s,s,s,s,s,s,l,r,l,r,s,r,s,s,s,s,s,s,r,s,s,l,s,s,s,s,s,s,s,s,r,s,s,s,s,s,r",
+        roads: "s,s,s,s,s,s,s,s,s,s,s,s,s,r,s,s,s,s,s,l,s,r,s,r,s,s,s,s,s,s,r,s,s,l,s,s,s,s,s,s,s,s,r,s,s,s,s,r,s",
         environments: [
+            () => verticalWater(1300, -2000, 3000),
+            () => car(1220, -600, 270, "red"),
+            () => car(1220, -700, 270, "blue"),
+            () => car(1220, -800, 270, "yellow"),
+            () => car(1220, -900, 270, "white"),
+            () => car(1220, -1000, 270, "blue"),
+            () => car(1220, -1100, 270, "blue"),
+            () => car(1220, -1200, 270, "red"),
+
+            () => car(950, -450, 45, "yellow"),
+            () => car(1050, -450, 45, "blue"),
+            () => car(1150, -450, 45, "red"),
+            
+            () => car(950, -350, 45, "gray"),
+            () => car(950, -250, 45, "green"),
+            () => car(950, -150, 45, "red"),
+            () => car(950, -50, 45, "yellow"),
+            () => car(950, 50, 45, "orange"),
+            () => car(950, 150, 45, "gray"),
+            () => car(950, 250, 45, "blue"),
+            () => car(950, 350, 45, "yellow"),
+
+            () => forest(-300, -1800, 16, 5),
+            () => forest(-300, 500, 16, 5),
+
+            () => propertyType1(600, 200, 270),
+            () => propertyType1(600, -250, 270),
+
+            () => house(200, -950, 270),
+            () => house(200, -800, 270),
+            () => house(200, -650, 270),
+            () => house(200, -500, 270),
+            () => house(200, -350, 270),
+            () => house(200, -200, 270),
+            () => house(200, -50, 270),
+            () => house(200, 100, 270),
+            () => house(200, 250, 270),
+
+            () => house(450, -1200, 0),
+            () => house(600, -1200, 0),
+            () => house(750, -1200, 0),
+
+            () => tree(250, -1250),
+            () => tree(200, -1150),
+
+            () => forest(-400, -1300, 5, 18),
         ]
     },
 ]

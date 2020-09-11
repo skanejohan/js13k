@@ -70,8 +70,11 @@ let propertyType1 = (x, y, rot) => {
     else if (rot == 90) {
         size = {x: -157, y: -44, w: 195, h: 400};
     }
-    else {
+    else if (rot == 180) {
         size = {x: -357, y: -160, w: 400, h: 195};
+    }
+    else {
+        size = {x: -35, y: -355, w: 195, h: 400};
     }
     return { x: x, y: y, rot: degToRad(rot), size: size, draw: () => { 
         context.translate(-50, -50); 
@@ -106,6 +109,49 @@ let blobShape = (x, y, col) => {
             context.rotate(-rot);
         } 
     };
+}
+
+let verticalWater = (x, y, h) => {
+    var colors = [
+        "#0000FF",
+        "#0000EE",
+        "#0000DD",
+        "#0000CC",
+        "#0000BB",
+        "#0000AA",
+        "#000099",
+        "#000088",
+        "#000077",
+        "#000066",
+    ]
+    return { x: x, y: y, rot: 0, size: {x: 0, y: 0, w: 500, h: h},
+        draw: () => { 
+            for (var i = 0; i < 10; i++) {
+                context.fillStyle = colors[i];
+                context.fillRect(i * 50, 0, 100, h); 
+            }
+        }
+    } 
+}
+
+let car = (x, y, rot, color) => {
+    return { x: x, y: y, rot: degToRad(rot), size: {x: -30, y: -30, w: 60, h: 60},
+        draw: () => {
+            context.fillStyle = color;
+            context.fillRect(-30, -15, 60, 30);
+            context.fillStyle = "white";
+            context.fillRect(-30, -5, 60, 4);
+            context.fillRect(-30, 1, 60, 4);
+            context.fillStyle = "#222222";
+            context.fillRect(-20, -13, 8, 26);
+            context.fillRect(0, -13, 12, 26);
+            context.fillRect(23, -13, 5, 8);
+            context.fillRect(23, 5, 5, 8);
+            context.lineWidth = 2;
+            context.strokeStyle = "black";
+            context.strokeRect(-30, -15, 60, 30);
+        }
+    }
 }
 
 let _getCanvas = name => {

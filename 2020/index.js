@@ -1,8 +1,3 @@
-/*
-   - environment on course 5 - race track?
-   - don't rotate around the center (another pivot point)
-*/
-
 const CHEAT = false;
 const DEBUG = false;
 

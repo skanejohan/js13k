@@ -1,8 +1,26 @@
 var gameContext = {
     gameState: GameState.IDLE,
     mousePos: { x : 0, y : 0 },
+    msRemaining: 0,
+    villageCount: 1, 
+    trebuchetCount: 1,
 
-    update(dt) {
+    update(ms) {
+        if (this.msRemaining > 0)
+        {
+            this.msRemaining -= ms;
+            if (this.msRemaining <= 0)
+            {
+                if (this.gameState == GameState.LEVELWON)
+                {
+                    this.setGameState(GameState.PLAYING);
+                }
+                else if (this.gameState == GameState.GAMEOVER)
+                {
+                    this.setGameState(GameState.IDLE);
+                }
+            }
+        }
     },
 
     render() {
@@ -26,6 +44,12 @@ var gameContext = {
             case GameState.PLAYING:
                 board.draw(drawSprite, this.mousePos);
                 break;
+            case GameState.LEVELWON:
+                context.fillText("LEVEL WON", 600, 400);
+                break;
+            case GameState.GAMEOVER:
+                context.fillText("GAME OVER", 600, 400);
+                break;
             default:
                 break;
         }
@@ -36,10 +60,10 @@ var gameContext = {
         switch (this.gameState)
         {
             case GameState.IDLE:
-                this.gameState = GameState.PLAYING;
+                this.setGameState(GameState.PLAYING);
                 break;
             case GameState.PLAYING:
-                this.gameState = GameState.IDLE;
+                this.setGameState(this.villageCount < 5 ? GameState.LEVELWON : GameState.GAMEOVER);
                 break;
             default:
                 break;
@@ -58,11 +82,23 @@ var gameContext = {
     setGameState(newState) {
         switch(newState) {
             case GameState.PLAYING:
+                board.reset(this.villageCount, this.trebuchetCount);
+                this.villageCount++;
+                this.trebuchetCount++;
                 this.gameState = GameState.PLAYING;
                 break;
             case GameState.IDLE:
                 this.gameState = GameState.IDLE;
                 break;
+            case GameState.LEVELWON:
+                this.gameState = GameState.LEVELWON;
+                this.msRemaining = 400;
+                break;
+            case GameState.GAMEOVER:
+                this.villageCount = 1;
+                this.trebuchetCount = 1;
+                this.gameState = GameState.GAMEOVER;
+                this.msRemaining = 1000;
             default:
                 this.gameState = newState;
         }

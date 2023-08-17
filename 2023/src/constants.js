@@ -1,6 +1,8 @@
 const GameState = {
     IDLE: 1,
-    PLAYING: 2
+    PLAYING: 2,
+    LEVELWON: 3,
+    GAMEOVER: 4
 }
 
 const HexSide = 30;

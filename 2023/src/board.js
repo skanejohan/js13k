@@ -3,6 +3,8 @@ var board = {
     s: HexSide,
     h: undefined,
     r: undefined,
+    villages: new Set(),
+    trebuchets: new Set(),
 
     __initializeCells()
     {
@@ -53,6 +55,32 @@ var board = {
         return cell;
     },
 
+    reset(villageCount, trebuchetCount) {
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        this.villages = new Set();
+        this.trebuchets = new Set();
+        var occupied = new Set();
+    
+        while (this.villages.size < villageCount)
+        {
+            var c = { r : getRandomInt(BoardRows), c : getRandomInt(BoardCols)};
+            this.villages.add(c);
+            occupied.add(c);
+        }
+        while (this.trebuchets.size < trebuchetCount)
+        {
+            var c = { r : getRandomInt(BoardRows), c : getRandomInt(BoardCols)};
+            if (!occupied.has(c))
+            {
+                this.trebuchets.add(c);
+                occupied.add(c);
+            }
+        }
+    },
+
     draw(drawSprite, mousePos) {
         this.__initializeCells();
         for (r = 0; r < BoardRows; r++) {
@@ -61,6 +89,14 @@ var board = {
                 drawSprite(sprites("grass"), cell.x, cell.y);
                 drawSprite(sprites("normal"), cell.x, cell.y);
             }
+        }
+        for (const v of this.villages) {
+            var cell = this.cells[v.r][v.c];
+            drawSprite(sprites("village"), cell.x, cell.y);
+        }
+        for (const t of this.trebuchets) {
+            var cell = this.cells[t.r][t.c];
+            drawSprite(sprites("trebuchet"), cell.x, cell.y);
         }
         var closestCell = this.__closestCell(mousePos);
         if (closestCell) {

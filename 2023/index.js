@@ -19,6 +19,9 @@ initialize = () => {
     canvas.addEventListener('click', () => {
         gameContext.click();
     });
+    canvas.addEventListener("mousemove", e => {
+        gameContext.mouseMove(e);
+    });
     handleResize();
     gameLoop();
 }

@@ -197,17 +197,22 @@ var board = {
                 if (over) { 
                     // I have moved to a trebuchet - its range should be highlighted
                     this.surroundingCells = this.__surrounding(this.hoveredCell, over.strength);
+                    this.text = "Click to load or hover over another cell to move";
                 }
                 else if (this.surroundingCells != undefined && !this.surroundingCells.has(this.hoveredCell))
                 {
                     // I have moved out of the highlighted area - nothing is highlighted
                     this.surroundingCells = undefined;
+                    this.text = undefined;
+                }
+                else if (this.surroundingCells != undefined) {
+                    this.text = "Click to move here";
                 }
             }
         }
     },
 
-    draw(drawSprite) {
+    draw(drawSprite, drawText) {
         for (r = 0; r < BoardRows; r++) {
             for (c = 0; c < BoardCols; c++) {
                 var cell = this.cells[r][c];
@@ -229,6 +234,10 @@ var board = {
         for (const v of this.villages) {
             var cell = this.cells[v.row][v.col];
             drawSprite(sprites("village"), cell.x, cell.y);
+        }
+
+        if (this.text) {
+            drawText(this.text, 600, 780);
         }
     }
 };

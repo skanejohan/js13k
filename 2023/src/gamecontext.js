@@ -35,6 +35,10 @@ var gameContext = {
             context.drawImage(sprite, left, top);
         }
 
+        function drawText(text, x, y) {
+            context.fillText(text, x, y);
+        }
+
         context.fillStyle = "blue";
         context.fillRect(0, 0, 1200, 800);
 
@@ -47,7 +51,7 @@ var gameContext = {
                 context.fillText("IDLE", 600, 400);
                 break;
             case GameState.PLAYING:
-                board.draw(drawSprite);
+                board.draw(drawSprite, drawText);
                 break;
             case GameState.LEVELWON:
                 context.fillText("LEVEL WON", 600, 400);

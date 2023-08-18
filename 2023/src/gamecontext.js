@@ -19,7 +19,12 @@ var gameContext = {
                 {
                     this.setGameState(GameState.IDLE);
                 }
+                return;
             }
+        }
+        
+        if (this.gameState == GameState.PLAYING) {
+            board.update(this.mousePos);
         }
     },
 
@@ -42,7 +47,7 @@ var gameContext = {
                 context.fillText("IDLE", 600, 400);
                 break;
             case GameState.PLAYING:
-                board.draw(drawSprite, this.mousePos);
+                board.draw(drawSprite);
                 break;
             case GameState.LEVELWON:
                 context.fillText("LEVEL WON", 600, 400);

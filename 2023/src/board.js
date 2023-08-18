@@ -3,7 +3,7 @@ var board = {
     h: undefined,
     r: undefined,
     cells: undefined, // matrix of { row, col, x, y }
-    villages: new Set(), // set of { row, col, strength }
+    villages: new Set(), // set of { row, col, strength, surroundingCells }
     trebuchets: new Set(), // set of { row, col, strength }
     hoveredCell: undefined, // { row, col, x, y }
     surroundingCells: undefined, // set of { row, col, x, y }
@@ -42,8 +42,15 @@ var board = {
         }
     },
 
-    __cell(r, c) {
-        return this.cells[r][c];
+    __cell(col, row) {
+        return this.cells[row][col];
+    }, 
+
+    __randomCell() {
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+        return this.cells[getRandomInt(BoardRows)][getRandomInt(BoardCols)];
     }, 
 
     __closestCell(mousePos) {
@@ -51,7 +58,7 @@ var board = {
         var minDistSquared = (this.s / 2 + this.h) * (this.s / 2 + this.h);
         for (r = 0; r < BoardRows; r++) {
             for (c = 0; c < BoardCols; c++) {
-                var candidate = this.__cell(r, c);
+                var candidate = this.__cell(c, r);
                 var distSquared = 
                     (candidate.x - mousePos.x) * (candidate.x - mousePos.x) + 
                     (candidate.y - mousePos.y) * (candidate.y - mousePos.y);
@@ -68,7 +75,7 @@ var board = {
         var cells = new Set();
         for (row = 0; row < BoardRows; row++) {
             for (col = 0; col < BoardCols; col++) {
-                var c = this.__cell(row, col);
+                var c = this.__cell(col, row);
                 if (Math.abs(c.row - source.row) > 1) {
                     continue;
                 } 
@@ -138,8 +145,16 @@ var board = {
 
     __villageOrTrebuchetAt(col, row) {
         var v = this.__villageAt(col, row); 
-        if (v) console.log("V");
         return v ? v : this.__trebuchetAt(col, row);
+    },
+
+    __createVillageOrTrebuchet(cell, strength) {
+        return {
+            col : cell.col,
+            row : cell.row,
+            strength : strength,
+            surroundingCells : this.__surrounding(cell, strength)
+        }
     },
 
     reset(villageCount, trebuchetCount) {
@@ -155,13 +170,13 @@ var board = {
 
         while (this.villages.size < villageCount)
         {
-            var c = { row : getRandomInt(BoardRows), col : getRandomInt(BoardCols), strength : 2 };
+            var c = this.__createVillageOrTrebuchet(this.__randomCell(), 2);
             this.villages.add(c);
             occupied.add(c);
         }
         while (this.trebuchets.size < trebuchetCount)
         {
-            var c = { row : getRandomInt(BoardRows), col : getRandomInt(BoardCols), strength : 3 };
+            var c = this.__createVillageOrTrebuchet(this.__randomCell(), 3);
             if (!occupied.has(c))
             {
                 this.trebuchets.add(c);
@@ -178,9 +193,9 @@ var board = {
                 this.surroundingCells = undefined;
             }
             else {
-                var over = this.__villageOrTrebuchetAt(c.col, c.row);
+                var over = this.__trebuchetAt(c.col, c.row);
                 if (over) { 
-                    // I have moved to a village or trebuchet - its range should be highlighted
+                    // I have moved to a trebuchet - its range should be highlighted
                     this.surroundingCells = this.__surrounding(this.hoveredCell, over.strength);
                 }
                 else if (this.surroundingCells != undefined && !this.surroundingCells.has(this.hoveredCell))
@@ -202,17 +217,18 @@ var board = {
         }
         for (const v of this.villages) {
             var cell = this.cells[v.row][v.col];
-            drawSprite(sprites("village"), cell.x, cell.y);
+            v.surroundingCells.forEach(c => drawSprite(sprites("villageRange"), c.x, c.y))
+        }
+        if (this.surroundingCells) {
+            this.surroundingCells.forEach(c => drawSprite(sprites("trebuchetRange"), c.x, c.y))
         }
         for (const t of this.trebuchets) {
             var cell = this.cells[t.row][t.col];
             drawSprite(sprites("trebuchet"), cell.x, cell.y);
         }
-        if (this.hoveredCell) {
-            drawSprite(sprites("highlight"), this.hoveredCell.x, this.hoveredCell.y);
-        }
-        if (this.surroundingCells) {
-            this.surroundingCells.forEach(c => drawSprite(sprites("trebuchet"), c.x, c.y))
+        for (const v of this.villages) {
+            var cell = this.cells[v.row][v.col];
+            drawSprite(sprites("village"), cell.x, cell.y);
         }
     }
 };

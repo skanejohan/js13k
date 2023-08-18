@@ -41,7 +41,9 @@ let sprites = name => {
         sprites.sprites.normal = createHex("#1F6420", false);
         sprites.sprites.highlight = createHex("yellow", false);
         sprites.sprites.village = createHex("white", false);
+        sprites.sprites.villageRange = createHex("#348C31", true);
         sprites.sprites.trebuchet = createHex("black", false);
+        sprites.sprites.trebuchetRange = createHex("#486F38", true);
     }
 
     return sprites.sprites[name];

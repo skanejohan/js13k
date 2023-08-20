@@ -72,7 +72,7 @@ var gameContext = {
                 this.setGameState(GameState.PLAYING);
                 break;
             case GameState.PLAYING:
-                this.setGameState(this.villageCount < 5 ? GameState.LEVELWON : GameState.GAMEOVER);
+                board.click(this.mousePos);
                 break;
             default:
                 break;

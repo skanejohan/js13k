@@ -1,7 +1,9 @@
 var board = {
     hexGrid: undefined,
     villages: new Set(), // set of { cell, strength, surroundingCells }
+    villageCells: new Set(), // Set of cell
     trebuchets: new Set(), // set of { cell, strength, surroundingCells, state }
+    trebuchetCells: new Set(), // Set of cell
     hoveredCell: undefined, // cell
     activeTrebuchet: undefined, // { cell, strength, surroundingCells } - while in trebuchet range
 
@@ -10,6 +12,26 @@ var board = {
         var r = Math.floor(Math.random() * BoardRows);
         return this.hexGrid.cell(c, r);
     }, 
+
+    __addVillage(v) {
+        this.villages.add(v);
+        this.villageCells.add(v.cell);
+    },
+
+    __deleteVillage(v) {
+        this.villages.delete(v);
+        this.villageCells.delete(v.cell);
+    },
+
+    __addTrebuchet(t) {
+        this.trebuchets.add(t);
+        this.trebuchetCells.add(t.cell);
+    },
+
+    __deleteTrebuchet(t) {
+        this.trebuchets.delete(t);
+        this.trebuchetCells.delete(t.cell);
+    },
 
     __trebuchetAt(cell) {
         for (const t of this.trebuchets) {
@@ -29,19 +51,19 @@ var board = {
     },
 
     __replaceOrRemoveTrebuchet(trebuchet, cell, newStrength) {
-        this.trebuchets.delete(trebuchet);
+        this.__deleteTrebuchet(trebuchet);
         if (newStrength >= 0) { // A trebuchet may have strength 0
             var t = this.__createVillageOrTrebuchet(cell, newStrength);
-            this.trebuchets.add(t);
+            this.__addTrebuchet(t);
         }
         return t;
     },
 
     __replaceOrRemoveVillage(village, newStrength) {
-        this.villages.delete(village);
+        this.__deleteVillage(village);
         if (newStrength > 0) { // A village may not have strength 0
             var v = this.__createVillageOrTrebuchet(village.cell, newStrength);
-            this.villages.add(v);
+            this.__addVillage(v);
         }
         return v;
     },
@@ -108,7 +130,7 @@ var board = {
                 var hit = this.__fireAtTrebuchet(t, v);
                 if (hit) {
                     if (hit.strength < 1) {
-                        this.trebuchets.delete(hit);
+                        this.__deleteTrebuchet(hit);
                     }
                 }
                 else {
@@ -132,7 +154,7 @@ var board = {
         while (this.villages.size < villageCount)
         {
             var c = this.__createVillageOrTrebuchet(this.__randomCell(), 2);
-            this.villages.add(c);
+            this.__addVillage(c);
             occupied.add(c);
         }
         while (this.trebuchets.size < trebuchetCount)
@@ -140,7 +162,7 @@ var board = {
             var c = this.__createVillageOrTrebuchet(this.__randomCell(), 3);
             if (!occupied.has(c))
             {
-                this.trebuchets.add(c);
+                this.__addTrebuchet(c);
                 occupied.add(c);
             }
         }
@@ -193,54 +215,53 @@ var board = {
 
     draw(drawSprite, drawText) {
 
-        // Draw all cells
+        var villageRange = new Set();
+        var trebuchetRange = new Set();
+        var combinedRange = new Set();
+        this.villages.forEach(v => v.surroundingCells.forEach(c => villageRange.add(c)));
+        this.trebuchets.forEach(v => v.surroundingCells.forEach(c => {
+            trebuchetRange.add(c);
+            if (villageRange.has(c)) {
+                combinedRange.add(c);
+            }
+        }));
+
         for (r = 0; r < BoardRows; r++) {
             for (c = 0; c < BoardCols; c++) {
-                var cell = this.hexGrid.cell(c, r); 
-                drawSprite(sprites("grass"), cell.cx, cell.cy);
-                drawSprite(sprites("normal"), cell.cx, cell.cy);
+                var cell = this.hexGrid.cell(c, r);
+
+                var frame = "fr_normal";
+                var background = "bg_grass";
+                if (this.villageCells.has(cell)) {
+                    background = "bg_village";
+                }
+                else if (this.trebuchetCells.has(cell)) {
+                    background = "bg_trebuchet";
+                }
+                else if (combinedRange.has(cell)) {
+                    background = "bg_trebuchet_and_village_range";
+                }
+                else if (villageRange.has(cell)) {
+                    background = "bg_village_range";
+                }
+                else if (trebuchetRange.has(cell)) {
+                    background = "bg_trebuchet_range";
+                }
+
+                drawSprite(sprites(background), cell.cx, cell.cy);
+                drawSprite(sprites(frame), cell.cx, cell.cy);
             }
         }
 
-        // Draw the village ranges
-        for (const v of this.villages) {
-            v.surroundingCells.forEach(c => {
-                drawSprite(sprites("villageRange"), c.cx, c.cy);
-                drawSprite(sprites("normal"), c.cx, c.cy);
-            });
-        }
-
-        // If we have an active (hovered) trebuchet, draw its range
-        if (this.activeTrebuchet) {
-            this.activeTrebuchet.surroundingCells.forEach(c => {
-                drawSprite(sprites("trebuchetRange"), c.cx, c.cy);
-                drawSprite(sprites("normal"), c.cx, c.cy);
-            })
-        }
-
-        // Draw the villages
-        for (const v of this.villages) {
-            drawSprite(sprites("village"), v.cell.cx, v.cell.cy);
-        }
-
-        // Draw the trebuchets
-        for (const t of this.trebuchets) {
-            drawSprite(sprites("trebuchet"), t.cell.cx, t.cell.cy);
-            switch(t.state) {
-                case TrebuchetState.LOAD_OR_MOVE:
-                    drawSprite(sprites("trebuchet_moveorload"), t.cell.cx, t.cell.cy);
-                    break;
-                case TrebuchetState.FIRE:
-                    drawSprite(sprites("trebuchet_fire"), t.cell.cx, t.cell.cy);
-                    break;
-                default:
-                    drawSprite(sprites("normal"), t.cell.cx, t.cell.cy);
-                    break;
+        this.trebuchets.forEach(t => {
+            if (t.state == TrebuchetState.LOAD_OR_MOVE) {
+                drawSprite(sprites("fr_trebuchet_load_or_move"), t.cell.cx, t.cell.cy);
             }
+            if (t.state == TrebuchetState.FIRE) {
+                drawSprite(sprites("fr_trebuchet_fire"), t.cell.cx, t,cell.cy);
+            }
+        });
 
-        }
-
-        // Draw the text
         if (this.activeTrebuchet) {
             if (this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
                 if (this.activeTrebuchet.cell == this.hoveredCell) {

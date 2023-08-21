@@ -37,15 +37,16 @@ let sprites = name => {
 
     if (typeof sprites.sprites == "undefined") {
         sprites.sprites = {};
-        sprites.sprites.grass = createHex("#407122", true);
-        sprites.sprites.normal = createHex("#1F6420", false);
-        sprites.sprites.highlight = createHex("yellow", false);
-        sprites.sprites.village = createHex("black", true);
-        sprites.sprites.villageRange = createHex("#348C31", true);
-        sprites.sprites.trebuchet = createHex("gray", true);
-        sprites.sprites.trebuchet_moveorload = createHex("yellow", false);
-        sprites.sprites.trebuchet_fire = createHex("green", false);
-        sprites.sprites.trebuchetRange = createHex("#486F38", true);
+        sprites.sprites.bg_grass = createHex("#407122", true);
+        sprites.sprites.bg_village = createHex("#244012", true);
+        sprites.sprites.bg_trebuchet = createHex("#5ca82d", true);
+        sprites.sprites.bg_village_range = createHex("#38631c", true);
+        sprites.sprites.bg_trebuchet_range = createHex("#486F38", true);
+        sprites.sprites.bg_trebuchet_and_village_range = createHex("#484F28", true);
+
+        sprites.sprites.fr_normal = createHex("#1F6420", false);
+        sprites.sprites.fr_trebuchet_load_or_move = createHex("#c3cc1f", false);
+        sprites.sprites.fr_trebuchet_fire = createHex("#a1625f", false);
     }
 
     return sprites.sprites[name];

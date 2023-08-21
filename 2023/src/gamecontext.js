@@ -73,6 +73,12 @@ var gameContext = {
                 break;
             case GameState.PLAYING:
                 board.click(this.mousePos);
+                if (board.levelWon()) {
+                    this.setGameState(GameState.LEVELWON);
+                }
+                if (board.levelLost()) {
+                    this.setGameState(GameState.GAMEOVER);
+                }
                 break;
             default:
                 break;

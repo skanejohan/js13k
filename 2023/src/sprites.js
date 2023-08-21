@@ -40,9 +40,11 @@ let sprites = name => {
         sprites.sprites.grass = createHex("#407122", true);
         sprites.sprites.normal = createHex("#1F6420", false);
         sprites.sprites.highlight = createHex("yellow", false);
-        sprites.sprites.village = createHex("white", false);
+        sprites.sprites.village = createHex("black", true);
         sprites.sprites.villageRange = createHex("#348C31", true);
-        sprites.sprites.trebuchet = createHex("black", false);
+        sprites.sprites.trebuchet = createHex("gray", true);
+        sprites.sprites.trebuchet_moveorload = createHex("yellow", false);
+        sprites.sprites.trebuchet_fire = createHex("green", false);
         sprites.sprites.trebuchetRange = createHex("#486F38", true);
     }
 

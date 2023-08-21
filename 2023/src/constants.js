@@ -5,6 +5,12 @@ const GameState = {
     GAMEOVER: 4
 }
 
+const TrebuchetState = {
+    LOAD_OR_MOVE: 1,
+    FIRE: 2,
+    DONE: 3
+}
+
 const HexSide = 30;
 
 const BoardLeftMargin = 30;

@@ -141,19 +141,25 @@ var board = {
                 this.activeTrebuchet = undefined;
                 this.hoveredTrebuchet = undefined;
                 for (const t of this.trebuchets) {
-                    if (this.__inRange(mousePos, t)) {
-                        if (this.activeTrebuchet) { // in range of more than one trebuchet
-                            this.activeTrebuchet = undefined;
-                            break;
-                        }
-                        else {
-                            this.activeTrebuchet = t;
-                        }
-                    } 
+                    if (this.__over(mousePos, t)) {
+                        this.activeTrebuchet = t;
+                        this.hoveredTrebuchet = t;
+                    }
                 }
-                if (this.activeTrebuchet && this.__over(mousePos, this.activeTrebuchet)) {
-                    this.hoveredTrebuchet = this.activeTrebuchet;
+                if (!this.activeTrebuchet) {
+                    for (const t of this.trebuchets) {
+                        if (this.__inRange(mousePos, t)) {
+                            if (this.activeTrebuchet) { // in range of more than one trebuchet
+                                this.activeTrebuchet = undefined;
+                                break;
+                            }
+                            else {
+                                this.activeTrebuchet = t;
+                            }
+                        } 
+                    }
                 }
+
                 this.hoveredVillage = undefined;
                 for (const v of this.villages) {
                     if (this.__over(mousePos, v)) {

@@ -63,6 +63,8 @@ let sprites = name => {
 
         sprites.sprites.fg_trebuchet = createCircle("black", false);
         sprites.sprites.fg_village = createCircle("black", false);
+        sprites.sprites.bg_highlight = createCircle("yellow", true);
+        sprites.sprites.attack = createCircle("black", true);
         sprites.sprites.fr_normal = createHex("#1F6420", false);
         sprites.sprites.fr_trebuchet_load_or_move = createHex("#c3cc1f", false);
         sprites.sprites.fr_trebuchet_fire = createHex("#a1625f", false);

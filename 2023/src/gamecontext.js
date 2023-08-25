@@ -24,7 +24,7 @@ var gameContext = {
         }
         
         if (this.gameState == GameState.PLAYING) {
-            board.update(this.mousePos);
+            board.update(ms, this.mousePos);
         }
     },
 

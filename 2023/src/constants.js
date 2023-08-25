@@ -11,6 +11,13 @@ const TrebuchetState = {
     DONE: 3
 }
 
+const AnimationState = {
+    NONE: 0, 
+    HIGHLIGHT_ATTACKER: 1,
+    HIGHLIGHT_ATTACK: 2,
+    HIGHLIGHT_ATTACKEE: 3,
+}
+
 const HexSide = 30;
 
 const BoardLeftMargin = 30;

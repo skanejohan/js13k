@@ -6,8 +6,10 @@ var board = {
     activeTrebuchet: undefined, // while in trebuchet range
     hoveredTrebuchet: undefined, // while over the trebuchet itself
     hoveredVillage: undefined, // while over the village itself
+    animations: [{ state : AnimationState.NONE }],
     mousePos: undefined,
 
+    __animation() { return this.animations[this.animations.length - 1] },
     __rndX() { return Math.floor(Math.random() * BoardWidth) },
     __rndY() { return Math.floor(Math.random() * BoardHeight) },
     __rndPos() { return { x: this.__rndX(), y : this.__rndY() } },
@@ -41,17 +43,17 @@ var board = {
         this.__attackWithVillagesWhenAllTrebuchetsDone();
     },
 
-    __fireAtVillage(v) {
-        var distance = this.__dist(this.activeTrebuchet.pos, v.pos);
-        var power = this.activeTrebuchet.radius - distance;
+    __fireAtVillage(t, v) {
+        var distance = this.__dist(t.pos, v.pos);
+        var power = t.radius - distance;
         if (power > 0) {
-            this.activeTrebuchet.radius -= power;
+            t.radius -= power;
             v.radius -= power;
             if (v.radius <= 0) {
                 this.villages.delete(v);
             }
         }
-        this.activeTrebuchet.state = TrebuchetState.DONE;
+        t.state = TrebuchetState.DONE;
         this.__attackWithVillagesWhenAllTrebuchetsDone();
     },
 
@@ -96,6 +98,17 @@ var board = {
         }
     },
 
+    __startAnimation(animationState, data, nextFn) {
+        this.animations.push( { state : animationState, nextFn: nextFn, data: data });
+    },
+
+    __endAnimation() {
+        var a = this.animations.pop();
+        if (a.nextFn) {
+            a.nextFn();
+        }
+    },
+    
     reset(villageCount, trebuchetCount) {
         this.villages = new Set();
         this.trebuchets = new Set();
@@ -121,36 +134,74 @@ var board = {
         }
     },
 
-    update(mousePos) {
-        this.activeTrebuchet = undefined;
-        this.hoveredTrebuchet = undefined;
-        for (const t of this.trebuchets) {
-            if (this.__inRange(mousePos, t)) {
-                if (this.activeTrebuchet) { // in range of more than one trebuchet
-                    this.activeTrebuchet = undefined;
-                    break;
+    update(ms, mousePos) {
+        var animation = this.__animation();
+        switch (animation.state) {
+            case AnimationState.NONE:
+                this.activeTrebuchet = undefined;
+                this.hoveredTrebuchet = undefined;
+                for (const t of this.trebuchets) {
+                    if (this.__inRange(mousePos, t)) {
+                        if (this.activeTrebuchet) { // in range of more than one trebuchet
+                            this.activeTrebuchet = undefined;
+                            break;
+                        }
+                        else {
+                            this.activeTrebuchet = t;
+                        }
+                    } 
                 }
-                else {
-                    this.activeTrebuchet = t;
+                if (this.activeTrebuchet && this.__over(mousePos, this.activeTrebuchet)) {
+                    this.hoveredTrebuchet = this.activeTrebuchet;
                 }
-            } 
-        }
-        if (this.activeTrebuchet && this.__over(mousePos, this.activeTrebuchet)) {
-            this.hoveredTrebuchet = this.activeTrebuchet;
-        }
-
-        this.hoveredVillage = undefined;
-        for (const v of this.villages) {
-            if (this.__over(mousePos, v)) {
-                this.hoveredVillage = v;
+                this.hoveredVillage = undefined;
+                for (const v of this.villages) {
+                    if (this.__over(mousePos, v)) {
+                        this.hoveredVillage = v;
+                        break;
+                    }
+                }
                 break;
-            }
+                case AnimationState.HIGHLIGHT_ATTACKER:
+                    var elapsedMs = animation.elapsedMs || 0;
+                    if (elapsedMs < 200) {
+                        animation.elapsedMs = elapsedMs + ms;
+                    }
+                    else {
+                        this.__endAnimation();
+                        this.__startAnimation(AnimationState.HIGHLIGHT_ATTACK, animation.data)
+                    }
+                    break;
+                case AnimationState.HIGHLIGHT_ATTACK:
+                    var elapsedMs = animation.elapsedMs || 0;
+                    if (elapsedMs < 200) {
+                        animation.elapsedMs = elapsedMs + ms;
+                    }
+                    else {
+                        this.__endAnimation();
+                        this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKEE, animation.data,
+                            () => this.__fireAtVillage(animation.data.t, animation.data.v));
+                    }
+                    break;
+                case AnimationState.HIGHLIGHT_ATTACKEE:
+                    var elapsedMs = animation.elapsedMs || 0;
+                    if (elapsedMs < 400) {
+                        animation.elapsedMs = elapsedMs + ms;
+                    }
+                    else {
+                        this.__endAnimation();
+                    }
+                break;
         }
 
         this.mousePos = mousePos;
     },
 
     click() {
+        if (this.__animation().state != AnimationState.NONE) {
+            return;
+        }
+
         if (this.activeTrebuchet) {
             if (this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
                 if (this.hoveredTrebuchet) { 
@@ -163,7 +214,7 @@ var board = {
             else if (this.activeTrebuchet.state == TrebuchetState.FIRE 
                      && this.hoveredVillage 
                      && this.__villageInRange(this.activeTrebuchet, this.hoveredVillage)) {
-                        this.__fireAtVillage(this.hoveredVillage);
+                        this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { t: this.activeTrebuchet, v: this.hoveredVillage});
                     }
         }
     },
@@ -185,6 +236,15 @@ var board = {
             }
         });
 
+        if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACK) {
+            var t = this.__animation().data.t;
+            var v = this.__animation().data.v;
+            var percent = (this.__animation().elapsedMs || 0) / 200;
+            var x = t.pos.x + (v.pos.x - t.pos.x) * percent; 
+            var y = t.pos.y + (v.pos.y - t.pos.y) * percent; 
+            drawSprite(sprites("attack"), x, y, 20, 20);
+        }
+
         this.trebuchets.forEach(t => {
             drawSprite(sprites("bg_trebuchet"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius);
             if (t == this.hoveredTrebuchet) {
@@ -192,21 +252,52 @@ var board = {
             }
         });
 
-        if (this.activeTrebuchet) {
-            if (this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
-                if (this.hoveredTrebuchet) {
-                    drawText("Click to load or hover over another cell to move", 600, 780);
-                }
-                else {
-                    drawText("Click to move here", 600, 780);
-                }
+        if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACKER) {
+            var t = this.__animation().data.t;
+            var alpha = (this.__animation().elapsedMs || 0)  / 200;
+            if (alpha > 0) {
+                drawSprite(sprites("bg_highlight"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius, alpha);
             }
-            if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
-                if (this.hoveredVillage) {
-                    drawText("Click to attack this village", 600, 780);
+        }
+
+        if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACK) {
+            var t = this.__animation().data.t;
+            var v = this.__animation().data.v;
+            var percent = (this.__animation().elapsedMs || 0) / 200;
+            var alpha = 1 - percent;
+            if (alpha > 0) {
+                drawSprite(sprites("bg_highlight"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius, alpha);
+            }
+        }
+
+        if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACKEE) {
+            var v = this.__animation().data.v;
+            var alpha = (this.__animation().elapsedMs || 0) / 200;
+            if (t > 200) {
+                alpha = 1 - alpha;
+            }
+            if (alpha > 0) {
+                drawSprite(sprites("bg_highlight"), v.pos.x, v.pos.y, 2 * BaseRadius, 2 * BaseRadius, alpha);
+            }
+        }
+
+        if (this.__animation().state == AnimationState.NONE) {
+            if (this.activeTrebuchet) {
+                if (this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
+                    if (this.hoveredTrebuchet) {
+                        drawText("Click to load or hover over another cell to move", 600, 780);
+                    }
+                    else {
+                        drawText("Click to move here", 600, 780);
+                    }
                 }
-                else {
-                    drawText("Hover over a village to attack it", 600, 780);
+                if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
+                    if (this.hoveredVillage) {
+                        drawText("Click to attack this village", 600, 780);
+                    }
+                    else {
+                        drawText("Hover over a village to attack it", 600, 780);
+                    }
                 }
             }
         }

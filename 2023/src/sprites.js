@@ -35,15 +35,34 @@ let sprites = name => {
         return sprite;
     }
 
+    let createCircle = (color, fill) => {
+        var sprite = createSprite(200, 200);
+        var ctx = sprite.getContext("2d");
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(100, 100, 100, 0, 2 * Math.PI);
+        if (fill)
+        {
+            ctx.fill();
+        }
+        else
+        {
+            ctx.stroke();
+        }
+        return sprite;
+    }
+
     if (typeof sprites.sprites == "undefined") {
         sprites.sprites = {};
-        sprites.sprites.bg_grass = createHex("#407122", true);
-        sprites.sprites.bg_village = createHex("#244012", true);
-        sprites.sprites.bg_trebuchet = createHex("#5ca82d", true);
-        sprites.sprites.bg_village_range = createHex("#38631c", true);
-        sprites.sprites.bg_trebuchet_range = createHex("#486F38", true);
-        sprites.sprites.bg_trebuchet_and_village_range = createHex("#484F28", true);
+        sprites.sprites.bg_village = createCircle("#244012", true);
+        sprites.sprites.bg_trebuchet = createCircle("#5ca82d", true);
+        sprites.sprites.bg_village_range = createCircle("#38631c", true);
+        sprites.sprites.bg_trebuchet_range = createCircle("#486F38", true);
 
+        sprites.sprites.fg_trebuchet = createCircle("black", false);
+        sprites.sprites.fg_village = createCircle("black", false);
         sprites.sprites.fr_normal = createHex("#1F6420", false);
         sprites.sprites.fr_trebuchet_load_or_move = createHex("#c3cc1f", false);
         sprites.sprites.fr_trebuchet_fire = createHex("#a1625f", false);

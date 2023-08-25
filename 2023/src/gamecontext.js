@@ -29,17 +29,26 @@ var gameContext = {
     },
 
     render() {
-        function drawSprite(sprite, x, y) {
-            var left = x - sprite.width / 2;
-            var top = y - sprite.height / 2;
+        function drawSprite(sprite, x, y, width, height, alpha) {
+            var a = alpha || 1.0;
+            var w = width || sprite.width;
+            var h = height || sprite.height;
+            var xScale = w / sprite.width;
+            var yScale = h / sprite.height;
+            var left = (x - w / 2) / xScale;
+            var top = (y - h / 2) / yScale;
+            context.save();
+            context.scale(xScale, yScale);
+            context.globalAlpha = a;
             context.drawImage(sprite, left, top);
+            context.restore();
         }
 
         function drawText(text, x, y) {
             context.fillText(text, x, y);
         }
 
-        context.fillStyle = "blue";
+        context.fillStyle = "#407122";
         context.fillRect(0, 0, 1200, 800);
 
         context.font = "24px Arial";      

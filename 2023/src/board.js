@@ -1,77 +1,26 @@
 var board = {
-    hexGrid: undefined,
-    villages: new Set(), // set of { cell, strength, surroundingCells }
-    villageCells: new Set(), // Set of cell
-    trebuchets: new Set(), // set of { cell, strength, surroundingCells, state }
-    trebuchetCells: new Set(), // Set of cell
-    hoveredCell: undefined, // cell
-    activeTrebuchet: undefined, // { cell, strength, surroundingCells } - while in trebuchet range
+    // village = { pos, strength, radius }
+    // trebuchet = { pos, strength, radius, state }
+    villages: new Set(),
+    trebuchets: new Set(),
+    activeTrebuchet: undefined, // while in trebuchet range
+    hoveredTrebuchet: undefined, // while over the trebuchet itself
+    hoveredVillage: undefined, // while over the village itself
+    mousePos: undefined,
 
-    __randomCell() {
-        var c = Math.floor(Math.random() * BoardCols);
-        var r = Math.floor(Math.random() * BoardRows);
-        return this.hexGrid.cell(c, r);
-    }, 
-
-    __addVillage(v) {
-        this.villages.add(v);
-        this.villageCells.add(v.cell);
-    },
-
-    __deleteVillage(v) {
-        this.villages.delete(v);
-        this.villageCells.delete(v.cell);
-    },
-
-    __addTrebuchet(t) {
-        this.trebuchets.add(t);
-        this.trebuchetCells.add(t.cell);
-    },
-
-    __deleteTrebuchet(t) {
-        this.trebuchets.delete(t);
-        this.trebuchetCells.delete(t.cell);
-    },
-
-    __trebuchetAt(cell) {
-        for (const t of this.trebuchets) {
-            if (t.cell == cell) {
-                return t;
-            }
-        }
-        return undefined;
-    },
-
-    __createVillageOrTrebuchet(cell, strength) {
-        return {
-            cell : cell,
-            strength : strength,
-            surroundingCells : this.hexGrid.neighbors(cell, strength)
-        }
-    },
-
-    __replaceOrRemoveTrebuchet(trebuchet, cell, newStrength) {
-        this.__deleteTrebuchet(trebuchet);
-        if (newStrength >= 0) { // A trebuchet may have strength 0
-            var t = this.__createVillageOrTrebuchet(cell, newStrength);
-            this.__addTrebuchet(t);
-        }
-        return t;
-    },
-
-    __replaceOrRemoveVillage(village, newStrength) {
-        this.__deleteVillage(village);
-        if (newStrength > 0) { // A village may not have strength 0
-            var v = this.__createVillageOrTrebuchet(village.cell, newStrength);
-            this.__addVillage(v);
-        }
-        return v;
-    },
+    __rndX() { return Math.floor(Math.random() * BoardWidth) },
+    __rndY() { return Math.floor(Math.random() * BoardHeight) },
+    __rndPos() { return { x: this.__rndX(), y : this.__rndY() } },
+    __sqDist(p1, p2) { return (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y) },
+    __dist(p1, p2) { return Math.sqrt(this.__sqDist(p1, p2)) },
+    __inRange(p, t) { return this.__sqDist(p, t.pos) <= t.radius * t.radius },
+    __over(p, t) { return this.__sqDist(p, t.pos) <= BaseRadius * BaseRadius },
+    __villageInRange(t, v) { return this.__sqDist(t.pos, v.pos) <= t.radius * t.radius },
 
     __setFireOrDoneStateForActiveTrebuchet() {
         this.activeTrebuchet.state = TrebuchetState.DONE;
         for (const v of this.villages) {
-            if (this.hexGrid.distance(this.activeTrebuchet.cell, v.cell) <= this.activeTrebuchet.strength) {
+            if (this.__villageInRange(this.activeTrebuchet, v)) {
                 this.activeTrebuchet.state = TrebuchetState.FIRE;
                 break;
             }
@@ -79,38 +28,45 @@ var board = {
     },
 
     __load() {
-        var newStrength = this.activeTrebuchet.strength + 1;
-        this.activeTrebuchet = this.__replaceOrRemoveTrebuchet(this.activeTrebuchet, this.hoveredCell, newStrength);
+        this.activeTrebuchet.strength += 1;
+        this.activeTrebuchet.radius += BaseRadius;
         this.__setFireOrDoneStateForActiveTrebuchet();
         this.__attackWithVillagesWhenAllTrebuchetsDone();
     },
 
     __move() {
-        this.activeTrebuchet = this.__replaceOrRemoveTrebuchet(this.activeTrebuchet, this.hoveredCell, this.activeTrebuchet.strength);
+        this.activeTrebuchet.pos = this.mousePos;
+        //this.__increaseStrengthForNearTrebuchets();
         this.__setFireOrDoneStateForActiveTrebuchet();
         this.__attackWithVillagesWhenAllTrebuchetsDone();
     },
 
-    __fireAtVillage(village) {
-        var distance = this.hexGrid.distance(this.activeTrebuchet.cell, village.cell);
-        var power = this.activeTrebuchet.strength - distance + 1;
-        this.activeTrebuchet = this.__replaceOrRemoveTrebuchet(this.activeTrebuchet, this.activeTrebuchet.cell, 0);
-        this.__replaceOrRemoveVillage(village, village.strength - power);
+    __fireAtVillage(v) {
+        var distance = this.__dist(this.activeTrebuchet.pos, v.pos);
+        var power = this.activeTrebuchet.radius - distance;
+        if (power > 0) {
+            this.activeTrebuchet.radius -= power;
+            v.radius -= power;
+            if (v.radius <= 0) {
+                this.villages.delete(v);
+            }
+        }
         this.activeTrebuchet.state = TrebuchetState.DONE;
         this.__attackWithVillagesWhenAllTrebuchetsDone();
     },
 
-    __fireAtTrebuchet(trebuchet, village) {
-        var distance = this.hexGrid.distance(trebuchet.cell, village.cell);
-        if (distance < village.strength) {
-            var power = 1;
-            var newTrebuchet = this.__replaceOrRemoveTrebuchet(trebuchet, trebuchet.cell, trebuchet.strength - power);
-            if (trebuchet == this.activeTrebuchet) {
-                this.activeTrebuchet = newTrebuchet;
+    __fireAtTrebuchet(t, v) {
+        var distance = this.__dist(t.pos, v.pos);
+        var power = v.radius - distance;
+        if (power > 0) {
+            v.radius -= power;
+            t.radius -= power;
+            if (t.radius <= 0) {
+                this.trebuchets.delete(t);
             }
-            return newTrebuchet;
+            return true;
         }
-        return undefined;
+        return false;
     },
 
     __attackWithVillagesWhenAllTrebuchetsDone() {
@@ -125,17 +81,13 @@ var board = {
         var trebuchetList = Array.from(this.trebuchets);
         for (var i = 0; i < villageList.length; i++) {
             var v = villageList[i];
+            var hasHit = false;
             for (var j = 0; j < trebuchetList.length; j++) {
                 var t = trebuchetList[j];
-                var hit = this.__fireAtTrebuchet(t, v);
-                if (hit) {
-                    if (hit.strength < 1) {
-                        this.__deleteTrebuchet(hit);
-                    }
-                }
-                else {
-                    this.__replaceOrRemoveVillage(v, v.strength + 1);
-                }
+                hasHit |= this.__fireAtTrebuchet(t, v);
+            }
+            if (!hasHit) {
+                v.radius += BaseRadius;
             }
         }
 
@@ -149,122 +101,100 @@ var board = {
         this.trebuchets = new Set();
         var occupied = new Set();
     
-        this.hexGrid = createHexGrid(HexSide, BoardCols, BoardRows, BoardLeftMargin, BoardTopMargin);
-
         while (this.villages.size < villageCount)
         {
-            var c = this.__createVillageOrTrebuchet(this.__randomCell(), 2);
-            this.__addVillage(c);
-            occupied.add(c);
+            var v = { pos: this.__rndPos(), strength: 2, radius: 2 * BaseRadius };
+            if (!occupied.has(v.pos)) // TODO should be a smallest distance
+            {
+                this.villages.add(v);
+                occupied.add(v.pos);
+            }
         }
         while (this.trebuchets.size < trebuchetCount)
         {
-            var c = this.__createVillageOrTrebuchet(this.__randomCell(), 3);
-            if (!occupied.has(c))
+            var t = { pos: this.__rndPos(), strength: 3, radius: 3 * BaseRadius , state: TrebuchetState.LOAD_OR_MOVE };
+            if (!occupied.has(t.pos)) // TODO should be a smallest distance
             {
-                this.__addTrebuchet(c);
-                occupied.add(c);
+                this.trebuchets.add(t);
+                occupied.add(t.pos);
             }
-        }
-        for (var t of this.trebuchets) {
-            t.state = TrebuchetState.LOAD_OR_MOVE;
         }
     },
 
     update(mousePos) {
-        var cell = this.hexGrid.enclosingCell(mousePos.x, mousePos.y);
-        if (cell != this.hoveredCell) {
-            this.hoveredCell = cell;
-            if (this.hoveredCell == undefined) {
-                this.activeTrebuchet = undefined;
-            }
-            else {
-                var trebuchet = this.__trebuchetAt(cell);
-                if (trebuchet) { 
-                    this.activeTrebuchet = trebuchet; // I am hovering over a trebuchet
+        this.activeTrebuchet = undefined;
+        this.hoveredTrebuchet = undefined;
+        for (const t of this.trebuchets) {
+            if (this.__inRange(mousePos, t)) {
+                if (this.activeTrebuchet) { // in range of more than one trebuchet
+                    this.activeTrebuchet = undefined;
+                    break;
                 }
-                else if (this.activeTrebuchet != undefined && !this.activeTrebuchet.surroundingCells.has(this.hoveredCell))
-                {
-                    this.activeTrebuchet = undefined; // I have moved out of the highlighted area - nothing is highlighted
+                else {
+                    this.activeTrebuchet = t;
                 }
-                // Otherwise, I remain in the trebuchet range
+            } 
+        }
+        if (this.activeTrebuchet && this.__over(mousePos, this.activeTrebuchet)) {
+            this.hoveredTrebuchet = this.activeTrebuchet;
+        }
+
+        this.hoveredVillage = undefined;
+        for (const v of this.villages) {
+            if (this.__over(mousePos, v)) {
+                this.hoveredVillage = v;
+                break;
             }
         }
+
+        this.mousePos = mousePos;
     },
 
     click() {
         if (this.activeTrebuchet) {
             if (this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
-                if (this.activeTrebuchet.cell == this.hoveredCell) { 
+                if (this.hoveredTrebuchet) { 
                     this.__load();
                 }
                 else { 
                     this.__move();
                 }
             }
-            if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
-                for (const v of this.villages) {
-                    if (v.cell == this.hoveredCell) {
-                        this.__fireAtVillage(v);
-                        break;
+            else if (this.activeTrebuchet.state == TrebuchetState.FIRE 
+                     && this.hoveredVillage 
+                     && this.__villageInRange(this.activeTrebuchet, this.hoveredVillage)) {
+                        this.__fireAtVillage(this.hoveredVillage);
                     }
-                }
-            }
         }
     },
 
     draw(drawSprite, drawText) {
 
-        var villageRange = new Set();
-        var trebuchetRange = new Set();
-        var combinedRange = new Set();
-        this.villages.forEach(v => v.surroundingCells.forEach(c => villageRange.add(c)));
-        this.trebuchets.forEach(v => v.surroundingCells.forEach(c => {
-            trebuchetRange.add(c);
-            if (villageRange.has(c)) {
-                combinedRange.add(c);
-            }
-        }));
-
-        for (r = 0; r < BoardRows; r++) {
-            for (c = 0; c < BoardCols; c++) {
-                var cell = this.hexGrid.cell(c, r);
-
-                var frame = "fr_normal";
-                var background = "bg_grass";
-                if (this.villageCells.has(cell)) {
-                    background = "bg_village";
-                }
-                else if (this.trebuchetCells.has(cell)) {
-                    background = "bg_trebuchet";
-                }
-                else if (combinedRange.has(cell)) {
-                    background = "bg_trebuchet_and_village_range";
-                }
-                else if (villageRange.has(cell)) {
-                    background = "bg_village_range";
-                }
-                else if (trebuchetRange.has(cell)) {
-                    background = "bg_trebuchet_range";
-                }
-
-                drawSprite(sprites(background), cell.cx, cell.cy);
-                drawSprite(sprites(frame), cell.cx, cell.cy);
-            }
-        }
+        this.villages.forEach(v => {
+            drawSprite(sprites("bg_village_range"), v.pos.x, v.pos.y, 2 * v.radius, 2 * v.radius, 0.5);
+        });
 
         this.trebuchets.forEach(t => {
-            if (t.state == TrebuchetState.LOAD_OR_MOVE) {
-                drawSprite(sprites("fr_trebuchet_load_or_move"), t.cell.cx, t.cell.cy);
+            drawSprite(sprites("bg_trebuchet_range"), t.pos.x, t.pos.y, 2 * t.radius, 2 * t.radius, 0.5);
+        });
+
+        this.villages.forEach(v => {
+            drawSprite(sprites("bg_village"), v.pos.x, v.pos.y, 2 * BaseRadius, 2 * BaseRadius);
+            if (v == this.hoveredVillage) {
+                drawSprite(sprites("fg_village"), v.pos.x, v.pos.y, 2 * BaseRadius, 2 * BaseRadius);
             }
-            if (t.state == TrebuchetState.FIRE) {
-                drawSprite(sprites("fr_trebuchet_fire"), t.cell.cx, t,cell.cy);
+        });
+
+        this.trebuchets.forEach(t => {
+            drawSprite(sprites("bg_trebuchet"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius);
+            if (t == this.hoveredTrebuchet) {
+                drawSprite(sprites("fg_trebuchet"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius);
             }
         });
 
         if (this.activeTrebuchet) {
             if (this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
-                if (this.activeTrebuchet.cell == this.hoveredCell) {
+                if (this.hoveredTrebuchet) {
                     drawText("Click to load or hover over another cell to move", 600, 780);
                 }
                 else {
@@ -272,7 +202,12 @@ var board = {
                 }
             }
             if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
-                drawText("Click on a village to attack it", 600, 780);
+                if (this.hoveredVillage) {
+                    drawText("Click to attack this village", 600, 780);
+                }
+                else {
+                    drawText("Hover over a village to attack it", 600, 780);
+                }
             }
         }
     },

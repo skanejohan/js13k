@@ -29,16 +29,15 @@ var gameContext = {
     },
 
     render() {
-        function drawSprite(sprite, x, y, width, height, alpha) {
+        function drawSprite(sprite, pos, scale, alpha) {
             var a = alpha || 1.0;
-            var w = width || sprite.width;
-            var h = height || sprite.height;
-            var xScale = w / sprite.width;
-            var yScale = h / sprite.height;
-            var left = (x - w / 2) / xScale;
-            var top = (y - h / 2) / yScale;
+            var s = scale || 1;
+            var w = sprite.width * s;
+            var h = sprite.height * s;
+            var left = (pos.x - w / 2) / s;
+            var top = (pos.y - h / 2) / s;
             context.save();
-            context.scale(xScale, yScale);
+            context.scale(s, s);
             context.globalAlpha = a;
             context.drawImage(sprite, left, top);
             context.restore();

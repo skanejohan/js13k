@@ -1,74 +1,116 @@
-let sprites = name => {
+var spriteGenerator = {
 
-    let createSprite = (w, h) => {
+    __createSprite(w, h) {
         var sprite = document.createElement('canvas');
         sprite.width = w;
         sprite.height = h;
+        sprite.ctx = sprite.getContext("2d"); 
         return sprite;
-    }
-    
-    let createHex = (color, fill) => {
-        var s = HexSide;
-        var h = s * Math.sin(30 * Math.PI / 180);
-        var r = s * Math.cos(30 * Math.PI / 180);
-        var sprite = createSprite(s + 2 * h + 4, 2 * r + 4);
-        var ctx = sprite.getContext("2d");
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = color;
-        ctx.fillStyle = color;
+    },
+
+    __createCircle(def) {
+        var circle = this.__createSprite(2 * def.r, 2 * def.r);
+        circle.ctx.strokeStyle = def.strokeStyle;
+        circle.ctx.fillStyle = def.fillStyle;
+        circle.ctx.lineWidth = def.lineWidth;
+        var startAngle = def.startAngle || 0;
+        var endAngle = def.endAngle || 2 * Math.PI;
+        circle.ctx.beginPath();
+        circle.ctx.arc(def.r, def.r, def.r, startAngle, endAngle);
+        if (def.fillStyle) {
+            circle.ctx.fill();
+        } else {
+            circle.ctx.stroke();
+        }
+        return circle;
+    },
+
+    __createLevelFilledCircle(def, filledPercent) {
+        var fp = Math.max(Math.min(filledPercent, 100), 0);
+        var topY = (1 - (fp / 100)) * 2 * def.r;
+        var dy = topY - def.r;
+        var angle = Math.asin(dy / def.r);
+        def.startAngle = angle;
+        def.endAngle = Math.PI - angle;
+        return this.__createCircle(def);
+    },
+
+    __createHealthCircle(health) {
+        var r = Math.round(245 - health * 1.25).toString(16);
+        var g = Math.round(66 + health * 1.8).toString(16);
+        var b = (66).toString(16);
+        return this.__createLevelFilledCircle({ r: 100, fillStyle: `#${r}${g}${b}` }, health);
+    },
+
+    __drawTrebuchet(ctx) {
         ctx.beginPath();
-        ctx.moveTo(h + 2, 0 + 2);
-        ctx.lineTo(h + s + 2, 0 + 2);
-        ctx.lineTo(h + s + h + 2, r + 2);
-        ctx.lineTo(h + s + 2, r + r + 2);
-        ctx.lineTo(h + 2, r + r + 2);
-        ctx.lineTo(0 + 2, r + 2);
-        ctx.lineTo(h + 2, 0 + 2);
-        if (fill)
-        {
-            ctx.fill();
-        }
-        else
-        {
-            ctx.stroke();
-        }
-        return sprite;
-    }
+        ctx.moveTo(40, 160);
+        ctx.lineTo(160, 160);
+        ctx.lineTo(160, 90);
+        ctx.lineTo(40, 90);
+        ctx.lineTo(40, 160);
+        ctx.stroke();
+    },
 
-    let createCircle = (color, fill) => {
-        var sprite = createSprite(200, 200);
-        var ctx = sprite.getContext("2d");
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = color;
-        ctx.fillStyle = color;
+    __drawVillage(ctx) {
         ctx.beginPath();
-        ctx.arc(100, 100, 100, 0, 2 * Math.PI);
-        if (fill)
-        {
-            ctx.fill();
+        ctx.moveTo(40, 160);
+        ctx.lineTo(160, 160);
+        ctx.lineTo(160, 90);
+        ctx.lineTo(40, 90);
+        ctx.lineTo(40, 160);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(40, 90);
+        ctx.lineTo(40, 70);
+        ctx.lineTo(70, 70);
+        ctx.lineTo(70, 90);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(85, 90);
+        ctx.lineTo(85, 60);
+        ctx.lineTo(115, 60);
+        ctx.lineTo(115, 90);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(85, 60);
+        ctx.lineTo(75, 60);
+        ctx.lineTo(75, 35);
+        ctx.lineTo(125, 35);
+        ctx.lineTo(125, 60);
+        ctx.lineTo(115, 60);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(160, 90);
+        ctx.lineTo(160, 70);
+        ctx.lineTo(130, 70);
+        ctx.lineTo(130, 90);
+        ctx.stroke();
+    },
+
+    __createTrebuchetOrVillage(health, isHovered, drawFn) {
+        var result = this.__createCircle({ r: 100, fillStyle: `#d4d1cb` });
+        var healthCircle = this.__createHealthCircle(health);
+        result.ctx.drawImage(healthCircle, 0, 0);
+        result.ctx.strokeStyle = "black";
+        result.ctx.lineWidth = 5;
+        drawFn(result.ctx);
+        if (isHovered) {
+            var frame = this.__createCircle({ r: 102, strokeStyle: `gray`, lineWidth: 8 });
+            result.ctx.drawImage(frame, 0, 0);
         }
-        else
-        {
-            ctx.stroke();
-        }
-        return sprite;
-    }
+        return result;
+    },
 
-    if (typeof sprites.sprites == "undefined") {
-        sprites.sprites = {};
-        sprites.sprites.bg_village = createCircle("#244012", true);
-        sprites.sprites.bg_trebuchet = createCircle("#5ca82d", true);
-        sprites.sprites.bg_village_range = createCircle("#38631c", true);
-        sprites.sprites.bg_trebuchet_range = createCircle("#486F38", true);
+    // Public
 
-        sprites.sprites.fg_trebuchet = createCircle("black", false);
-        sprites.sprites.fg_village = createCircle("black", false);
-        sprites.sprites.bg_highlight = createCircle("yellow", true);
-        sprites.sprites.attack = createCircle("black", true);
-        sprites.sprites.fr_normal = createHex("#1F6420", false);
-        sprites.sprites.fr_trebuchet_load_or_move = createHex("#c3cc1f", false);
-        sprites.sprites.fr_trebuchet_fire = createHex("#a1625f", false);
-    }
-
-    return sprites.sprites[name];
+    createTrebuchet(health, isHovered) { return this.__createTrebuchetOrVillage(health, isHovered, this.__drawTrebuchet) },
+    createVillage(health, isHovered) { return this.__createTrebuchetOrVillage(health, isHovered, this.__drawVillage) },
+    createRange() { return this.__createCircle({ r: 100, fillStyle: `#38631c` }) },
+    createAttack() { return this.__createCircle({ r: 7, fillStyle: `black` }) },
+    createHighlight() { return this.__createCircle({ r: 100, fillStyle: `yellow` }) },
 }

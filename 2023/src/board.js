@@ -1,6 +1,6 @@
 var board = {
-    // village = { pos, strength, radius }
-    // trebuchet = { pos, strength, radius, state }
+    // village = { pos, health, strength, radius }
+    // trebuchet = { pos, health, strength, radius, state }
     villages: new Set(),
     trebuchets: new Set(),
     activeTrebuchet: undefined, // while in trebuchet range
@@ -18,6 +18,34 @@ var board = {
     __inRange(p, t) { return this.__sqDist(p, t.pos) <= t.radius * t.radius },
     __over(p, t) { return this.__sqDist(p, t.pos) <= BaseRadius * BaseRadius },
     __villageInRange(t, v) { return this.__sqDist(t.pos, v.pos) <= t.radius * t.radius },
+    __trebuchetInRange(v, t) { return this.__sqDist(t.pos, v.pos) <= v.radius * v.radius },
+
+    // Village actions
+    __createVillage() { return { pos: this.__rndPos(), health: 100, strength: 30, radius: 3 * BaseRadius } },
+    __attackTrebuchet(v, t) { t.health -= v.strength },
+    __updateVillage(v) { },
+    __removeKilledVillages() {
+        var vs = Array.from(this.villages);
+        for (var i = 0; i < vs.length; i++) {
+            if (vs[i].health <= 0) {
+                this.villages.delete(vs[i]);
+            }
+        }
+    },
+
+    // Trebuchet actions
+    __createTrebuchet() { return { pos: this.__rndPos(), health: 100, strength: 50, radius: 4 * BaseRadius , state: TrebuchetState.LOAD_OR_MOVE } },
+    __attackVillage(t, v) { v.health -= t.strength },
+    __loadTrebuchet(t) { t.Strength = Math.min(t.strength + 20, 100) },
+    __moveTrebuchet(t, pos) { t.pos = pos },
+    __removeKilledTrebuchets() {
+        var ts = Array.from(this.trebuchets);
+        for (var i = 0; i < ts.length; i++) {
+            if (ts[i].health <= 0) {
+                this.trebuchets.delete(ts[i]);
+            }
+        }
+    },
 
     __setFireOrDoneStateForActiveTrebuchet() {
         this.activeTrebuchet.state = TrebuchetState.DONE;
@@ -30,45 +58,29 @@ var board = {
     },
 
     __load() {
-        this.activeTrebuchet.strength += 1;
-        this.activeTrebuchet.radius += BaseRadius;
+        this.__loadTrebuchet(this.activeTrebuchet);
         this.__setFireOrDoneStateForActiveTrebuchet();
         this.__attackWithVillagesWhenAllTrebuchetsDone();
     },
 
     __move() {
-        this.activeTrebuchet.pos = this.mousePos;
-        //this.__increaseStrengthForNearTrebuchets();
+        this.__moveTrebuchet(this.activeTrebuchet, this.mousePos);
         this.__setFireOrDoneStateForActiveTrebuchet();
         this.__attackWithVillagesWhenAllTrebuchetsDone();
     },
 
     __fireAtVillage(t, v) {
-        var distance = this.__dist(t.pos, v.pos);
-        var power = t.radius - distance;
-        if (power > 0) {
-            t.radius -= power;
-            v.radius -= power;
-            if (v.radius <= 0) {
-                this.villages.delete(v);
-            }
+        if (this.__villageInRange(t, v)) {
+            this.__attackVillage(t, v);
         }
         t.state = TrebuchetState.DONE;
         this.__attackWithVillagesWhenAllTrebuchetsDone();
     },
 
-    __fireAtTrebuchet(t, v) {
-        var distance = this.__dist(t.pos, v.pos);
-        var power = v.radius - distance;
-        if (power > 0) {
-            v.radius -= power;
-            t.radius -= power;
-            if (t.radius <= 0) {
-                this.trebuchets.delete(t);
-            }
-            return true;
+    __fireAtTrebuchet(v, t) {
+        if (this.__trebuchetInRange(t, v)) {
+            this.__attackTrebuchet(v, t);
         }
-        return false;
     },
 
     __attackWithVillagesWhenAllTrebuchetsDone() {
@@ -78,18 +90,11 @@ var board = {
             }
         }
 
-        // if a trebuchet is in range of a village, the village will attack it. If not, the village's strength increases
-        var villageList = Array.from(this.villages);
-        var trebuchetList = Array.from(this.trebuchets);
-        for (var i = 0; i < villageList.length; i++) {
-            var v = villageList[i];
-            var hasHit = false;
-            for (var j = 0; j < trebuchetList.length; j++) {
-                var t = trebuchetList[j];
-                hasHit |= this.__fireAtTrebuchet(t, v);
-            }
-            if (!hasHit) {
-                v.radius += BaseRadius;
+        for (const v of this.villages) {
+            for (const t of this.trebuchets) {
+                if (v.health > 0 && this.__trebuchetInRange(v, t)) {
+                    this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { from: v, to: t, trebuchetAttack: false });
+                }
             }
         }
 
@@ -116,7 +121,7 @@ var board = {
     
         while (this.villages.size < villageCount)
         {
-            var v = { pos: this.__rndPos(), strength: 2, radius: 2 * BaseRadius };
+            var v = this.__createVillage();
             if (!occupied.has(v.pos)) // TODO should be a smallest distance
             {
                 this.villages.add(v);
@@ -125,7 +130,7 @@ var board = {
         }
         while (this.trebuchets.size < trebuchetCount)
         {
-            var t = { pos: this.__rndPos(), strength: 3, radius: 3 * BaseRadius , state: TrebuchetState.LOAD_OR_MOVE };
+            var t = this.__createTrebuchet();
             if (!occupied.has(t.pos)) // TODO should be a smallest distance
             {
                 this.trebuchets.add(t);
@@ -135,6 +140,8 @@ var board = {
     },
 
     update(ms, mousePos) {
+        this.__removeKilledVillages();
+        this.__removeKilledTrebuchets();
         var animation = this.__animation();
         switch (animation.state) {
             case AnimationState.NONE:
@@ -186,7 +193,14 @@ var board = {
                     else {
                         this.__endAnimation();
                         this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKEE, animation.data,
-                            () => this.__fireAtVillage(animation.data.t, animation.data.v));
+                            () => {
+                                if (animation.data.trebuchetAttack) {
+                                    this.__fireAtVillage(animation.data.from, animation.data.to);
+                                }
+                                else {
+                                    this.__fireAtTrebuchet(animation.data.from, animation.data.to);
+                                }
+                            });
                     }
                     break;
                 case AnimationState.HIGHLIGHT_ATTACKEE:
@@ -220,70 +234,75 @@ var board = {
             else if (this.activeTrebuchet.state == TrebuchetState.FIRE 
                      && this.hoveredVillage 
                      && this.__villageInRange(this.activeTrebuchet, this.hoveredVillage)) {
-                        this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { t: this.activeTrebuchet, v: this.hoveredVillage});
+                        this.__startAnimation(
+                            AnimationState.HIGHLIGHT_ATTACKER, 
+                            { 
+                                from: this.activeTrebuchet, 
+                                to: this.hoveredVillage,
+                                trebuchetAttack: true
+                            });
                     }
         }
     },
 
     draw(drawSprite, drawText) {
 
+        var drawRadiusScaledSprite = (sprite, pos, radius, alpha) => {
+            drawSprite(sprite, pos, 2 * radius / 200, alpha);
+        };
+
         this.villages.forEach(v => {
-            drawSprite(sprites("bg_village_range"), v.pos.x, v.pos.y, 2 * v.radius, 2 * v.radius, 0.5);
+            drawRadiusScaledSprite(spriteGenerator.createRange(), v.pos, v.radius, 0.5);
         });
 
         this.trebuchets.forEach(t => {
-            drawSprite(sprites("bg_trebuchet_range"), t.pos.x, t.pos.y, 2 * t.radius, 2 * t.radius, 0.5);
+            drawRadiusScaledSprite(spriteGenerator.createRange(), t.pos, t.radius, 0.5);
         });
 
         this.villages.forEach(v => {
-            drawSprite(sprites("bg_village"), v.pos.x, v.pos.y, 2 * BaseRadius, 2 * BaseRadius);
-            if (v == this.hoveredVillage) {
-                drawSprite(sprites("fg_village"), v.pos.x, v.pos.y, 2 * BaseRadius, 2 * BaseRadius);
-            }
+            drawSprite(spriteGenerator.createVillage(v.health, v == this.hoveredVillage), v.pos, 0.5);
         });
 
         if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACK) {
-            var t = this.__animation().data.t;
-            var v = this.__animation().data.v;
+            var from = this.__animation().data.from;
+            var to = this.__animation().data.to;
             var percent = (this.__animation().elapsedMs || 0) / 200;
-            var x = t.pos.x + (v.pos.x - t.pos.x) * percent; 
-            var y = t.pos.y + (v.pos.y - t.pos.y) * percent; 
-            drawSprite(sprites("attack"), x, y, 20, 20);
+            var pos = {
+                x: from.pos.x + (to.pos.x - from.pos.x) * percent,
+                y: from.pos.y + (to.pos.y - from.pos.y) * percent
+            }
+            drawSprite(spriteGenerator.createAttack(), pos);
         }
 
         this.trebuchets.forEach(t => {
-            drawSprite(sprites("bg_trebuchet"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius);
-            if (t == this.hoveredTrebuchet) {
-                drawSprite(sprites("fg_trebuchet"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius);
-            }
+            drawSprite(spriteGenerator.createTrebuchet(t.health, t == this.hoveredTrebuchet), t.pos, 0.5);
         });
 
         if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACKER) {
-            var t = this.__animation().data.t;
+            var from = this.__animation().data.from;
             var alpha = (this.__animation().elapsedMs || 0)  / 200;
             if (alpha > 0) {
-                drawSprite(sprites("bg_highlight"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius, alpha);
+                drawSprite(spriteGenerator.createHighlight(), from.pos, 0.5, alpha);
             }
         }
 
         if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACK) {
-            var t = this.__animation().data.t;
-            var v = this.__animation().data.v;
+            var from = this.__animation().data.from;
             var percent = (this.__animation().elapsedMs || 0) / 200;
             var alpha = 1 - percent;
             if (alpha > 0) {
-                drawSprite(sprites("bg_highlight"), t.pos.x, t.pos.y, 2 * BaseRadius, 2 * BaseRadius, alpha);
+                drawSprite(spriteGenerator.createHighlight(), from.pos, 0.5, alpha);
             }
         }
 
         if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACKEE) {
-            var v = this.__animation().data.v;
+            var to = this.__animation().data.to;
             var alpha = (this.__animation().elapsedMs || 0) / 200;
-            if (t > 200) {
+            if (this.__animation().elapsedMs > 200) {
                 alpha = 1 - alpha;
             }
             if (alpha > 0) {
-                drawSprite(sprites("bg_highlight"), v.pos.x, v.pos.y, 2 * BaseRadius, 2 * BaseRadius, alpha);
+                drawSprite(spriteGenerator.createHighlight(), to.pos, 0.5, alpha);
             }
         }
 

@@ -1,4 +1,4 @@
-var spriteGenerator = {
+var sprites = {
 
     __createSprite(w, h) {
         var sprite = document.createElement('canvas');
@@ -44,11 +44,26 @@ var spriteGenerator = {
 
     __drawTrebuchet(ctx) {
         ctx.beginPath();
-        ctx.moveTo(40, 160);
-        ctx.lineTo(160, 160);
-        ctx.lineTo(160, 90);
-        ctx.lineTo(40, 90);
-        ctx.lineTo(40, 160);
+        ctx.moveTo(60, 160);
+        ctx.lineTo(140, 160);
+        ctx.lineTo(110, 40);
+        ctx.lineTo(90, 40);
+        ctx.lineTo(60, 160);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(25, 60);
+        ctx.lineTo(180, 130);
+        ctx.lineTo(174, 140);
+        ctx.lineTo(20, 70);
+        ctx.lineTo(26, 60);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(30, 75);
+        ctx.lineTo(15, 120);
+        ctx.lineTo(45, 120);
+        ctx.lineTo(30, 75);
         ctx.stroke();
     },
 

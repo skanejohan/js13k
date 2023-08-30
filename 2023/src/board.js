@@ -47,6 +47,21 @@ var board = {
         }
     },
 
+    __canBePlacedAt(item, pos) {
+        for (const v of this.villages) {
+            var d = this.__dist(v, pos);
+            if (v != item && this.__dist(v.pos, pos) < 2.3 * BaseRadius) {
+                return false;
+            }
+        }
+        for (const t of this.trebuchets) {
+            if (t != item && this.__dist(t.pos, pos) < 2.3 * BaseRadius) {
+                return false;
+            }
+        }
+        return true;
+    },
+
     __setFireOrDoneStateForActiveTrebuchet() {
         this.activeTrebuchet.state = TrebuchetState.DONE;
         for (const v of this.villages) {
@@ -64,9 +79,11 @@ var board = {
     },
 
     __move() {
-        this.__moveTrebuchet(this.activeTrebuchet, this.mousePos);
-        this.__setFireOrDoneStateForActiveTrebuchet();
-        this.__attackWithVillagesWhenAllTrebuchetsDone();
+        if (this.__canBePlacedAt(this.activeTrebuchet, this.mousePos)) {
+            this.__moveTrebuchet(this.activeTrebuchet, this.mousePos);
+            this.__setFireOrDoneStateForActiveTrebuchet();
+            this.__attackWithVillagesWhenAllTrebuchetsDone();
+        }
     },
 
     __fireAtVillage(t, v) {
@@ -117,24 +134,19 @@ var board = {
     reset(villageCount, trebuchetCount) {
         this.villages = new Set();
         this.trebuchets = new Set();
-        var occupied = new Set();
     
         while (this.villages.size < villageCount)
         {
             var v = this.__createVillage();
-            if (!occupied.has(v.pos)) // TODO should be a smallest distance
-            {
+            if (this.__canBePlacedAt(v, v.pos)) {
                 this.villages.add(v);
-                occupied.add(v.pos);
             }
         }
         while (this.trebuchets.size < trebuchetCount)
         {
             var t = this.__createTrebuchet();
-            if (!occupied.has(t.pos)) // TODO should be a smallest distance
-            {
+            if (this.__canBePlacedAt(t, t.pos)) {
                 this.trebuchets.add(t);
-                occupied.add(t.pos);
             }
         }
     },
@@ -252,15 +264,15 @@ var board = {
         };
 
         this.villages.forEach(v => {
-            drawRadiusScaledSprite(spriteGenerator.createRange(), v.pos, v.radius, 0.5);
+            drawRadiusScaledSprite(sprites.createRange(), v.pos, v.radius, 0.5);
         });
 
         this.trebuchets.forEach(t => {
-            drawRadiusScaledSprite(spriteGenerator.createRange(), t.pos, t.radius, 0.5);
+            drawRadiusScaledSprite(sprites.createRange(), t.pos, t.radius, 0.5);
         });
 
         this.villages.forEach(v => {
-            drawSprite(spriteGenerator.createVillage(v.health, v == this.hoveredVillage), v.pos, 0.5);
+            drawSprite(sprites.createVillage(v.health, v == this.hoveredVillage), v.pos, 0.5);
         });
 
         if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACK) {
@@ -271,18 +283,18 @@ var board = {
                 x: from.pos.x + (to.pos.x - from.pos.x) * percent,
                 y: from.pos.y + (to.pos.y - from.pos.y) * percent
             }
-            drawSprite(spriteGenerator.createAttack(), pos);
+            drawSprite(sprites.createAttack(), pos);
         }
 
         this.trebuchets.forEach(t => {
-            drawSprite(spriteGenerator.createTrebuchet(t.health, t == this.hoveredTrebuchet), t.pos, 0.5);
+            drawSprite(sprites.createTrebuchet(t.health, t == this.hoveredTrebuchet), t.pos, 0.5);
         });
 
         if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACKER) {
             var from = this.__animation().data.from;
             var alpha = (this.__animation().elapsedMs || 0)  / 200;
             if (alpha > 0) {
-                drawSprite(spriteGenerator.createHighlight(), from.pos, 0.5, alpha);
+                drawSprite(sprites.createHighlight(), from.pos, 0.5, alpha);
             }
         }
 
@@ -291,7 +303,7 @@ var board = {
             var percent = (this.__animation().elapsedMs || 0) / 200;
             var alpha = 1 - percent;
             if (alpha > 0) {
-                drawSprite(spriteGenerator.createHighlight(), from.pos, 0.5, alpha);
+                drawSprite(sprites.createHighlight(), from.pos, 0.5, alpha);
             }
         }
 
@@ -302,7 +314,7 @@ var board = {
                 alpha = 1 - alpha;
             }
             if (alpha > 0) {
-                drawSprite(spriteGenerator.createHighlight(), to.pos, 0.5, alpha);
+                drawSprite(sprites.createHighlight(), to.pos, 0.5, alpha);
             }
         }
 

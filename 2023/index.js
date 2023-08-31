@@ -1,5 +1,6 @@
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+const drawing = createDrawing(context);
 
 let lastTime = Date.now();
 

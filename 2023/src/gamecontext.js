@@ -43,29 +43,21 @@ var gameContext = {
             context.restore();
         }
 
-        function drawText(text, x, y) {
-            context.fillText(text, x, y);
-        }
-
-        context.fillStyle = "#407122";
-        context.fillRect(0, 0, 1200, 800);
-
-        context.font = "24px Arial";      
-        context.textAlign = "center";  
-        context.fillStyle = "white";
+        drawing.fillRect(0, 0, 1200, 800, "#407122");
+       
         switch (this.gameState)
         {
             case GameState.IDLE:
-                context.fillText("IDLE", 600, 400);
+                drawing.fillText("IDLE", 600, 400, {textAlign: "center"});
                 break;
             case GameState.PLAYING:
-                board.draw(drawSprite, drawText);
+                board.draw(drawSprite);
                 break;
             case GameState.LEVELWON:
-                context.fillText("LEVEL WON", 600, 400);
+                drawing.fillText("LEVEL WON", 600, 400, {textAlign: "center"});
                 break;
             case GameState.GAMEOVER:
-                context.fillText("GAME OVER", 600, 400);
+                drawing.fillText("GAME OVER", 600, 400, {textAlign: "center"});
                 break;
             default:
                 break;

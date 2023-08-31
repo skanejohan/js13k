@@ -107,24 +107,20 @@ var sprites = {
         ctx.stroke();
     },
 
-    __createTrebuchetOrVillage(health, isHovered, drawFn) {
+    __createTrebuchetOrVillage(health, drawFn) {
         var result = this.__createCircle({ r: 100, fillStyle: `#d4d1cb` });
         var healthCircle = this.__createHealthCircle(health);
         result.ctx.drawImage(healthCircle, 0, 0);
         result.ctx.strokeStyle = "black";
         result.ctx.lineWidth = 5;
         drawFn(result.ctx);
-        if (isHovered) {
-            var frame = this.__createCircle({ r: 102, strokeStyle: `gray`, lineWidth: 8 });
-            result.ctx.drawImage(frame, 0, 0);
-        }
         return result;
     },
 
     // Public
 
-    createTrebuchet(health, isHovered) { return this.__createTrebuchetOrVillage(health, isHovered, this.__drawTrebuchet) },
-    createVillage(health, isHovered) { return this.__createTrebuchetOrVillage(health, isHovered, this.__drawVillage) },
+    createTrebuchet(health, isHovered) { return this.__createTrebuchetOrVillage(health, this.__drawTrebuchet) },
+    createVillage(health, isHovered) { return this.__createTrebuchetOrVillage(health, this.__drawVillage) },
     createRange() { return this.__createCircle({ r: 100, fillStyle: `#38631c` }) },
     createAttack() { return this.__createCircle({ r: 7, fillStyle: `black` }) },
     createHighlight() { return this.__createCircle({ r: 100, fillStyle: `yellow` }) },

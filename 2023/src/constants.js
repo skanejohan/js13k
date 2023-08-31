@@ -18,6 +18,13 @@ const AnimationState = {
     HIGHLIGHT_ATTACKEE: 3,
 }
 
+const AttackType = {
+    TREBUCHET_ATTACKS_VILLAGE: 0,
+    TREBUCHET_MISSES_VILLAGE: 1,
+    VILLAGE_ATTACKS_TREBUCHET: 2,
+    VILLAGE_MISSES_TREBUCHET: 3
+}
+
 const HexSide = 30;
 
 const BoardLeftMargin = 30;

@@ -109,6 +109,36 @@ var sprites = {
         return result;
     },
 
+    createHealthPowerup() {
+        var result = this.__createCircle({ r: 100, fillStyle: `#bf6b26` });
+        result.ctx.strokeStyle = "black";
+        result.ctx.lineWidth = 5;
+        
+        result.ctx.beginPath();
+        result.ctx.arc(88, 112, 50, 0.9 *  Math.PI, 0.6 * Math.PI);
+        result.ctx.stroke();
+
+        result.ctx.beginPath();
+        result.ctx.moveTo(40, 126);
+        result.ctx.lineTo(40, 160);
+        result.ctx.lineTo(74, 160);
+        result.ctx.stroke();
+
+        result.ctx.beginPath();
+        result.ctx.arc(20, 180, 80, 1.57 *  Math.PI, 1.93 * Math.PI);
+        result.ctx.stroke();
+
+        result.ctx.beginPath();
+        result.ctx.moveTo(122, 30);
+        result.ctx.lineTo(122, 74);
+        result.ctx.lineTo(154, 42);
+        result.ctx.moveTo(122, 74);
+        result.ctx.lineTo(166, 74);
+        result.ctx.stroke();
+
+        return result;
+    },
+
     // Public
 
     createTrebuchet(health, isDone) { return this.__createTrebuchetOrVillage(health, this.__drawTrebuchet, isDone) },

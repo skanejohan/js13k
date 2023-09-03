@@ -1,8 +1,10 @@
 var board = {
     // village = { pos, health, strength }
     // trebuchet = { pos, health, strength, radius, state }
+    // powerup = { pos }
     villages: new Set(),
     trebuchets: new Set(),
+    powerups: new Set(),
     activeTrebuchet: undefined, 
     hoveredTrebuchet: undefined, // while over the trebuchet itself
     hoveredVillage: undefined, // while over the village itself
@@ -11,7 +13,7 @@ var board = {
     villageAttacks: [],
     levelScore: 0,
     score: 0,
-    level: 0,
+    level: 1,
 
     __rnd(n) { return Math.floor(Math.random() * n) },
     __rndPos() { return { x: 100 + this.__rnd(1000), y : 100 + this.__rnd(600) } },
@@ -30,7 +32,7 @@ var board = {
     },
 
     // Village actions
-    __createVillage() { return { pos: this.__rndPos(), health: 100, strength: Math.round(30 + ((3 * this.level) * this.__rnd(100)) / 100) } },
+    __createVillage() { return { pos: this.__rndPos(), health: 100, strength: Math.round(30 + ((4 * this.level) * this.__rnd(100)) / 100) } },
     __attackTrebuchet(v, t) { t.health -= v.strength },
     __updateVillage(v) { },
     __removeKilledVillages() {
@@ -38,6 +40,9 @@ var board = {
         for (var i = 0; i < vs.length; i++) {
             if (vs[i].health <= 0) {
                 this.villages.delete(vs[i]);
+                if (this.__rnd(100) < 25) {
+                    this.powerups.add( { pos : vs[i].pos } );
+                }
             }
         }
     },
@@ -52,6 +57,17 @@ var board = {
         for (var i = 0; i < ts.length; i++) {
             if (ts[i].health <= 0) {
                 this.trebuchets.delete(ts[i]);
+            }
+        }
+    },
+
+    __handlePowerup() {
+        var ps = Array.from(this.powerups);
+        for (var p of ps) {
+            var d = this.__dist(this.activeTrebuchet.pos, p.pos);
+            if (d < 2 * BaseRadius) {
+                this.activeTrebuchet.health = 100;
+                this.powerups.delete(p);
             }
         }
     },
@@ -80,6 +96,7 @@ var board = {
     __move() {
         if (this.__canBePlacedAt(this.activeTrebuchet, this.mousePos)) {
             this.__moveTrebuchet(this.activeTrebuchet, this.mousePos);
+            this.__handlePowerup();
             this.activeTrebuchet.state = TrebuchetState.FIRE;
             this.__attackWithVillagesWhenAllTrebuchetsDone();
         }
@@ -121,13 +138,14 @@ var board = {
          }
     },
 
-    reset(villageCount, trebuchetCount) {
-        var noOfVillages = villageCount + this.__rnd(2);
-        var noOfTrebuchets = trebuchetCount + this.__rnd(2);
+    reset() {
+        var noOfVillages = this.level + 2 + this.__rnd(2);
+        var noOfTrebuchets = this.level + 1 + this.__rnd(2);
 
         this.villages = new Set();
         this.trebuchets = new Set();
-
+        this.powerups = new Set();
+        
         this.activeTrebuchet = undefined;
         this.hoveredTrebuchet = undefined;
         this.hoveredVillage = undefined;
@@ -300,6 +318,8 @@ var board = {
             drawRadiusScaledSprite(sprites.createRange(), this.activeTrebuchet.pos, this.activeTrebuchet.radius, 0.5);
         }
 
+        this.powerups.forEach(p => drawSprite(sprites.createHealthPowerup(), p.pos, 0.5));
+
         this.villages.forEach(v => {
             drawSprite(sprites.createVillage(v.health, false), v.pos, 0.5);
             if (v == this.hoveredVillage) {
@@ -373,7 +393,14 @@ var board = {
                     drawing.fillText("Click here to load or hover outside the trebuchet to move.", 600, 788, {textAlign: "center"});
                 }
                 else if (this.__inRange(this.mousePos, this.activeTrebuchet) && this.__canBePlacedAt(this.activeTrebuchet, this.mousePos)) {
-                    drawing.fillText("Click to move here.", 600, 788, {textAlign: "center"});
+                    var text = "Click to move here.";
+                    for (const p of this.powerups) {
+                        if (this.__over(this.mousePos, p)) {
+                            text = "Click to move here and eat this turnip to restore your health.";
+                            break;
+                        }
+                    }
+                    drawing.fillText(text, 600, 788, {textAlign: "center"});
                 }
             }
             if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
@@ -398,5 +425,10 @@ var board = {
 
     levelLost() {
         return this.trebuchets.size == 0;
+    },
+
+    gameOver() {
+        this.level = 1;
+        this.score = 0;
     }
 };

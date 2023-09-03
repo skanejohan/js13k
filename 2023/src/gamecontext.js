@@ -2,8 +2,6 @@ var gameContext = {
     gameState: GameState.IDLE,
     mousePos: { x : 0, y : 0 },
     msRemaining: 0,
-    villageCount: 2, 
-    trebuchetCount: 2,
 
     update(ms) {
         if (this.msRemaining > 0)
@@ -105,9 +103,7 @@ var gameContext = {
     setGameState(newState) {
         switch(newState) {
             case GameState.PLAYING:
-                board.reset(this.villageCount, this.trebuchetCount);
-                this.villageCount++;
-                this.trebuchetCount++;
+                board.reset();
                 this.gameState = GameState.PLAYING;
                 break;
             case GameState.IDLE:
@@ -119,8 +115,7 @@ var gameContext = {
                 this.msRemaining = 800;
                 break;
             case GameState.GAMEOVER:
-                this.villageCount = 2;
-                this.trebuchetCount = 2;
+                board.gameOver();
                 this.gameState = GameState.GAMEOVER;
                 this.msRemaining = 1000;
             default:
@@ -128,3 +123,4 @@ var gameContext = {
         }
     },
 }
+

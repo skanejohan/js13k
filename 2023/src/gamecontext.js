@@ -54,7 +54,15 @@ var gameContext = {
         switch (this.gameState)
         {
             case GameState.IDLE:
-                drawing.fillText("IDLE", 600, 400, {textAlign: "center"});
+                drawing.fillText("TURRETS AND TREBUCHETS", 600, 150, {font: "36px Arial", textAlign: "center"});
+                drawing.fillText("It is the early 13th century and war rages across Europe. Your mission", 600, 300, {textAlign: "center"});
+                drawing.fillText("is to attack and conquer the surrounding villages using the increasingly", 600, 340, {textAlign: "center"});
+                drawing.fillText("popular long-range catapult, the trebuchet. However, the defenders also", 600, 380, {textAlign: "center"});
+                drawing.fillText("have some tricks to make your task a lot less enjoyable.", 600, 420, {textAlign: "center"});
+                drawing.fillText("Start by either loading your trebuchet (which increases the damage it", 600, 520, {textAlign: "center"});
+                drawing.fillText("will make when hitting a village) or moving to a more favorable position.", 600, 560, {textAlign: "center"});
+                drawing.fillText("Then attack one of the villages. When all your trebuchets have attacked", 600, 600, {textAlign: "center"});
+                drawing.fillText("a village, the villages will counter-attack. Good luck!", 600, 640, {textAlign: "center"});
                 break;
             case GameState.PLAYING:
                 board.draw(drawSprite);

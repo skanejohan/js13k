@@ -69,41 +69,33 @@ var sprites = {
 
     __drawVillage(ctx) {
         ctx.beginPath();
-        ctx.moveTo(40, 160);
-        ctx.lineTo(160, 160);
-        ctx.lineTo(160, 90);
-        ctx.lineTo(40, 90);
-        ctx.lineTo(40, 160);
+        ctx.moveTo(50, 170);
+        ctx.lineTo(80, 170);
+        ctx.lineTo(80, 130);
+        ctx.lineTo(120, 130);
+        ctx.lineTo(120, 170);
+        ctx.lineTo(150, 170);
+        ctx.lineTo(135, 80);
+        ctx.lineTo(65, 80);
+        ctx.lineTo(50, 170);
+        ctx.lineTo(80, 170);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(40, 90);
-        ctx.lineTo(40, 70);
-        ctx.lineTo(70, 70);
-        ctx.lineTo(70, 90);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(85, 90);
-        ctx.lineTo(85, 60);
-        ctx.lineTo(115, 60);
-        ctx.lineTo(115, 90);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(85, 60);
-        ctx.lineTo(75, 60);
-        ctx.lineTo(75, 35);
-        ctx.lineTo(125, 35);
-        ctx.lineTo(125, 60);
-        ctx.lineTo(115, 60);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(160, 90);
-        ctx.lineTo(160, 70);
-        ctx.lineTo(130, 70);
-        ctx.lineTo(130, 90);
+        ctx.moveTo(40, 80);
+        ctx.lineTo(160, 80);
+        ctx.lineTo(160, 40);
+        ctx.lineTo(130, 40);
+        ctx.lineTo(130, 60);
+        ctx.lineTo(120, 60);
+        ctx.lineTo(120, 40);
+        ctx.lineTo(80, 40);
+        ctx.lineTo(80, 60);
+        ctx.lineTo(70, 60);
+        ctx.lineTo(70, 40);
+        ctx.lineTo(40, 40);
+        ctx.lineTo(40, 80);
+        ctx.lineTo(160, 80);
         ctx.stroke();
     },
 

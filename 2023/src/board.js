@@ -19,7 +19,7 @@ var board = {
     __dist(p1, p2) { return Math.sqrt(this.__sqDist(p1, p2)) },
     __inRange(p, t) { return this.__sqDist(p, t.pos) <= t.radius * t.radius },
     __over(p, t) { return this.__sqDist(p, t.pos) <= BaseRadius * BaseRadius },
-    __changeOfHit(from, to) { var d = this.__dist(from.pos, to.pos); return Math.min(100, Math.max(0, (700 - d) / 5.5)); },
+    __chanceOfHit(from, to) { var d = this.__dist(from.pos, to.pos); return Math.min(100, Math.max(1, (700 - d) / 5.5)); },
     __shuffleArray(a) {
         for (let i = a.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -127,6 +127,12 @@ var board = {
 
         this.villages = new Set();
         this.trebuchets = new Set();
+
+        this.activeTrebuchet = undefined;
+        this.hoveredTrebuchet = undefined;
+        this.hoveredVillage = undefined;
+        this.animation = undefined;
+        this.villageAttacks = [];
     
         while (this.villages.size < noOfVillages)
         {
@@ -212,7 +218,7 @@ var board = {
                 while(this.villageAttacks.length > 0) {
                     var { v, t } = this.villageAttacks.pop();
                     if (this.trebuchets.has(t)) {
-                        var attackType = this.__rnd(100) < this.__changeOfHit(v, t) 
+                        var attackType = this.__rnd(100) < this.__chanceOfHit(v, t) 
                             ? AttackType.VILLAGE_ATTACKS_TREBUCHET 
                             : AttackType.VILLAGE_MISSES_TREBUCHET;
                         this.animation =
@@ -268,7 +274,7 @@ var board = {
             }
             else if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
                 if (this.hoveredVillage) {
-                    var attackType = this.__rnd(100) < this.__changeOfHit(this.activeTrebuchet, this.hoveredVillage)
+                    var attackType = this.__rnd(100) < this.__chanceOfHit(this.activeTrebuchet, this.hoveredVillage)
                         ? AttackType.TREBUCHET_ATTACKS_VILLAGE
                         : AttackType.TREBUCHET_MISSES_VILLAGE;
                     this.animation =
@@ -279,10 +285,6 @@ var board = {
                         state: AnimationState.HIGHLIGHT_ATTACKER,
                         elapsedMs: 0
                     };
-                }
-                else {
-                    this.activeTrebuchet.state = TrebuchetState.DONE;
-                    this.__attackWithVillagesWhenAllTrebuchetsDone();
                 }
             } 
         }
@@ -368,19 +370,19 @@ var board = {
         if (this.activeTrebuchet) {
             if (this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
                 if (this.hoveredTrebuchet) {
-                    drawing.fillText("Click here to load or hover outside the trebuchet to move", 600, 788, {textAlign: "center"});
+                    drawing.fillText("Click here to load or hover outside the trebuchet to move.", 600, 788, {textAlign: "center"});
                 }
-                else if (this.__inRange(this.mousePos, this.activeTrebuchet)) {
-                    drawing.fillText("Click to move here", 600, 788, {textAlign: "center"});
+                else if (this.__inRange(this.mousePos, this.activeTrebuchet) && this.__canBePlacedAt(this.activeTrebuchet, this.mousePos)) {
+                    drawing.fillText("Click to move here.", 600, 788, {textAlign: "center"});
                 }
             }
             if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
                 if (this.hoveredVillage) {
-                    var c = Math.round(this.__changeOfHit(this.activeTrebuchet, this.hoveredVillage));
-                    drawing.fillText(`Click to attack this village. Chance: ${c} %`, 600, 788, {textAlign: "center"});
+                    var c = Math.round(this.__chanceOfHit(this.activeTrebuchet, this.hoveredVillage));
+                    drawing.fillText(`Click to attack this village. Chance: ${c} %.`, 600, 788, {textAlign: "center"});
                 }
                 else {
-                    drawing.fillText("Hover over a village to attack it or click here to skip the attack phase", 600, 788, {textAlign: "center"});
+                    drawing.fillText("Hover over a village to attack it.", 600, 788, {textAlign: "center"});
                 }
             }
         }

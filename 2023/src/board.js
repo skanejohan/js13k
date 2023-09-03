@@ -6,20 +6,28 @@ var board = {
     activeTrebuchet: undefined, 
     hoveredTrebuchet: undefined, // while over the trebuchet itself
     hoveredVillage: undefined, // while over the village itself
-    animations: [{ state : AnimationState.NONE }],
+    animation: undefined, // { from, to, attackType, state, elapsedMs }
     mousePos: undefined,
+    villageAttacks: [],
     levelScore: 0,
     score: 0,
     level: 0,
 
     __rnd(n) { return Math.floor(Math.random() * n) },
-    __animation() { return this.animations[this.animations.length - 1] },
     __rndPos() { return { x: 100 + this.__rnd(1000), y : 100 + this.__rnd(600) } },
     __sqDist(p1, p2) { return (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y) },
     __dist(p1, p2) { return Math.sqrt(this.__sqDist(p1, p2)) },
     __inRange(p, t) { return this.__sqDist(p, t.pos) <= t.radius * t.radius },
     __over(p, t) { return this.__sqDist(p, t.pos) <= BaseRadius * BaseRadius },
     __changeOfHit(from, to) { var d = this.__dist(from.pos, to.pos); return Math.min(100, Math.max(0, (700 - d) / 5.5)); },
+    __shuffleArray(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = a[i];
+          a[i] = a[j];
+          a[j] = temp;
+        }
+    },
 
     // Village actions
     __createVillage() { return { pos: this.__rndPos(), health: 100, strength: Math.round(30 + ((3 * this.level) * this.__rnd(100)) / 100) } },
@@ -96,36 +104,23 @@ var board = {
 
         for (const v of this.villages) {
             for (const t of this.trebuchets) {
-                if (t.health > 0)
-                {
-                    if (v.health > 0) {
-                        if (this.__rnd(100) < this.__changeOfHit(v, t)) {
-                            this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { from: v, to: t, attackType: AttackType.VILLAGE_ATTACKS_TREBUCHET });
-                        }
-                        else {
-                            this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { from: v, to: t, attackType: AttackType.VILLAGE_MISSES_TREBUCHET });
-                        }
-                    }
+                if (v.health > 0) {
+                    this.villageAttacks.push({v:v, t:t});
                 }
             }
         }
 
-        for (var t of this.trebuchets) {
-            t.state = TrebuchetState.LOAD_OR_MOVE;
-        }
+        this.__shuffleArray(this.villageAttacks);
     },
 
-    __startAnimation(animationState, data, nextFn) {
-        this.animations.push( { state : animationState, nextFn: nextFn, data: data });
+    __resetTrebuchetsWhenAllVillagesDone() {
+        if (this.villageAttacks.length == 0) {
+            for (var t of this.trebuchets) {
+                 t.state = TrebuchetState.LOAD_OR_MOVE;
+             }
+         }
     },
 
-    __endAnimation() {
-        var a = this.animations.pop();
-        if (a.nextFn) {
-            a.nextFn();
-        }
-    },
-    
     reset(villageCount, trebuchetCount) {
         var noOfVillages = villageCount + this.__rnd(2);
         var noOfTrebuchets = trebuchetCount + this.__rnd(2);
@@ -155,9 +150,87 @@ var board = {
     update(ms, mousePos) {
         this.__removeKilledVillages();
         this.__removeKilledTrebuchets();
-        var animation = this.__animation();
-        switch (animation.state) {
-            case AnimationState.NONE:
+
+        if (this.animation) {
+            switch(this.animation.state) {
+                case AnimationState.HIGHLIGHT_ATTACKER:
+                    var elapsedMs = this.animation.elapsedMs || 0;
+                    if (elapsedMs < 200) {
+                        this.animation.elapsedMs = elapsedMs + ms;
+                    }
+                    else {
+                        this.animation.state = AnimationState.HIGHLIGHT_ATTACK;
+                        this.animation.elapsedMs = 0;
+                    }
+                    break;
+                case AnimationState.HIGHLIGHT_ATTACK:
+                    var elapsedMs = this.animation.elapsedMs || 0;
+                    var maxMS = this.animation.attackType == AttackType.TREBUCHET_MISSES_VILLAGE 
+                        || this.animation.attackType == AttackType.VILLAGE_MISSES_TREBUCHET
+                        ? 300 : 200;
+                    if (elapsedMs < maxMS) {
+                        this.animation.elapsedMs = elapsedMs + ms;
+                    }
+                    else {
+                        switch(this.animation.attackType) {
+                            case AttackType.TREBUCHET_MISSES_VILLAGE:
+                                this.animation.from.state = TrebuchetState.DONE;
+                                this.animation = undefined;
+                                this.__attackWithVillagesWhenAllTrebuchetsDone();
+                                break;
+                            case AttackType.VILLAGE_MISSES_TREBUCHET:
+                                this.__resetTrebuchetsWhenAllVillagesDone();
+                                this.animation = undefined;
+                                break;
+                            default:
+                                this.animation.state = AnimationState.HIGHLIGHT_ATTACKEE;
+                                this.animation.elapsedMs = 0;
+                                break;
+                            }
+                        }
+                    break;
+                case AnimationState.HIGHLIGHT_ATTACKEE:
+                    var elapsedMs = this.animation.elapsedMs || 0;
+                    if (elapsedMs < 400) {
+                        this.animation.elapsedMs = elapsedMs + ms;
+                    }
+                    else {
+                        if (this.animation.attackType == AttackType.VILLAGE_ATTACKS_TREBUCHET) {
+                            this.__fireAtTrebuchet(this.animation.from, this.animation.to);
+                            this.__resetTrebuchetsWhenAllVillagesDone();
+                        }
+                        else {
+                            this.__fireAtVillage(this.animation.from, this.animation.to);
+                        }
+                        this.animation = undefined;
+                    }
+                    break;
+            }
+        }
+        else {
+            if (this.villageAttacks.length > 0) {
+                while(this.villageAttacks.length > 0) {
+                    var { v, t } = this.villageAttacks.pop();
+                    if (this.trebuchets.has(t)) {
+                        var attackType = this.__rnd(100) < this.__changeOfHit(v, t) 
+                            ? AttackType.VILLAGE_ATTACKS_TREBUCHET 
+                            : AttackType.VILLAGE_MISSES_TREBUCHET;
+                        this.animation =
+                        { 
+                            from: v, 
+                            to: t, 
+                            attackType: attackType,
+                            state: AnimationState.HIGHLIGHT_ATTACKER,
+                            elapsedMs: 0
+                        };
+                        break;
+                    }
+                    else {
+                        this.__resetTrebuchetsWhenAllVillagesDone();
+                    }
+                }
+            }
+            else {
                 this.hoveredTrebuchet = undefined;
                 for (const t of this.trebuchets) {
                     if (this.__over(mousePos, t)) {
@@ -173,62 +246,14 @@ var board = {
                         break;
                     }
                 }
-                break;
-                case AnimationState.HIGHLIGHT_ATTACKER:
-                    var elapsedMs = animation.elapsedMs || 0;
-                    if (elapsedMs < 200) {
-                        animation.elapsedMs = elapsedMs + ms;
-                    }
-                    else {
-                        this.__endAnimation();
-                        this.__startAnimation(AnimationState.HIGHLIGHT_ATTACK, animation.data)
-                    }
-                    break;
-                case AnimationState.HIGHLIGHT_ATTACK:
-                    var elapsedMs = animation.elapsedMs || 0;
-                    var maxMS = animation.data.attackType == AttackType.TREBUCHET_MISSES_VILLAGE || animation.data.attackType == AttackType.VILLAGE_MISSES_TREBUCHET
-                        ? 300 : 200;
-                    if (elapsedMs < maxMS) {
-                        animation.elapsedMs = elapsedMs + ms;
-                    }
-                    else {
-                        this.__endAnimation();
-                        if (animation.data.attackType == AttackType.TREBUCHET_MISSES_VILLAGE) {
-                            animation.data.from.state = TrebuchetState.DONE;
-                            this.__attackWithVillagesWhenAllTrebuchetsDone();
-                        }
-                        else if (animation.data.attackType == AttackType.VILLAGE_MISSES_TREBUCHET) {
-                            // nothing
-                        }
-                        else {
-                            this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKEE, animation.data,
-                                () => {
-                                    if (animation.data.attackType == AttackType.TREBUCHET_ATTACKS_VILLAGE) {
-                                        this.__fireAtVillage(animation.data.from, animation.data.to);
-                                    }
-                                    else { // AttackType.VILLAGE_ATTACKS_TREBUCHET
-                                        this.__fireAtTrebuchet(animation.data.from, animation.data.to);
-                                    }
-                                });
-                            }
-                    }
-                    break;
-                case AnimationState.HIGHLIGHT_ATTACKEE:
-                    var elapsedMs = animation.elapsedMs || 0;
-                    if (elapsedMs < 400) {
-                        animation.elapsedMs = elapsedMs + ms;
-                    }
-                    else {
-                        this.__endAnimation();
-                    }
-                break;
+            }
         }
 
         this.mousePos = mousePos;
     },
 
     click() {
-        if (this.__animation().state != AnimationState.NONE) {
+        if (this.animation) {
             return;
         }
 
@@ -243,24 +268,17 @@ var board = {
             }
             else if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
                 if (this.hoveredVillage) {
-                    if (this.__rnd(100) < this.__changeOfHit(this.activeTrebuchet, this.hoveredVillage)) {
-                        this.__startAnimation(
-                            AnimationState.HIGHLIGHT_ATTACKER, 
-                            { 
-                                from: this.activeTrebuchet, 
-                                to: this.hoveredVillage,
-                                attackType: AttackType.TREBUCHET_ATTACKS_VILLAGE
-                            });
-                    }
-                    else {
-                        this.__startAnimation(
-                            AnimationState.HIGHLIGHT_ATTACKER, 
-                            { 
-                                from: this.activeTrebuchet, 
-                                to: this.hoveredVillage,
-                                attackType: AttackType.TREBUCHET_MISSES_VILLAGE
-                            });
-                    }
+                    var attackType = this.__rnd(100) < this.__changeOfHit(this.activeTrebuchet, this.hoveredVillage)
+                        ? AttackType.TREBUCHET_ATTACKS_VILLAGE
+                        : AttackType.TREBUCHET_MISSES_VILLAGE;
+                    this.animation =
+                    { 
+                        from: this.activeTrebuchet, 
+                        to: this.hoveredVillage, 
+                        attackType: attackType,
+                        state: AnimationState.HIGHLIGHT_ATTACKER,
+                        elapsedMs: 0
+                    };
                 }
                 else {
                     this.activeTrebuchet.state = TrebuchetState.DONE;
@@ -287,10 +305,10 @@ var board = {
             }
         });
 
-        if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACK) {
-            var from = this.__animation().data.from;
-            var to = this.__animation().data.to;
-            var percent = (this.__animation().elapsedMs || 0) / 200;
+        if (this.animation && this.animation.state == AnimationState.HIGHLIGHT_ATTACK) {
+            var from = this.animation.from;
+            var to = this.animation.to;
+            var percent = (this.animation.elapsedMs || 0) / 200;
             var pos = {
                 x: from.pos.x + (to.pos.x - from.pos.x) * percent,
                 y: from.pos.y + (to.pos.y - from.pos.y) * percent
@@ -305,27 +323,27 @@ var board = {
             }
         });
 
-        if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACKER) {
-            var from = this.__animation().data.from;
-            var alpha = (this.__animation().elapsedMs || 0)  / 200;
+        if (this.animation && this.animation.state == AnimationState.HIGHLIGHT_ATTACKER) {
+            var from = this.animation.from;
+            var alpha = (this.animation.elapsedMs || 0)  / 200;
             if (alpha > 0) {
                 drawSprite(sprites.createHighlight(), from.pos, 0.5, alpha);
             }
         }
 
-        if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACK) {
-            var from = this.__animation().data.from;
-            var percent = (this.__animation().elapsedMs || 0) / 200;
+        if (this.animation && this.animation.state == AnimationState.HIGHLIGHT_ATTACK) {
+            var from = this.animation.from;
+            var percent = (this.animation.elapsedMs || 0) / 200;
             var alpha = 1 - percent;
             if (alpha > 0) {
                 drawSprite(sprites.createHighlight(), from.pos, 0.5, alpha);
             }
         }
 
-        if (this.__animation().state == AnimationState.HIGHLIGHT_ATTACKEE) {
-            var to = this.__animation().data.to;
-            var alpha = (this.__animation().elapsedMs || 0) / 200;
-            if (this.__animation().elapsedMs > 200) {
+        if (this.animation && this.animation.state == AnimationState.HIGHLIGHT_ATTACKEE) {
+            var to = this.animation.to;
+            var alpha = (this.animation.elapsedMs || 0) / 200;
+            if (this.animation.elapsedMs > 200) {
                 alpha = 1 - alpha;
             }
             if (alpha > 0) {

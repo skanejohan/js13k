@@ -107,11 +107,11 @@ var sprites = {
         ctx.stroke();
     },
 
-    __createTrebuchetOrVillage(health, drawFn) {
+    __createTrebuchetOrVillage(health, drawFn, isDone) {
         var result = this.__createCircle({ r: 100, fillStyle: `#d4d1cb` });
         var healthCircle = this.__createHealthCircle(health);
         result.ctx.drawImage(healthCircle, 0, 0);
-        result.ctx.strokeStyle = "black";
+        result.ctx.strokeStyle = isDone ? "gray" : "black";
         result.ctx.lineWidth = 5;
         drawFn(result.ctx);
         return result;
@@ -119,8 +119,8 @@ var sprites = {
 
     // Public
 
-    createTrebuchet(health, isHovered) { return this.__createTrebuchetOrVillage(health, this.__drawTrebuchet) },
-    createVillage(health, isHovered) { return this.__createTrebuchetOrVillage(health, this.__drawVillage) },
+    createTrebuchet(health, isDone) { return this.__createTrebuchetOrVillage(health, this.__drawTrebuchet, isDone) },
+    createVillage(health) { return this.__createTrebuchetOrVillage(health, this.__drawVillage) },
     createRange() { return this.__createCircle({ r: 100, fillStyle: `#38631c` }) },
     createAttack() { return this.__createCircle({ r: 7, fillStyle: `black` }) },
     createHighlight() { return this.__createCircle({ r: 100, fillStyle: `yellow` }) },

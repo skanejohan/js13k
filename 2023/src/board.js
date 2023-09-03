@@ -10,12 +10,11 @@ var board = {
     mousePos: undefined,
     levelScore: 0,
     score: 0,
+    level: 0,
 
     __rnd(n) { return Math.floor(Math.random() * n) },
     __animation() { return this.animations[this.animations.length - 1] },
-    __rndX() { return this.__rnd(BoardWidth) },
-    __rndY() { return this.__rnd(BoardHeight) },
-    __rndPos() { return { x: this.__rndX(), y : this.__rndY() } },
+    __rndPos() { return { x: 100 + this.__rnd(1000), y : 100 + this.__rnd(600) } },
     __sqDist(p1, p2) { return (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y) },
     __dist(p1, p2) { return Math.sqrt(this.__sqDist(p1, p2)) },
     __inRange(p, t) { return this.__sqDist(p, t.pos) <= t.radius * t.radius },
@@ -23,7 +22,7 @@ var board = {
     __changeOfHit(from, to) { var d = this.__dist(from.pos, to.pos); return Math.min(100, Math.max(0, (700 - d) / 5.5)); },
 
     // Village actions
-    __createVillage() { return { pos: this.__rndPos(), health: 100, strength: 30 } },
+    __createVillage() { return { pos: this.__rndPos(), health: 100, strength: Math.round(30 + ((3 * this.level) * this.__rnd(100)) / 100) } },
     __attackTrebuchet(v, t) { t.health -= v.strength },
     __updateVillage(v) { },
     __removeKilledVillages() {
@@ -97,12 +96,15 @@ var board = {
 
         for (const v of this.villages) {
             for (const t of this.trebuchets) {
-                if (v.health > 0) {
-                    if (this.__rnd(100) < this.__changeOfHit(v, t)) {
-                        this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { from: v, to: t, attackType: AttackType.VILLAGE_ATTACKS_TREBUCHET });
-                    }
-                    else {
-                        this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { from: v, to: t, attackType: AttackType.VILLAGE_MISSES_TREBUCHET });
+                if (t.health > 0)
+                {
+                    if (v.health > 0) {
+                        if (this.__rnd(100) < this.__changeOfHit(v, t)) {
+                            this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { from: v, to: t, attackType: AttackType.VILLAGE_ATTACKS_TREBUCHET });
+                        }
+                        else {
+                            this.__startAnimation(AnimationState.HIGHLIGHT_ATTACKER, { from: v, to: t, attackType: AttackType.VILLAGE_MISSES_TREBUCHET });
+                        }
                     }
                 }
             }
@@ -125,23 +127,29 @@ var board = {
     },
     
     reset(villageCount, trebuchetCount) {
+        var noOfVillages = villageCount + this.__rnd(2);
+        var noOfTrebuchets = trebuchetCount + this.__rnd(2);
+
         this.villages = new Set();
         this.trebuchets = new Set();
     
-        while (this.villages.size < villageCount)
+        while (this.villages.size < noOfVillages)
         {
             var v = this.__createVillage();
             if (this.__canBePlacedAt(v, v.pos)) {
                 this.villages.add(v);
             }
         }
-        while (this.trebuchets.size < trebuchetCount)
+        while (this.trebuchets.size < noOfTrebuchets)
         {
             var t = this.__createTrebuchet();
             if (this.__canBePlacedAt(t, t.pos)) {
                 this.trebuchets.add(t);
             }
         }
+
+        this.levelScore = 100 + (noOfVillages - noOfTrebuchets) * 25;
+        this.level++;
     },
 
     update(ms, mousePos) {
@@ -268,9 +276,9 @@ var board = {
             drawSprite(sprite, pos, 2 * radius / 200, alpha);
         };
 
-        this.trebuchets.forEach(t => {
-            drawRadiusScaledSprite(sprites.createRange(), t.pos, t.radius, 0.5);
-        });
+        if (this.activeTrebuchet && this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
+            drawRadiusScaledSprite(sprites.createRange(), this.activeTrebuchet.pos, this.activeTrebuchet.radius, 0.5);
+        }
 
         this.villages.forEach(v => {
             drawSprite(sprites.createVillage(v.health, false), v.pos, 0.5);
@@ -291,7 +299,7 @@ var board = {
         }
 
         this.trebuchets.forEach(t => {
-            drawSprite(sprites.createTrebuchet(t.health, false), t.pos, 0.5);
+            drawSprite(sprites.createTrebuchet(t.health, t.state == TrebuchetState.DONE), t.pos, 0.5);
             if (t == this.activeTrebuchet) {
                 drawing.circle(t.pos.x, t.pos.y, 50, "gray", t.strength / 10);
             }
@@ -342,7 +350,7 @@ var board = {
         if (this.activeTrebuchet) {
             if (this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
                 if (this.hoveredTrebuchet) {
-                    drawing.fillText("Click to load or hover over another cell to move", 600, 788, {textAlign: "center"});
+                    drawing.fillText("Click here to load or hover outside the trebuchet to move", 600, 788, {textAlign: "center"});
                 }
                 else if (this.__inRange(this.mousePos, this.activeTrebuchet)) {
                     drawing.fillText("Click to move here", 600, 788, {textAlign: "center"});
@@ -350,14 +358,18 @@ var board = {
             }
             if (this.activeTrebuchet.state == TrebuchetState.FIRE) {
                 if (this.hoveredVillage) {
-                    var c = this.__changeOfHit(this.activeTrebuchet, this.hoveredVillage);
-                    drawing.fillText("Click to attack this village. Chance: " + c, 600, 788, {textAlign: "center"});
+                    var c = Math.round(this.__changeOfHit(this.activeTrebuchet, this.hoveredVillage));
+                    drawing.fillText(`Click to attack this village. Chance: ${c} %`, 600, 788, {textAlign: "center"});
                 }
                 else {
                     drawing.fillText("Hover over a village to attack it or click here to skip the attack phase", 600, 788, {textAlign: "center"});
                 }
             }
         }
+    },
+
+    updateScore() {
+        this.score += this.levelScore;
     },
 
     levelWon() {

@@ -2,8 +2,8 @@ var gameContext = {
     gameState: GameState.IDLE,
     mousePos: { x : 0, y : 0 },
     msRemaining: 0,
-    villageCount: 1, 
-    trebuchetCount: 1,
+    villageCount: 2, 
+    trebuchetCount: 2,
 
     update(ms) {
         if (this.msRemaining > 0)
@@ -25,6 +25,12 @@ var gameContext = {
         
         if (this.gameState == GameState.PLAYING) {
             board.update(ms, this.mousePos);
+            if (board.levelWon()) {
+                this.setGameState(GameState.LEVELWON);
+            }
+            if (board.levelLost()) {
+                this.setGameState(GameState.GAMEOVER);
+            }
         }
     },
 
@@ -73,12 +79,6 @@ var gameContext = {
                 break;
             case GameState.PLAYING:
                 board.click(this.mousePos);
-                if (board.levelWon()) {
-                    this.setGameState(GameState.LEVELWON);
-                }
-                if (board.levelLost()) {
-                    this.setGameState(GameState.GAMEOVER);
-                }
                 break;
             default:
                 break;
@@ -106,12 +106,13 @@ var gameContext = {
                 this.gameState = GameState.IDLE;
                 break;
             case GameState.LEVELWON:
+                board.updateScore();
                 this.gameState = GameState.LEVELWON;
-                this.msRemaining = 400;
+                this.msRemaining = 800;
                 break;
             case GameState.GAMEOVER:
-                this.villageCount = 1;
-                this.trebuchetCount = 1;
+                this.villageCount = 2;
+                this.trebuchetCount = 2;
                 this.gameState = GameState.GAMEOVER;
                 this.msRemaining = 1000;
             default:

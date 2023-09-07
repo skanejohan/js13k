@@ -312,12 +312,15 @@ var board = {
                         };
                         break;
                     }
+                    else { 
+                        v.attacksToPerform -= 1;
+                    }
                 }
             }
             else {
                 this.hoveredTrebuchet = undefined;
                 for (const t of this.trebuchets) {
-                    if (this.__over(mousePos, t)) {
+                    if (this.__over(mousePos, t) && t.state != TrebuchetState.DONE) {
                         this.activeTrebuchet = t;
                         this.hoveredTrebuchet = t;
                     }

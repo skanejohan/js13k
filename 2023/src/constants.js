@@ -15,6 +15,7 @@ const AnimationState = {
     HIGHLIGHT_ATTACKER: 1,
     HIGHLIGHT_ATTACK: 2,
     HIGHLIGHT_ATTACKEE: 3,
+    EARTHQUAKE: 4
 }
 
 const AttackType = {

@@ -8,9 +8,10 @@ var board = {
     activeTrebuchet: undefined, 
     hoveredTrebuchet: undefined, // while over the trebuchet itself
     hoveredVillage: undefined, // while over the village itself
-    animation: undefined, // { from, to, attackType, state, elapsedMs }
+    animation: undefined, // { from, to, attackType, state, elapsedMs } or { dx, dy, state }
     mousePos: undefined,
     villageAttacks: [],
+    noOfHits: 0,
     levelScore: 0,
     score: 0,
     level: 1,
@@ -87,6 +88,28 @@ var board = {
         return true;
     },
 
+    __moveTrebuchetsAfterEarthquake() {
+        for (var t of this.trebuchets) {
+            while (true) {
+                var pos = this.__rndPos();
+                if (this.__canBePlacedAt(t, pos)) {
+                    t.pos = pos;
+                    this.__handlePowerup();
+                    break;
+                }
+            }
+        }
+    },
+
+    __startEarthquakeIfApplicable() {
+        if (this.noOfHits == 0 && this.villageAttacks.length == 0) {
+            this.animation = { dx: 0, dy: 0, state: AnimationState.EARTHQUAKE, elapsedMs: 0 }; 
+        }
+        else {
+            this.animation = undefined;
+        }
+    },
+
     __load() {
         this.__loadTrebuchet(this.activeTrebuchet);
         this.activeTrebuchet.state = TrebuchetState.FIRE;
@@ -120,9 +143,15 @@ var board = {
         }
 
         for (const v of this.villages) {
+            v.attacksToPerform = 0;
+            v.attacksPerformed = 0;
+        }
+
+        for (const v of this.villages) {
             for (const t of this.trebuchets) {
                 if (v.health > 0) {
                     this.villageAttacks.push({v:v, t:t});
+                    v.attacksToPerform += 1;
                 }
             }
         }
@@ -130,12 +159,27 @@ var board = {
         this.__shuffleArray(this.villageAttacks);
     },
 
-    __resetTrebuchetsWhenAllVillagesDone() {
-        if (this.villageAttacks.length == 0) {
-            for (var t of this.trebuchets) {
-                 t.state = TrebuchetState.LOAD_OR_MOVE;
-             }
-         }
+    __allVillagesHaveAttacked() {
+        var result = true;
+        for (const v of this.villages) {
+            if (!v.attacksToPerform || v.attacksToPerform == 0 || v.attacksPerformed < v.attacksToPerform) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    },
+
+    __endTurn() {
+        for (var t of this.trebuchets) {
+            t.state = TrebuchetState.LOAD_OR_MOVE;
+        }
+        this.__startEarthquakeIfApplicable();
+        for (var v of this.villages) {
+            v.attacksToPerform = 0;
+            v.attacksPerformed = 0;
+        }
+        this.noOfHits = 0;
     },
 
     reset() {
@@ -203,12 +247,13 @@ var board = {
                                 this.__attackWithVillagesWhenAllTrebuchetsDone();
                                 break;
                             case AttackType.VILLAGE_MISSES_TREBUCHET:
-                                this.__resetTrebuchetsWhenAllVillagesDone();
+                                this.animation.from.attacksPerformed += 1;
                                 this.animation = undefined;
                                 break;
                             default:
                                 this.animation.state = AnimationState.HIGHLIGHT_ATTACKEE;
                                 this.animation.elapsedMs = 0;
+                                this.noOfHits += 1;
                                 break;
                             }
                         }
@@ -221,12 +266,30 @@ var board = {
                     else {
                         if (this.animation.attackType == AttackType.VILLAGE_ATTACKS_TREBUCHET) {
                             this.__fireAtTrebuchet(this.animation.from, this.animation.to);
-                            this.__resetTrebuchetsWhenAllVillagesDone();
+                            this.animation.from.attacksPerformed += 1;
                         }
                         else {
                             this.__fireAtVillage(this.animation.from, this.animation.to);
                         }
                         this.animation = undefined;
+                    }
+                    break;
+                case AnimationState.EARTHQUAKE:
+                    var elapsedMs = this.animation.elapsedMs || 0;
+                    if (elapsedMs > 800) {
+                        this.__moveTrebuchetsAfterEarthquake();
+                        this.animation = undefined;
+                    }
+                    else {
+                        if (this.animation.dx == 0 && this.animation.dy == 0) {
+                            this.animation.dx = this.__rnd(10) - 5;
+                            this.animation.dy = this.__rnd(10) - 5;
+                        }
+                        else {
+                            this.animation.dx = 0;
+                            this.animation.dy = 0;
+                        }
+                        this.animation.elapsedMs = elapsedMs + ms
                     }
                     break;
             }
@@ -249,9 +312,6 @@ var board = {
                         };
                         break;
                     }
-                    else {
-                        this.__resetTrebuchetsWhenAllVillagesDone();
-                    }
                 }
             }
             else {
@@ -271,6 +331,10 @@ var board = {
                     }
                 }
             }
+        }
+
+        if (this.__allVillagesHaveAttacked()) {
+            this.__endTurn();
         }
 
         this.mousePos = mousePos;
@@ -310,18 +374,25 @@ var board = {
 
     draw(drawSprite) {
 
+        var doDrawSprite = (sprite, pos, radius, alpha) => {
+            var p = this.animation && this.animation.state == AnimationState.EARTHQUAKE
+                ? { x : pos.x + this.animation.dx, y : pos.y + this.animation.dy }
+                : pos;
+            drawSprite(sprite, p, radius, alpha);
+        };
+
         var drawRadiusScaledSprite = (sprite, pos, radius, alpha) => {
-            drawSprite(sprite, pos, 2 * radius / 200, alpha);
+            doDrawSprite(sprite, pos, 2 * radius / 200, alpha);
         };
 
         if (this.activeTrebuchet && this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE) {
             drawRadiusScaledSprite(sprites.createRange(), this.activeTrebuchet.pos, this.activeTrebuchet.radius, 0.5);
         }
 
-        this.powerups.forEach(p => drawSprite(sprites.createHealthPowerup(), p.pos, 0.5));
+        this.powerups.forEach(p => doDrawSprite(sprites.createHealthPowerup(), p.pos, 0.5));
 
         this.villages.forEach(v => {
-            drawSprite(sprites.createVillage(v.health, false), v.pos, 0.5);
+            doDrawSprite(sprites.createVillage(v.health, false), v.pos, 0.5);
             if (v == this.hoveredVillage) {
                 drawing.circle(v.pos.x, v.pos.y, 50, "gray", v.strength / 10);
             }
@@ -335,11 +406,11 @@ var board = {
                 x: from.pos.x + (to.pos.x - from.pos.x) * percent,
                 y: from.pos.y + (to.pos.y - from.pos.y) * percent
             }
-            drawSprite(sprites.createAttack(), pos);
+            doDrawSprite(sprites.createAttack(), pos);
         }
 
         this.trebuchets.forEach(t => {
-            drawSprite(sprites.createTrebuchet(t.health, t.state == TrebuchetState.DONE), t.pos, 0.5);
+            doDrawSprite(sprites.createTrebuchet(t.health, t.state == TrebuchetState.DONE), t.pos, 0.5);
             if (t == this.activeTrebuchet) {
                 drawing.circle(t.pos.x, t.pos.y, 50, "gray", t.strength / 10);
             }
@@ -349,7 +420,7 @@ var board = {
             var from = this.animation.from;
             var alpha = (this.animation.elapsedMs || 0)  / 200;
             if (alpha > 0) {
-                drawSprite(sprites.createHighlight(), from.pos, 0.5, alpha);
+                doDrawSprite(sprites.createHighlight(), from.pos, 0.5, alpha);
             }
         }
 
@@ -358,7 +429,7 @@ var board = {
             var percent = (this.animation.elapsedMs || 0) / 200;
             var alpha = 1 - percent;
             if (alpha > 0) {
-                drawSprite(sprites.createHighlight(), from.pos, 0.5, alpha);
+                doDrawSprite(sprites.createHighlight(), from.pos, 0.5, alpha);
             }
         }
 
@@ -369,7 +440,7 @@ var board = {
                 alpha = 1 - alpha;
             }
             if (alpha > 0) {
-                drawSprite(sprites.createHighlight(), to.pos, 0.5, alpha);
+                doDrawSprite(sprites.createHighlight(), to.pos, 0.5, alpha);
             }
         }
 
@@ -382,6 +453,10 @@ var board = {
             var h = this.hoveredTrebuchet ? this.hoveredTrebuchet.health : this.hoveredVillage.health;
             drawing.fillText(`Strength: ${s}`, 1040, 28, {textAlign: "right"});
             drawing.fillText(`Health: ${h}`, 1180, 28, {textAlign: "right"});
+        }
+
+        if (this.animation && this.animation.state == AnimationState.EARTHQUAKE) {
+            drawing.fillText("EARTHQUAKE", 600 + this.animation.dx, 400 + this.animation.dy, { font: "48px Arial", textAlign: "center" });
         }
 
         // Draw lower info bar

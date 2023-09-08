@@ -28,3 +28,5 @@ const AttackType = {
 const BoardWidth = 1100;
 const BoardHeight = 700;
 const BaseRadius = 50;
+
+const HighScoreString = "johan.ahlgren.turrets_and_trebuchets";

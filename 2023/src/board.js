@@ -13,6 +13,8 @@ var board = {
     villageAttacks: [],
     noOfHits: 0,
     levelScore: 0,
+    highScore: 0,
+    newHighScore: false,
     score: 0,
     level: 1,
 
@@ -196,6 +198,8 @@ var board = {
         this.animation = undefined;
         this.villageAttacks = [];
     
+        this.highScore = parseInt(localStorage.getItem(HighScoreString)) || 0;
+
         while (this.villages.size < noOfVillages)
         {
             var v = this.__createVillage();
@@ -450,7 +454,8 @@ var board = {
         // Draw upper info bar
         drawing.fillRect(0, 0, 1200, 40, "#2d4f18");
         drawing.fillText(`Level score: ${this.levelScore}`, 20, 28);
-        drawing.fillText(`Score: ${this.score}`, 600, 28, {textAlign: "center"});
+        drawing.fillText(`Score: ${this.score}`, 620, 28);
+        drawing.fillText(`High score: ${this.highScore}`, 320, 28);
         if (this.hoveredTrebuchet || this.hoveredVillage) {
             var s = this.hoveredTrebuchet ? this.hoveredTrebuchet.strength : this.hoveredVillage.strength;
             var h = this.hoveredTrebuchet ? this.hoveredTrebuchet.health : this.hoveredVillage.health;
@@ -506,6 +511,14 @@ var board = {
     },
 
     gameOver() {
+        if (this.highScore < this.score) {
+            this.highScore = this.score;
+            localStorage.setItem(HighScoreString, this.highScore);
+            this.newHighScore = true;
+        }
+        else {
+            this.newHighScore = false;
+        }
         this.level = 1;
         this.score = 0;
     }

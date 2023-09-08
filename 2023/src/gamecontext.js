@@ -60,7 +60,8 @@ var gameContext = {
                 drawing.fillText("Start by either loading your trebuchet (which increases the damage it", 600, 520, {textAlign: "center"});
                 drawing.fillText("will make when hitting a village) or moving to a more favorable position.", 600, 560, {textAlign: "center"});
                 drawing.fillText("Then attack one of the villages. When all your trebuchets have attacked", 600, 600, {textAlign: "center"});
-                drawing.fillText("a village, the villages will counter-attack. Good luck!", 600, 640, {textAlign: "center"});
+                drawing.fillText("a village, the villages will counter-attack. You also need to watch out", 600, 640, {textAlign: "center"});
+                drawing.fillText("for the medieval earthquakes - they are very unpredictable... Good luck!", 600, 680, {textAlign: "center"});
                 break;
             case GameState.PLAYING:
                 board.draw(drawSprite);
@@ -70,6 +71,9 @@ var gameContext = {
                 break;
             case GameState.GAMEOVER:
                 drawing.fillText("GAME OVER", 600, 400, {textAlign: "center"});
+                if (board.newHighScore) {
+                    drawing.fillText("New high score: " + board.highScore, 600, 440, {textAlign: "center"});
+                }
                 break;
             default:
                 break;
@@ -117,7 +121,7 @@ var gameContext = {
             case GameState.GAMEOVER:
                 board.gameOver();
                 this.gameState = GameState.GAMEOVER;
-                this.msRemaining = 1000;
+                this.msRemaining = 2000;
             default:
                 this.gameState = newState;
         }

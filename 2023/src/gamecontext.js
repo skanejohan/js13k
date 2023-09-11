@@ -114,7 +114,6 @@ var gameContext = {
                 this.gameState = GameState.IDLE;
                 break;
             case GameState.LEVELWON:
-                board.updateScore();
                 this.gameState = GameState.LEVELWON;
                 this.msRemaining = 800;
                 break;

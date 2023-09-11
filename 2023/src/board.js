@@ -12,7 +12,6 @@ var board = {
     mousePos: undefined,
     villageAttacks: [],
     noOfHits: 0,
-    levelScore: 0,
     highScore: 0,
     newHighScore: false,
     score: 0,
@@ -43,6 +42,7 @@ var board = {
         for (var i = 0; i < vs.length; i++) {
             if (vs[i].health <= 0) {
                 this.villages.delete(vs[i]);
+                this.score += vs[i].strength;
                 if (this.__rnd(100) < 25) {
                     this.powerups.add( { pos : vs[i].pos } );
                 }
@@ -223,7 +223,7 @@ var board = {
             }
         }
 
-        this.levelScore = 100 + (noOfVillages - noOfTrebuchets) * 25;
+
         this.level++;
     },
 
@@ -466,9 +466,8 @@ var board = {
 
         // Draw upper info bar
         drawing.fillRect(0, 0, 1200, 40, "#2d4f18");
-        drawing.fillText(`Level score: ${this.levelScore}`, 20, 28);
-        drawing.fillText(`Score: ${this.score}`, 620, 28);
-        drawing.fillText(`High score: ${this.highScore}`, 320, 28);
+        drawing.fillText(`Score: ${this.score}`, 20, 28);
+        drawing.fillText(`High score: ${this.highScore}`, 600, 28, {textAlign: "center"});
         if (this.hoveredTrebuchet || this.hoveredVillage) {
             var s = this.hoveredTrebuchet ? this.hoveredTrebuchet.strength : this.hoveredVillage.strength;
             var h = this.hoveredTrebuchet ? this.hoveredTrebuchet.health : this.hoveredVillage.health;
@@ -505,10 +504,6 @@ var board = {
                 }
             }
         }
-    },
-
-    updateScore() {
-        this.score += this.levelScore;
     },
 
     levelWon() {

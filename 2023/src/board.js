@@ -60,18 +60,26 @@ var board = {
         for (var i = 0; i < ts.length; i++) {
             if (ts[i].health <= 0) {
                 this.trebuchets.delete(ts[i]);
+                if (this.activeTrebuchet == ts[i]) {
+                    this.activeTrebuchet = undefined;
+                }
+            }
+        }
+    },
+
+    __trebuchetPlacedHereWillUsePowerup(pos) {
+        for (const p of this.powerups) {
+            if (this.__dist(pos, p.pos) < 2 * BaseRadius) {
+                return p;
             }
         }
     },
 
     __handlePowerup() {
-        var ps = Array.from(this.powerups);
-        for (var p of ps) {
-            var d = this.__dist(this.activeTrebuchet.pos, p.pos);
-            if (d < 2 * BaseRadius) {
-                this.activeTrebuchet.health = 100;
-                this.powerups.delete(p);
-            }
+        var powerup = this.__trebuchetPlacedHereWillUsePowerup(this.activeTrebuchet.pos);
+        if (powerup) {
+            this.activeTrebuchet.health = 100;
+            this.powerups.delete(powerup);
         }
     },
 
@@ -396,7 +404,12 @@ var board = {
             drawRadiusScaledSprite(sprites.createRange(), this.activeTrebuchet.pos, this.activeTrebuchet.radius, 0.5);
         }
 
-        this.powerups.forEach(p => doDrawSprite(sprites.createHealthPowerup(), p.pos, 0.5));
+        this.powerups.forEach(p => {
+            var highlight = this.mousePos && this.activeTrebuchet 
+                && this.activeTrebuchet.state == TrebuchetState.LOAD_OR_MOVE 
+                && this.__trebuchetPlacedHereWillUsePowerup(this.mousePos);
+            doDrawSprite(sprites.createHealthPowerup(highlight), p.pos, 0.5)
+        });
 
         this.villages.forEach(v => {
             doDrawSprite(sprites.createVillage(v.health, false), v.pos, 0.5);
@@ -476,13 +489,9 @@ var board = {
                     drawing.fillText("Click here to load or hover outside the trebuchet to move.", 600, 788, {textAlign: "center"});
                 }
                 else if (this.__inRange(this.mousePos, this.activeTrebuchet) && this.__canBePlacedAt(this.activeTrebuchet, this.mousePos)) {
-                    var text = "Click to move here.";
-                    for (const p of this.powerups) {
-                        if (this.__over(this.mousePos, p)) {
-                            text = "Click to move here and eat this turnip to restore your health.";
-                            break;
-                        }
-                    }
+                    var text = this.__trebuchetPlacedHereWillUsePowerup(this.mousePos)
+                        ? "Click to move here and eat this turnip to restore your health."
+                        : "Click to move here.";
                     drawing.fillText(text, 600, 788, {textAlign: "center"});
                 }
             }

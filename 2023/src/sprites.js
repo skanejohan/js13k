@@ -109,8 +109,8 @@ var sprites = {
         return result;
     },
 
-    createHealthPowerup() {
-        var result = this.__createCircle({ r: 100, fillStyle: `#bf6b26` });
+    createHealthPowerup(highlight) {
+        var result = this.__createCircle({ r: 100, fillStyle: `#fcc200` });
         result.ctx.strokeStyle = "black";
         result.ctx.lineWidth = 5;
         
@@ -135,6 +135,14 @@ var sprites = {
         result.ctx.moveTo(122, 74);
         result.ctx.lineTo(166, 74);
         result.ctx.stroke();
+
+        if (highlight) {
+            result.ctx.strokeStyle = "#daa520";
+            result.ctx.lineWidth = 10;
+            result.ctx.beginPath();
+            result.ctx.arc(100, 100, 95, 0, 2 * Math.PI);
+            result.ctx.stroke();
+        }
 
         return result;
     },

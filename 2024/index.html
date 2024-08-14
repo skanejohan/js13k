@@ -1,19 +1,26 @@
 <!doctype HTML>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>WHACKY WESQUE WHEEL</title>
-        <link rel="stylesheet" href="index.css">
-    </head>
-    <body>
-        <div id="container">
-          <svg id="scene" viewBox="0 0 1920 780" xmlns="http://www.w3.org/2000/svg">
-            <g id="layer1"></g>
-            <g id="layer2"></g>
-            <g id="layer3"></g>
-            <g id="overlay"></g>
-          </svg>
-        </div>
-        <script src="index.js"></script>
-    </body>
+  <head>
+    <meta charset="UTF-8">
+    <title>WHACKY WESQUE WHEEL</title>
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+    <div id="container">
+      <svg id="scene" viewBox="0 0 1920 780" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="spinner-gradient">
+            <stop offset="0%" stop-opacity="0.3" stop-color="yellow" />
+            <stop offset="100%" stop-opacity="1" stop-color="red" />
+          </linearGradient>
+        </defs>
+        <g id="layer1"></g>
+        <g id="layer2"></g>
+        <g id="layer3"></g>
+        <circle id="circle" r="40" fill="none" stroke="url(#spinner-gradient)" stroke-width="8" id="circle" />
+        <g id="overlay"></g>
+      </svg>
+    </div>
+    <script src="index.js"></script>
+  </body>
 </html>

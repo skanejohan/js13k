@@ -1,8 +1,9 @@
 let leftEdge = 200;
-let rightEdge = 1200;
+let rightEdge = 1720;
 let circleTranslationX = 800;
 let circleTranslationY = 400;
 let sceneTranslationX = 0;
+let sceneX = 0;
 let dx = 0;
 
 let circle = document.getElementById("circle");
@@ -27,6 +28,14 @@ document.addEventListener('keydown',
 
 let points = [{x:0,y:500}, {x:500,y:500}, {x:700,y:400},  {x:800,y:200}, {x:900,y:100}, {x:1200,y:200}, {x:1500,y:200}, {x:1800,y:300}, {x:1900,y:500}, {x:2400,y:500}];
 
+let findLine = ps => {
+    for (i = 0; i < ps.length-1; i++) {
+        if (sceneX < ps[i+1].x) {
+            return { x1: ps[i].x, y1: ps[i].y, x2: ps[i+1].x, y2: ps[i+1].y }
+        }
+    }
+}
+
 // Set up the scene
 let generatePolygon = ps => {
     let x = 0;
@@ -36,6 +45,7 @@ let generatePolygon = ps => {
         x = p.x;
     });
     s += `${x},800 0,800" fill="white" />`;
+    s += `<line x1="0" y1="0" x2="0" y2="0" stroke-width="4" stroke="black" id="debug" />`;
     return s;
 }
 
@@ -52,7 +62,7 @@ let gameLoop = () => {
 
     let translationX = Math.abs(5 * (dx * dt / 100));
     if (dx > 0) { // We move right
-        if (sceneTranslationX > -1000) {
+        if (sceneX < 2100) {
             let leftToApply = rightEdge - circleTranslationX;
             let toApply = Math.min(translationX, leftToApply);
             circleTranslationX += toApply;
@@ -63,7 +73,7 @@ let gameLoop = () => {
         }
     }
     else { // We move left
-        if (sceneTranslationX < 0) {
+        if (sceneX > 200) {
             let leftToApply = circleTranslationX - leftEdge;
             let toApply = Math.min(translationX, leftToApply);
             circleTranslationX -= toApply;
@@ -78,8 +88,18 @@ let gameLoop = () => {
     layer2.setAttribute("transform", `translate(${0.6 * sceneTranslationX} 0)`); 
     layer1.setAttribute("transform", `translate(${0.2 * sceneTranslationX} 0)`); 
 
+    sceneX = circleTranslationX - sceneTranslationX;
+
+    let line = findLine(points);
+    document.getElementById("debug").setAttribute('x1', line.x1);
+    document.getElementById("debug").setAttribute('y1', line.y1);
+    document.getElementById("debug").setAttribute('x2', line.x2);
+    document.getElementById("debug").setAttribute('y2', line.y2);
+
     requestAnimationFrame(gameLoop);
     lastTime = now;
+
+    console.log(`${sceneX} - circle: ${circleTranslationX}, scene: ${sceneTranslationX}`);
 }
 
 gameLoop();

@@ -1,25 +1,63 @@
-let generatePolygon = (ps, color) => {
-    let x = 0;
-    let s = '<polygon points="';
-    ps.forEach(p => {
-        s += `${p.x},${p.y} `;
-        x = p.x;
-    });
-    s += `${x},800 0,800" fill="${color}" />`;
-    return s;
-}
+let getScene = (points, minX, maxX) => {
 
-let getScene = n => {
+    let _minX = minX;
+    let _maxX = maxX;
 
-    let _points = points1();
-    let _minX = 200;
-    let _maxX = 2100;
-    if (n == 2) {
-        _points = points2();
-        _minX = 200;
-        _maxX = 19000;
+    let _lines = [];
+    let _points = [];
+    let _controlPoints = [];
+
+    let R = 45;
+
+    let _addPoint = (p) => {
+        _points.push(p);
+        if (_points.length > 1) {
+            let pp = _points[_points.length-2]; // Previous point
+            let w = p.x - pp.x;
+            let h = p.y - pp.y;
+            let a = h;
+            let b = -w;
+            let line = { 
+                x1: pp.x,
+                y1: pp.y, 
+                x2: p.x, 
+                y2: p.y,
+                a: a,
+                b: -Math.abs(b),
+                c: a * p.x + b * p.y,
+                v: Math.atan(h/w) }
+            line.cx1 = line.x1 + Math.sin(line.v) * R;
+            line.cy1 = line.y1 - Math.cos(line.v) * R;
+            line.cx2 = line.x2 + Math.sin(line.v) * R;
+            line.cy2 = line.y2 - Math.cos(line.v) * R;
+            _lines.push(line);
         }
-    let _polygon = generatePolygon(_points, "white") + `<line x1="0" y1="0" x2="0" y2="0" stroke-width="4" stroke="black" id="debug" />`;
+    }
+
+    let _calculateControlPoints = () => {
+        _controlPoints.push( { x: _lines[0].cx1, y : _lines[0].cy1 });
+        for (let i = 1; i < _lines.length; i++) {
+            let v = (_lines[i-1].v + _lines[i].v) / 2;
+            let x = _lines[i-1].x2 + Math.sin(v) * R;
+            let y = _lines[i-1].y2 - Math.cos(v) * R;
+            _controlPoints.push( { x: x, y : y });
+        }
+        _controlPoints.push( { x: _lines[_lines.length-1].cx2, y : _lines[_lines.length-1].cy2 });
+    }
+
+    let _polygon = (showHoveredLine, showControlPoints) => {
+        let p = generatePolygon(_points, "white");
+        if (showHoveredLine) {
+            p += `<line x1="0" y1="0" x2="0" y2="0" stroke-width="4" stroke="black" id="hoveredLine" />`;
+        }
+        if (showControlPoints) {
+            _controlPoints.forEach(cp => p += `<circle cx="${cp.x}" cy="${cp.y}" r="6" fill="green" />`);
+        }
+        return p;
+    }
+
+    points.forEach(p => _addPoint(p));
+    _calculateControlPoints();
 
     return {
         polygon: _polygon,
@@ -28,17 +66,3 @@ let getScene = n => {
         maxX: _maxX
     }
 }
-
-let generateMountain = (ymin, ymax, color) => {
-    let points = [{x:0,y:800}];
-    for (var i = 100; i < 20000; i += 50) {
-        var diff = (ymax - ymin) / 2;
-        var y = 400 + diff * Math.sin(i);
-        points.push( {x:i,y:y} );
-    }
-    points.push( {x:20000,y:800} );
-    return points;
-}
-
-let points1 = () => [{x:0,y:500}, {x:500,y:500}, {x:700,y:400},  {x:800,y:200}, {x:900,y:100}, {x:1200,y:200}, {x:1500,y:200}, {x:1800,y:300}, {x:1900,y:500}, {x:2400,y:500}];
-let points2 = () => generateMountain(500, 700);

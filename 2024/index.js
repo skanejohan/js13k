@@ -12,7 +12,9 @@ let layer2 = document.getElementById("layer2");
 let layer3 = document.getElementById("layer3");
 let overlay = document.getElementById("overlay");
 
-let scene = getScene(1);
+let level = l2;
+
+let scene = getScene(level.points, level.minX, level.maxX);
 
 document.addEventListener('keydown', 
     e => {
@@ -37,7 +39,7 @@ let findLine = ps => {
 
 layer1.innerHTML = generatePolygon(generateMountain(100, 700), "gray");
 layer2.innerHTML = generatePolygon(generateMountain(300, 700), "darkgray");
-layer3.innerHTML = scene.polygon;
+layer3.innerHTML = scene.polygon(true, true);
 overlay.innerHTML = '<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL</text>';
 
 let lastTime = Date.now();
@@ -77,10 +79,10 @@ let gameLoop = () => {
     sceneX = circleTranslationX - sceneTranslationX;
 
     let line = findLine(scene.points);
-    document.getElementById("debug").setAttribute('x1', line.x1);
-    document.getElementById("debug").setAttribute('y1', line.y1);
-    document.getElementById("debug").setAttribute('x2', line.x2);
-    document.getElementById("debug").setAttribute('y2', line.y2);
+    document.getElementById("hoveredLine").setAttribute('x1', line.x1);
+    document.getElementById("hoveredLine").setAttribute('y1', line.y1);
+    document.getElementById("hoveredLine").setAttribute('x2', line.x2);
+    document.getElementById("hoveredLine").setAttribute('y2', line.y2);
 
     requestAnimationFrame(gameLoop);
     lastTime = now;

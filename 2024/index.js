@@ -12,6 +12,8 @@ let layer2 = document.getElementById("layer2");
 let layer3 = document.getElementById("layer3");
 let overlay = document.getElementById("overlay");
 
+let scene = getScene(1);
+
 document.addEventListener('keydown', 
     e => {
         if (e.code == "ArrowLeft") {
@@ -25,9 +27,6 @@ document.addEventListener('keydown',
         }
     }, false);
 
-
-let points = [{x:0,y:500}, {x:500,y:500}, {x:700,y:400},  {x:800,y:200}, {x:900,y:100}, {x:1200,y:200}, {x:1500,y:200}, {x:1800,y:300}, {x:1900,y:500}, {x:2400,y:500}];
-
 let findLine = ps => {
     for (i = 0; i < ps.length-1; i++) {
         if (sceneX < ps[i+1].x) {
@@ -36,22 +35,9 @@ let findLine = ps => {
     }
 }
 
-// Set up the scene
-let generatePolygon = ps => {
-    let x = 0;
-    let s = '<polygon points="';
-    ps.forEach(p => {
-        s += `${p.x},${p.y} `;
-        x = p.x;
-    });
-    s += `${x},800 0,800" fill="white" />`;
-    s += `<line x1="0" y1="0" x2="0" y2="0" stroke-width="4" stroke="black" id="debug" />`;
-    return s;
-}
-
-layer1.innerHTML = '<rect width="200" height="100" x="100" y="100" rx="20" ry="20" fill="blue" />';
-layer2.innerHTML = '<rect width="200" height="100" x="100" y="300" rx="20" ry="20" fill="red" />';
-layer3.innerHTML = generatePolygon(points);
+layer1.innerHTML = generatePolygon(generateMountain(100, 700), "gray");
+layer2.innerHTML = generatePolygon(generateMountain(300, 700), "darkgray");
+layer3.innerHTML = scene.polygon;
 overlay.innerHTML = '<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL</text>';
 
 let lastTime = Date.now();
@@ -62,7 +48,7 @@ let gameLoop = () => {
 
     let translationX = Math.abs(5 * (dx * dt / 100));
     if (dx > 0) { // We move right
-        if (sceneX < 2100) {
+        if (sceneX < scene.maxX) {
             let leftToApply = rightEdge - circleTranslationX;
             let toApply = Math.min(translationX, leftToApply);
             circleTranslationX += toApply;
@@ -73,7 +59,7 @@ let gameLoop = () => {
         }
     }
     else { // We move left
-        if (sceneX > 200) {
+        if (sceneX > scene.minX) {
             let leftToApply = circleTranslationX - leftEdge;
             let toApply = Math.min(translationX, leftToApply);
             circleTranslationX -= toApply;
@@ -90,7 +76,7 @@ let gameLoop = () => {
 
     sceneX = circleTranslationX - sceneTranslationX;
 
-    let line = findLine(points);
+    let line = findLine(scene.points);
     document.getElementById("debug").setAttribute('x1', line.x1);
     document.getElementById("debug").setAttribute('y1', line.y1);
     document.getElementById("debug").setAttribute('x2', line.x2);

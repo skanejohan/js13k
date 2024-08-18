@@ -1,10 +1,6 @@
 let leftEdge = 200;
 let rightEdge = 1720;
-let circleTranslationX = 800;
-let circleTranslationY = 400;
-let sceneTranslationX = 0;
 let sceneX = 0;
-let dx = 0;
 
 let circle = document.getElementById("circle");
 let layer1 = document.getElementById("layer1");
@@ -14,20 +10,9 @@ let overlay = document.getElementById("overlay");
 
 let level = l2;
 
+let input = getInput(document);
 let scene = getScene(level.points, level.minX, level.maxX);
-
-document.addEventListener('keydown', 
-    e => {
-        if (e.code == "ArrowLeft") {
-            dx -= 1;
-        }
-        if (e.code == "ArrowRight") {
-            dx += 1;
-        }
-        if (e.code == "Space") {
-            dx = 0;
-        }
-    }, false);
+let movement = getMovement(input);
 
 let findLine = ps => {
     for (i = 0; i < ps.length-1; i++) {
@@ -48,35 +33,14 @@ let gameLoop = () => {
     let now = Date.now();
     let dt = (now - lastTime);
 
-    let translationX = Math.abs(5 * (dx * dt / 100));
-    if (dx > 0) { // We move right
-        if (sceneX < scene.maxX) {
-            let leftToApply = rightEdge - circleTranslationX;
-            let toApply = Math.min(translationX, leftToApply);
-            circleTranslationX += toApply;
-            sceneTranslationX -= translationX - toApply;
-        }
-        else {
-            dx = 0;
-        }
-    }
-    else { // We move left
-        if (sceneX > scene.minX) {
-            let leftToApply = circleTranslationX - leftEdge;
-            let toApply = Math.min(translationX, leftToApply);
-            circleTranslationX -= toApply;
-            sceneTranslationX += translationX - toApply;
-        }
-        else {
-            dx = 0;
-        }
-    }
-    circle.setAttribute("transform", `translate(${circleTranslationX} ${circleTranslationY})`);
-    layer3.setAttribute("transform", `translate(${sceneTranslationX} 0)`); 
-    layer2.setAttribute("transform", `translate(${0.6 * sceneTranslationX} 0)`); 
-    layer1.setAttribute("transform", `translate(${0.2 * sceneTranslationX} 0)`); 
+    movement.update(dt);
 
-    sceneX = circleTranslationX - sceneTranslationX;
+    circle.setAttribute("transform", `translate(${movement.circleTranslationX()} ${movement.circleTranslationY()})`);
+    layer3.setAttribute("transform", `translate(${movement.sceneTranslationX()} 0)`); 
+    layer2.setAttribute("transform", `translate(${0.6 * movement.sceneTranslationX()} 0)`); 
+    layer1.setAttribute("transform", `translate(${0.2 * movement.sceneTranslationX()} 0)`); 
+
+    sceneX = movement.circleTranslationX() - movement.sceneTranslationX();
 
     let line = findLine(scene.points);
     document.getElementById("hoveredLine").setAttribute('x1', line.x1);
@@ -87,7 +51,7 @@ let gameLoop = () => {
     requestAnimationFrame(gameLoop);
     lastTime = now;
 
-    console.log(`${sceneX} - circle: ${circleTranslationX}, scene: ${sceneTranslationX}`);
+    console.log(`${sceneX} - circle: ${movement.circleTranslationX()}, scene: ${movement.sceneTranslationX()}`);
 }
 
 gameLoop();

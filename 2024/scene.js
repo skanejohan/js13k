@@ -56,10 +56,24 @@ let getScene = (points, minX, maxX) => {
         return p;
     }
 
+    let _findLine = x => {
+        for (i = 0; i < points.length-1; i++) {
+            if (x < points[i+1].x) {
+                return { 
+                    x1: points[i].x, 
+                    y1: points[i].y, 
+                    x2: points[i+1].x, 
+                    y2: points[i+1].y 
+                }
+            }
+        }
+    }
+    
     points.forEach(p => _addPoint(p));
     _calculateControlPoints();
 
     return {
+        findLine: _findLine,
         polygon: _polygon,
         points: _points,
         minX: _minX,

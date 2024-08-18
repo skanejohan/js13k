@@ -1,10 +1,11 @@
 let getMovement = input => {
 
+    let da = 0;
     let dx = 0;
+    let dy = 0;
     let _input = input;
-    let _circleTranslationX = 800;
-    let _circleTranslationY = 400;
-    let _sceneTranslationX = 0;
+    let _circle = { x : 0, screenX : 800, y : 400, a : 0 }
+    let _scene = { x : 0 }
 
     let _update = dt => {
         if (_input.isDown("ArrowLeft")) {
@@ -19,22 +20,24 @@ let getMovement = input => {
     
         let translationX = Math.abs(5 * (dx * dt / 100));
         if (dx > 0) { // We move right
-            if (sceneX < scene.maxX) {
-                let leftToApply = rightEdge - _circleTranslationX;
+            if (_circle.x < scene.maxX) {
+                let leftToApply = rightEdge - _circle.screenX;
                 let toApply = Math.min(translationX, leftToApply);
-                _circleTranslationX += toApply;
-                _sceneTranslationX -= translationX - toApply;
+                _circle.screenX += toApply;
+                _scene.x -= translationX - toApply;
+                _circle.x = _circle.screenX - _scene.x;
             }
             else {
                 dx = 0;
             }
         }
         else { // We move left
-            if (sceneX > scene.minX) {
-                let leftToApply = _circleTranslationX - leftEdge;
+            if (_circle.x > scene.minX) {
+                let leftToApply = _circle.screenX - leftEdge;
                 let toApply = Math.min(translationX, leftToApply);
-                _circleTranslationX -= toApply;
-                _sceneTranslationX += translationX - toApply;
+                _circle.screenX -= toApply;
+                _scene.x += translationX - toApply;
+                _circle.x = _circle.screenX - _scene.x;
             }
             else {
                 dx = 0;
@@ -44,8 +47,7 @@ let getMovement = input => {
 
     return {
         update: _update,
-        circleTranslationX: () => _circleTranslationX,
-        circleTranslationY: () => _circleTranslationY,
-        sceneTranslationX: () => _sceneTranslationX,
+        circle: () => _circle,
+        scene: () => _scene,
     }
 }

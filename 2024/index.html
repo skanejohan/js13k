@@ -17,14 +17,15 @@
         <g id="layer1"></g>
         <g id="layer2"></g>
         <g id="layer3"></g>
-        <circle id="circle" r="40" fill="none" stroke="url(#spinner-gradient)" stroke-width="8" id="circle" />
+        <g id="debug">
+          <line x1="0" y1="0" x2="0" y2="0" stroke-width="4" stroke="black" id="hoveredLine" />
+          <circle r="5" fill="red" id="hoveredPoint" />
+        </g>
         <g id="overlay"></g>
       </svg>
     </div>
     <script src="input.js"></script>
     <script src="svg.js"></script>
-    <script src="movement.js"></script>
-    <script src="scene.js"></script>
     <script src="levels.js"></script>
     <script src="index.js"></script>
   </body>

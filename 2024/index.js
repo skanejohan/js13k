@@ -3,7 +3,7 @@ let hoveredLine = document.getElementById("hoveredLine");
 
 let input = getInput(document);
 
-let level = l2();
+let level = l3();
 
 let skiersCaught = 0;
 
@@ -14,11 +14,12 @@ let getOverlayText = () => {
     return `<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL - ${skiersCaught} SKIERS CAUGHT</text>`;
 }
 
-layer1.innerHTML = generatePolygon(generateMountain(100, 700), "gray");
-layer2.innerHTML = generatePolygon(generateMountain(300, 700), "darkgray");
+layer1.innerHTML = generatePolygon(generateMountain(100, 100, 20000, 700, 50), "gray");
+layer2.innerHTML = generatePolygon(generateMountain(100, 300, 20000, 700, 50), "darkgray");
 layer3.innerHTML = '<circle r="40" fill="none" stroke="url(#spinner-gradient)" stroke-width="8" id="circle" />' + 
     generatePolygon(level.points, "white") +
-    generateSkiers(level.skiers);
+    generateSkiers(level.skiers) + 
+    generateBlockers(level.blockers); // DEBUG
 overlay.innerHTML = getOverlayText();
 
 let lastTime = Date.now();
@@ -111,6 +112,16 @@ let gameLoop = () => {
     hoveredPoint.setAttribute('cy', point.y); // DEBUG
 
     _update(input.isDown("ArrowLeft"), input.isDown("ArrowRight"), input.isDown("Space"));
+
+    for (let i = 0; i < level.blockers.length; i++) {
+        let b = level.blockers[i];
+        if (cx < b.left && cx + dx * (dt / 100) > b.left && cy > b.top) {
+            da = 0;
+            dx = 0;
+            cx = b.left - 1;
+            break;
+        }
+    }
 
     ca += da * (dt / 100);
     cx += dx * (dt / 100);

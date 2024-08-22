@@ -9,13 +9,17 @@ let generatePolygon = (points, color) => {
     return s;
 }
 
-let generateMountain = (ymin, ymax, color) => {
-    let points = [{x:0,y:800}];
-    for (var i = 100; i < 20000; i += 50) {
+let generateSine = (points, xmin, ymin, xmax, ymax, yoffset, lineLength) => {
+    for (var i = xmin; i < xmax; i += lineLength) {
         var diff = (ymax - ymin) / 2;
-        var y = 400 + diff * Math.sin(i);
+        var y = yoffset + diff * Math.sin(i);
         points.push( {x:i,y:y} );
     }
+}
+
+let generateMountain = (xmin, ymin, xmax, ymax, lineLength) => {
+    let points = [{x:0,y:800}];
+    generateSine(points, xmin, ymin, xmax, ymax, 400, lineLength);
     points.push( {x:20000,y:800} );
     return points;
 }
@@ -26,6 +30,14 @@ let generateSkiers = positions => {
     positions.forEach(p => {
         s += `<use href="#skier" id="skier_${i}" />`;
         i++;
+    });
+    return s;
+}
+
+let generateBlockers = blockers => {
+    let s = "";
+    blockers.forEach(b => {
+        s += `<rect x="${b.left}" y="${b.top}" width="${b.right-b.left}" height="800" fill="black" opacity="0.1" />`
     });
     return s;
 }

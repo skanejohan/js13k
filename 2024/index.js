@@ -5,12 +5,21 @@ let input = getInput(document);
 
 let level = l2();
 
+let skiersCaught = 0;
+
+let getOverlayText = () => {
+    if (skiersCaught == 13) {
+        return `<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL - LEVEL WON</text>`;
+    }
+    return `<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL - ${skiersCaught} SKIERS CAUGHT</text>`;
+}
+
 layer1.innerHTML = generatePolygon(generateMountain(100, 700), "gray");
 layer2.innerHTML = generatePolygon(generateMountain(300, 700), "darkgray");
 layer3.innerHTML = '<circle r="40" fill="none" stroke="url(#spinner-gradient)" stroke-width="8" id="circle" />' + 
     generatePolygon(level.points, "white") +
     generateSkiers(level.skiers);
-overlay.innerHTML = '<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL</text>';
+overlay.innerHTML = getOverlayText();
 
 let lastTime = Date.now();
 
@@ -20,6 +29,7 @@ let cy = 100;
 let ca = 0;
 
 let offsetx = 0;
+
 
 // -------------------------------------------------------------------
 
@@ -33,15 +43,17 @@ let findLineAndPoint = x => {
             let y1 = level.points[i-1].y;
             let x2 = level.points[i].x;
             let y2 = level.points[i].y;
-            line = { 
+            let l = { 
                 x1 : x1, 
                 y1 : y1, 
                 x2 : x2, 
                 y2 : y2, 
                 v: Math.atan((y2-y1)/(x2-x1)) };
-            point.x = x;
-            point.y = line.y1 + ((x - line.x1) / (line.x2 - line.x1)) * (line.y2 - line.y1);
-            break;
+            let p = {
+                x : x,
+                y : y1 + ((x - x1) / (x2 - x1)) * (y2 - y1)
+            }
+            return { line: l, point: p };
         }
     }
 }
@@ -87,7 +99,9 @@ let gameLoop = () => {
     let dt = (now - lastTime);
 
     if (cx < line.x1 || cx > line.x2) {
-        findLineAndPoint(cx);
+        let lp = findLineAndPoint(cx);
+        point = lp.point;
+        line = lp.line;
     }
     hoveredLine.setAttribute('x1', line.x1); // DEBUG
     hoveredLine.setAttribute('x2', line.x2); // DEBUG
@@ -119,10 +133,29 @@ let gameLoop = () => {
 
     for (let i = 0; i < level.skiers.length; i++) {
         let s = level.skiers[i];
+        let lp = findLineAndPoint(s.x);
+
+        if ((s.dx > 0 && lp.line.v < -0.4) || (s.dx < 0 && lp.line.v > 0.4)) {
+            s.dx = -s.dx
+        }
+
+        s.x += s.dx;
+        s.y = lp.point.y - 20;
+        var el = document.getElementById(`skier_${i}`);
+        if (el) {
+            el.setAttribute("transform", `translate(${s.x} ${s.y})`);
+        }
+    }
+
+    for (let i = 0; i < level.skiers.length; i++) {
+        let s = level.skiers[i];
         if ((s.x - cx) * (s.x - cx) + (s.y - cy) * (s.y - cy) < 3600) {
-            let id = `skier_${s.x}_${s.y}`;
-            document.getElementById(id).remove();
-            level.skiers.splice(i, 1);
+            var el = document.getElementById(`skier_${i}`);
+            if (el) {
+                el.remove();
+                skiersCaught++;
+                overlay.innerHTML = getOverlayText();
+            }
             break;
         }
     }

@@ -13,6 +13,58 @@
             <stop offset="0%" stop-opacity="0.3" stop-color="yellow" />
             <stop offset="100%" stop-opacity="1" stop-color="red" />
           </linearGradient>
+          <g id="skier">
+            <circle cx="0" cy="-15" r="10" fill="#ffdbac"/> <!-- head -->
+            <rect x="2" y="10" width="8" height="15" rx="3" fill="blue" /> <!-- right leg -->
+            <rect x="-10" y="10" width="8" height="15" rx="3" fill="blue" /> <!-- left leg -->
+            <rect x="-15" y="-15" width="30" height="30" rx="5" fill="red"/> <!-- body -->
+            <rect x="5" y="-10" width="20" height="8" rx="3" fill="red"> <!-- right arm -->
+              <animateTransform id="an1"
+                  attributeName="transform"
+                  begin="0s; an2.end"
+                  dur="0.2s"
+                  type="rotate"
+                  from="315 9 -4"
+                  to="350 9 -4" />
+              <animateTransform id="an2"
+                  attributeName="transform"
+                  begin="an1.end"
+                  dur="0.2s"
+                  type="rotate"
+                  from="350 9 -4"
+                  to="315 9 -4" />
+            </rect>
+            <rect x="-25" y="-10" width="20" height="8" rx="3" fill="red"> <!-- left arm -->
+              <animateTransform id="an3"
+                  attributeName="transform"
+                  begin="0s; an4.end"
+                  dur="0.2s"
+                  type="rotate"
+                  from="45 -9 -4"
+                  to="10 -9 -4" />
+              <animateTransform id="an4"
+                  attributeName="transform"
+                  begin="an3.end"
+                  dur="0.2s"
+                  type="rotate"
+                  from="10 -9 -4"
+                  to="45 -9 -4" />
+            </rect>
+              <animateTransform id="an5"
+                  attributeName="transform"
+                  begin="0s; an6.end"
+                  dur="0.2s"
+                  type="translate"
+                  from="0 0"
+                  to="0 5" />
+              <animateTransform id="an6"
+                  attributeName="transform"
+                  begin="an5.end"
+                  dur="0.2s"
+                  type="translate"
+                  from="0 5"
+                  to="0 0" />
+            </g>
         </defs>
         <g id="layer1"></g>
         <g id="layer2"></g>

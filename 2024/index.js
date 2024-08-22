@@ -3,11 +3,13 @@ let hoveredLine = document.getElementById("hoveredLine");
 
 let input = getInput(document);
 
-let level = l2;
+let level = l2();
 
 layer1.innerHTML = generatePolygon(generateMountain(100, 700), "gray");
 layer2.innerHTML = generatePolygon(generateMountain(300, 700), "darkgray");
-layer3.innerHTML = '<circle r="40" fill="none" stroke="url(#spinner-gradient)" stroke-width="8" id="circle" />' + generatePolygon(level.points, "white");
+layer3.innerHTML = '<circle r="40" fill="none" stroke="url(#spinner-gradient)" stroke-width="8" id="circle" />' + 
+    generatePolygon(level.points, "white") +
+    generateSkiers(level.skiers);
 overlay.innerHTML = '<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL</text>';
 
 let lastTime = Date.now();
@@ -77,6 +79,9 @@ let _update = (left, right, stop) => {
 
 // -------------------------------------------------------------------
 
+let rightX = 1520;
+let rightY = 400;
+
 let gameLoop = () => {
     let now = Date.now();
     let dt = (now - lastTime);
@@ -112,12 +117,22 @@ let gameLoop = () => {
 
     circle.setAttribute("transform", `translate(${cx} ${cy}) rotate(${ca})`);
 
-    if (cx - 1720 > offsetx) {
-        offsetx = cx - 1720;
+    for (let i = 0; i < level.skiers.length; i++) {
+        let s = level.skiers[i];
+        if ((s.x - cx) * (s.x - cx) + (s.y - cy) * (s.y - cy) < 3600) {
+            let id = `skier_${s.x}_${s.y}`;
+            document.getElementById(id).remove();
+            level.skiers.splice(i, 1);
+            break;
+        }
     }
 
-    if (cx < offsetx + 200) {
-        offsetx = cx - 200;
+    if (cx - rightX > offsetx) {
+        offsetx = cx - rightX;
+    }
+
+    if (cx < offsetx + rightY) {
+        offsetx = cx - rightY;
     }
     layer1.setAttribute("transform", `translate(${-0.2*offsetx} 0)`); 
     layer2.setAttribute("transform", `translate(${-0.6*offsetx} 0)`); 

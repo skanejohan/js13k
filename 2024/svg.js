@@ -19,3 +19,12 @@ let generateMountain = (ymin, ymax, color) => {
     points.push( {x:20000,y:800} );
     return points;
 }
+
+let generateSkiers = positions => {
+    let s = "";
+    positions.forEach(p => {
+        //s += `<use x="${p.x}" y="${p.y}" href="#skier" id="skier_${p.x}_${p.y}" /> <circle r="5" fill="black" cx="${p.x}" cy="${p.y}" />`;
+        s += `<use x="${p.x}" y="${p.y}" href="#skier" id="skier_${p.x}_${p.y}" />`;
+    });
+    return s;
+}

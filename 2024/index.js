@@ -3,7 +3,7 @@ let hoveredLine = document.getElementById("hoveredLine");
 
 let input = getInput(document);
 
-let level = l3();
+let level = l2();
 
 let skiersCaught = 0;
 
@@ -34,29 +34,40 @@ let offsetx = 0;
 
 // -------------------------------------------------------------------
 
-let line = { x1 : 0, x2 : 0 };
-let point = { x : 0, y : 0 };
+let circleLineAndPoint = LineAndPoint();
 
-let findLineAndPoint = x => {
-    for (i = 1; i < level.points.length; i++) {
-        if (x < level.points[i].x) {
-            let x1 = level.points[i-1].x;
-            let y1 = level.points[i-1].y;
-            let x2 = level.points[i].x;
-            let y2 = level.points[i].y;
-            let l = { 
-                x1 : x1, 
-                y1 : y1, 
-                x2 : x2, 
-                y2 : y2, 
-                v: Math.atan((y2-y1)/(x2-x1)) };
-            let p = {
-                x : x,
-                y : y1 + ((x - x1) / (x2 - x1)) * (y2 - y1)
+let updateLineAndPoint = (lp, x) => {
+    if (x < lp.line.x1 || x > lp.line.x2) {
+        for (i = 1; i < level.points.length; i++) {
+            if (x < level.points[i].x) {
+                let x1 = level.points[i-1].x;
+                let y1 = level.points[i-1].y;
+                let x2 = level.points[i].x;
+                let y2 = level.points[i].y;
+                lp.line = {
+                    x1 : x1, 
+                    y1 : y1, 
+                    x2 : x2, 
+                    y2 : y2, 
+                    v: Math.atan((y2-y1)/(x2-x1)) };
+                break;
             }
-            return { line: l, point: p };
         }
     }
+    lp.point = {
+        x : x,
+        y : lp.line.y1 + ((x - lp.line.x1) / (lp.line.x2 - lp.line.x1)) * (lp.line.y2 - lp.line.y1)
+    }
+}
+
+ // DEBUG
+let highlightLineAndPoint = lp => {
+    hoveredLine.setAttribute('x1', lp.line.x1);
+    hoveredLine.setAttribute('x2', lp.line.x2);
+    hoveredLine.setAttribute('y1', lp.line.y1);
+    hoveredLine.setAttribute('y2', lp.line.y2);
+    hoveredPoint.setAttribute('cx', lp.point.x);
+    hoveredPoint.setAttribute('cy', lp.point.y);
 }
 
 // -------------------------------------------------------------------
@@ -76,13 +87,13 @@ let _updateOnGround = (left, right, stop) => {
     if (left) { da -= 1; }
     if (right) { da += 1; }
     if (stop) { da = 0; }
-    da += Math.sin(line.v);
-    dx = da * Math.cos(line.v);
-    dy = da * Math.sin(line.v);
+    da += Math.sin(circleLineAndPoint.line.v);
+    dx = da * Math.cos(circleLineAndPoint.line.v);
+    dy = da * Math.sin(circleLineAndPoint.line.v);
 }
 
 let _update = (left, right, stop) => {
-    if (cy < point.y - cr) {
+    if (cy < circleLineAndPoint.point.y - cr) {
         _updateInAir(left, right, stop)
     }
     else {
@@ -99,17 +110,8 @@ let gameLoop = () => {
     let now = Date.now();
     let dt = (now - lastTime);
 
-    if (cx < line.x1 || cx > line.x2) {
-        let lp = findLineAndPoint(cx);
-        point = lp.point;
-        line = lp.line;
-    }
-    hoveredLine.setAttribute('x1', line.x1); // DEBUG
-    hoveredLine.setAttribute('x2', line.x2); // DEBUG
-    hoveredLine.setAttribute('y1', line.y1); // DEBUG
-    hoveredLine.setAttribute('y2', line.y2); // DEBUG
-    hoveredPoint.setAttribute('cx', point.x); // DEBUG
-    hoveredPoint.setAttribute('cy', point.y); // DEBUG
+    updateLineAndPoint(circleLineAndPoint, cx);
+    highlightLineAndPoint(circleLineAndPoint);
 
     _update(input.isDown("ArrowLeft"), input.isDown("ArrowRight"), input.isDown("Space"));
 
@@ -138,20 +140,20 @@ let gameLoop = () => {
         da = 0;
         ca = 0;
     }
-    cy = Math.min(cy, point.y - cr);
+    cy = Math.min(cy, circleLineAndPoint.point.y - cr + 3); // 3 ???
 
     circle.setAttribute("transform", `translate(${cx} ${cy}) rotate(${ca})`);
 
     for (let i = 0; i < level.skiers.length; i++) {
         let s = level.skiers[i];
-        let lp = findLineAndPoint(s.x);
+        updateLineAndPoint(s.lp, s.x);
 
-        if ((s.dx > 0 && lp.line.v < -0.4) || (s.dx < 0 && lp.line.v > 0.4)) {
+        if ((s.dx > 0 && s.lp.line.v < -0.4) || (s.dx < 0 && s.lp.line.v > 0.4)) {
             s.dx = -s.dx
         }
 
         s.x += s.dx;
-        s.y = lp.point.y - 20;
+        s.y = s.lp.point.y - 20;
         var el = document.getElementById(`skier_${i}`);
         if (el) {
             el.setAttribute("transform", `translate(${s.x} ${s.y})`);

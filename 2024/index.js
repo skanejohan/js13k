@@ -1,21 +1,29 @@
+let layer1 = document.getElementById("layer1");
+let layer2 = document.getElementById("layer2");
+let layergreen = document.getElementById("layergreen");
 let layer3 = document.getElementById("layer3");
 let hoveredLine = document.getElementById("hoveredLine");
 
 let input = getInput(document);
 
-let level = l2();
+let level = l4();
 
 let skiersCaught = 0;
+let levelLost = false;
 
 let getOverlayText = () => {
     if (skiersCaught == 13) {
         return `<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL - LEVEL WON</text>`;
+    }
+    if (levelLost) {
+        return `<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL - LEVEL LOST</text>`;
     }
     return `<text x="100" y="40" fill="black">WHACKY WESQUE WHEEL - ${skiersCaught} SKIERS CAUGHT</text>`;
 }
 
 layer1.innerHTML = generatePolygon(generateMountain(100, 100, 20000, 700, 50), "gray");
 layer2.innerHTML = generatePolygon(generateMountain(100, 300, 20000, 700, 50), "darkgray");
+layergreen.innerHTML = generatePolygon(generateMountain(100, 600, 20000, 700, 50), "#99ffd6");
 layer3.innerHTML = '<circle r="40" fill="none" stroke="url(#spinner-gradient)" stroke-width="8" id="circle" />' + 
     generatePolygon(level.points, "white") +
     generateSkiers(level.skiers) + 
@@ -35,6 +43,7 @@ let offsetx = 0;
 // -------------------------------------------------------------------
 
 let circleLineAndPoint = LineAndPoint();
+let previousLine = circleLineAndPoint.line;
 
 let updateLineAndPoint = (lp, x) => {
     if (x < lp.line.x1 || x > lp.line.x2) {
@@ -80,7 +89,7 @@ let _updateInAir = (left, right, stop) => {
     if (left) { da -= 2; }
     if (right) { da += 2; }
     if (stop) { da = 0; }
-    dy += 1;
+    dy += 2;
 }
 
 let _updateOnGround = (left, right, stop) => {
@@ -94,6 +103,12 @@ let _updateOnGround = (left, right, stop) => {
 
 let _update = (left, right, stop) => {
     if (cy < circleLineAndPoint.point.y - cr) {
+        _updateInAir(left, right, stop)
+    }
+    else if (previousLine.v < 0 && circleLineAndPoint.line.v >= 0 && dx > 0) {
+        _updateInAir(left, right, stop)
+    }
+    else if (previousLine.v > 0 && circleLineAndPoint.line.v <= 0 && dx < 0) {
         _updateInAir(left, right, stop)
     }
     else {
@@ -117,10 +132,16 @@ let gameLoop = () => {
 
     for (let i = 0; i < level.blockers.length; i++) {
         let b = level.blockers[i];
-        if (cx < b.left && cx + dx * (dt / 100) > b.left && cy > b.top) {
+        if (cy + cr > b.top && cx < b.left && cx + dx * (dt / 100) >= b.left) {
             da = 0;
             dx = 0;
             cx = b.left - 1;
+            break;
+        }
+        else if (cy + cr > b.top && cx > b.right && cx + dx * (dt / 100) <= b.right) {
+            da = 0;
+            dx = 0;
+            cx = b.right + 1;
             break;
         }
     }
@@ -140,7 +161,7 @@ let gameLoop = () => {
         da = 0;
         ca = 0;
     }
-    cy = Math.min(cy, circleLineAndPoint.point.y - cr + 3); // 3 ???
+    cy = Math.trunc(Math.min(cy, circleLineAndPoint.point.y - cr + 3)); // 3 ???
 
     circle.setAttribute("transform", `translate(${cx} ${cy}) rotate(${ca})`);
 
@@ -148,12 +169,21 @@ let gameLoop = () => {
         let s = level.skiers[i];
         updateLineAndPoint(s.lp, s.x);
 
-        if ((s.dx > 0 && s.lp.line.v < -0.4) || (s.dx < 0 && s.lp.line.v > 0.4)) {
+        let blockerHit = false;
+        for (let i = 0; i < level.blockers.length; i++) {
+            let b = level.blockers[i];
+            if (s.x < b.left && s.x + s.dx * (dt / 100) > b.left) {
+                blockerHit = true;
+                break;
+            }
+        }
+    
+        if ((s.dx > 0 && s.lp.line.v < -0.4) || (s.dx < 0 && s.lp.line.v > 0.4) || blockerHit) {
             s.dx = -s.dx
         }
 
-        s.x += s.dx;
-        s.y = s.lp.point.y - 20;
+        s.x += s.dx * (dt / 100);
+        s.y = Math.trunc(s.lp.point.y - 20); // Should really be the new x
         var el = document.getElementById(`skier_${i}`);
         if (el) {
             el.setAttribute("transform", `translate(${s.x} ${s.y})`);
@@ -167,6 +197,9 @@ let gameLoop = () => {
             if (el) {
                 el.remove();
                 skiersCaught++;
+                if (s.mustBeLast && skiersCaught < 13) {
+                    levelLost = true;
+                }
                 overlay.innerHTML = getOverlayText();
             }
             break;
@@ -182,6 +215,7 @@ let gameLoop = () => {
     }
     layer1.setAttribute("transform", `translate(${-0.2*offsetx} 0)`); 
     layer2.setAttribute("transform", `translate(${-0.6*offsetx} 0)`); 
+    layergreen.setAttribute("transform", `translate(${-0.8*offsetx} 0)`); 
     layer3.setAttribute("transform", `translate(${-offsetx} 0)`); 
     debug.setAttribute("transform", `translate(${-offsetx} 0)`); 
 

@@ -1,3 +1,15 @@
+let Point = (x, y) => {
+    return { x: x, y : y }
+}
+
+let sine = (start, end) => {
+    let points = [];
+    for (var x = start; x <= end; x += 0.1) {
+        points.push(Point(x - start, Math.sin(x*Math.PI)));
+    }
+    return points;
+}
+
 let LineAndPoint = () => {
     return {
         line: { x1 : 0, y1: 0, x2 : 0, y2: 0, x: 0 },
@@ -5,11 +17,12 @@ let LineAndPoint = () => {
     }
 }
 
-let addSkier = (x, y, dx) => {
+
+let addSkier = (x, dx, mustBeLast) => {
     return {
         x: x,
-        y: y,
         dx: dx,
+        mustBeLast: mustBeLast,
         lp: LineAndPoint()    
     }
 }
@@ -27,9 +40,9 @@ let l2 = () => {
         minX: 200,
         maxX: 19000,
         skiers: [
-            addSkier(900, 480, 1), addSkier(2100, 480, 5), addSkier(3300, 480, -10), addSkier(4500, 480, -5), addSkier(5700, 480, 10),
-            addSkier(6800, 480, -5), addSkier(8000, 480, 5), addSkier(9200, 480, 10), addSkier(10400, 480, -10), addSkier(11600, 480, -5),
-            addSkier(12700, 480, 10), addSkier(13900, 480, -5), addSkier(15100, 480, 10)
+            addSkier(900, 1), addSkier(2100, 5), addSkier(3300, -10), addSkier(4500, -5), addSkier(5700, 10),
+            addSkier(6800, -5), addSkier(8000, 5), addSkier(9200, 10), addSkier(10400, -10), addSkier(11600, -5),
+            addSkier(12700, 10), addSkier(13900, -5), addSkier(15100, 10)
         ],
         blockers: []
     }
@@ -52,11 +65,63 @@ let l3 = () => {
 }
 
 let l4 = () => {
-    let points = [{x:0,y:800}];
-    points.push( {x:0,y:400} );
-    points.push( {x:2000,y:400});
-    points.push( {x:2000,y:200});
-    points.push( {x:20000,y:400} );
+    let points = [Point(0, 800), Point(0, 0), Point(500, 0), Point(500, 600)];
+    points.push(Point(2000, 600));
+
+    // First hill
+    let slope = sine(3/2, 7/2);
+    slope.forEach(p => { p.x = 2000 + p.x * 350; p.y = 500 - 100 * p.y; });
+    points.push(...slope);
+
+    points.push(Point(3000, 600));
+
+    // Second hill
+    let slope2 = sine(3/2, 7/2);
+    slope2.forEach(p => { p.x = 3000 + p.x * 350; p.y = 500 - 100 * p.y; });
+    points.push(...slope2);
+
+    // Steep wall
+    points.push(Point(4000, 600));
+    points.push(Point(4000, 400));
+
+    // First valley
+    slope = sine(1/2, 5/2);
+    slope.forEach(p => { p.x = 5000 + p.x * 350; p.y = 500 - 100 * p.y; });
+    points.push(...slope);
+
+    // Second, third and fourth valley
+    slope = sine(1/2, 13/2);
+    slope.forEach(p => { p.x = 7000 + p.x * 350; p.y = 500 - 100 * p.y; });
+    points.push(...slope);
+
+    // Fifth - deep - valley with two hills
+
+    slope = sine(3/2, 7/2);
+    slope.forEach(p => { p.x = 11500 + p.x * 250; p.y = 300 - 70 * p.y; });
+    points.push(...slope);
+
+    points.push(Point(12000, 400));
+    points.push(Point(12000, 700));
+    points.push(Point(12500, 700));
+    points.push(Point(12500, 400));
+
+    slope = sine(3/2, 7/2);
+    slope.forEach(p => { p.x = 12600 + p.x * 250; p.y = 300 - 70 * p.y; });
+    points.push(...slope);
+
+
+    // Sixth - wide - valley
+    slope = sine(1/2, 3/2);
+    slope.forEach(p => { p.x = 14000 + p.x * 350; p.y = 500 - 100 * p.y; });
+    points.push(...slope);
+
+    slope = sine(3/2, 5/2);
+    slope.forEach(p => { p.x = 15000 + p.x * 350; p.y = 500 - 100 * p.y; });
+    points.push(...slope);
+
+
+
+    points.push( {x:20000,y:600} );
     points.push( {x:20000,y:800} );
 
     return {
@@ -64,10 +129,21 @@ let l4 = () => {
         minX: 200,
         maxX: 19000,
         skiers: [
-            // {x:900,y:480,dx:1}, {x:2100,y:480,dx:5}, {x:3300,y:480,dx:-10}, {x:4500,y:480,dx:-5}, {x:5700,y:480,dx:10},
-            // {x:6800,y:480,dx:-5}, {x:8000,y:480,dx:5}, {x:9200,y:480,dx:10}, {x:10400,y:480,dx:-10}, {x:11600,y:480,dx:-5},
-            // {x:12700,y:480,dx:10}, {x:13900,y:480,dx:-5}, {x:15100,y:480,dx:10}
+            addSkier(2500, 5), addSkier(2500, -10), addSkier(2500, 20),
+            addSkier(3500, 15), 
+            addSkier(5500, -15), 
+            addSkier(7500, 15), 
+            addSkier(8000, -15), 
+            addSkier(8500, 15), 
+            addSkier(12200, 3, true),
+            addSkier(15200, 5), 
+            addSkier(15200, 10), 
+            addSkier(15200, -10), 
+            addSkier(15200, -5)
         ],
-        blockers: []
+        blockers: [{left:0, right:540, top: -20000}, {left:3960, right:4100, top: 410}, 
+            {left:12000, right:12040, top: 410},
+            {left:12460, right:12500, top: 410},
+            {left:19000, right:20000, top: -20000}]
     }
 }

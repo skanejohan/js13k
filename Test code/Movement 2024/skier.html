@@ -1,0 +1,65 @@
+<!doctype HTML>
+<html>
+  <head></head>
+  <body>
+    <svg>
+        <defs>
+      <g id="skier">
+      <circle cx="100" cy="100" r="10" fill="#ffdbac"/> <!-- head -->
+      <rect x="102" y="125" width="8" height="15" rx="3" fill="blue" /> <!-- right leg -->
+      <rect x="90" y="125" width="8" height="15" rx="3" fill="blue" /> <!-- left leg -->
+      <rect x="85" y="100" width="30" height="30" rx="5" fill="red"/> <!-- body -->
+      <rect x="105" y="105" width="20" height="8" rx="3" fill="red"> <!-- right arm -->
+        <animateTransform id="an1"
+            attributeName="transform"
+            begin="0s; an2.end"
+            dur="0.2s"
+            type="rotate"
+            from="315 109 109"
+            to="350 109 109" />
+        <animateTransform id="an2"
+            attributeName="transform"
+            begin="an1.end"
+            dur="0.2s"
+            type="rotate"
+            from="350 109 109"
+            to="315 109 109" />
+      </rect>
+      <rect x="75" y="105" width="20" height="8" rx="3" fill="red"> <!-- left arm -->
+        <animateTransform id="an3"
+            attributeName="transform"
+            begin="0s; an4.end"
+            dur="0.2s"
+            type="rotate"
+            from="45 91 109"
+            to="10 91 109" />
+        <animateTransform id="an4"
+            attributeName="transform"
+            begin="an3.end"
+            dur="0.2s"
+            type="rotate"
+            from="10 91 109"
+            to="45 91 109" />
+      </rect>
+        <animateTransform id="an5"
+            attributeName="transform"
+            begin="0s; an6.end"
+            dur="0.2s"
+            type="translate"
+            from="0 0"
+            to="0 5" />
+        <animateTransform id="an6"
+            attributeName="transform"
+            begin="an5.end"
+            dur="0.2s"
+            type="translate"
+            from="0 5"
+            to="0 0" />
+      </g>
+    </defs>
+    <use x="5" y="5" href="#skier" />
+    <use x="205" y="5" href="#skier" />
+    <use x="405" y="5" href="#skier" />
+    </svg>
+  </body>
+</html>

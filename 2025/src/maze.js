@@ -51,46 +51,30 @@ function generateMaze(width, height) {
     return edges;
 }
 
+function edgeExists(x1, y1, x2, y2) {
+    return edges.has(_s4(x1, y1, x2, y2)) || edges.has(_s4(x2, y2, x1, y1));
+}
+
 function getMazeSvg(width, height, edges) {
 
-    let rect = (x, y, side) => {
-        let r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        r.setAttribute("x", x * side);
-        r.setAttribute("y", y * side);
-        r.setAttribute("width", side);
-        r.setAttribute("height", side);
-        r.setAttribute("fill", "red");
-        return r;
-    }
+    let rect = (x, y, side) => svgRect(x * side, y * side, side + 1, side + 1, "green");
 
-    let line = (x, y, side, hor) => {
-        let l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        l.setAttribute("x1", x * side);
-        l.setAttribute("y1", y * side);
-        l.setAttribute("x2", hor ? (x + 1) * side : x * side);
-        l.setAttribute("y2", hor ? y * side : (y + 1) * side);
-        l.setAttribute("stroke", "black");
-        return l;
-    }
-
-    let has = (x1, y1, x2, y2) => {
-        return edges.has(_s4(x1, y1, x2, y2)) || edges.has(_s4(x2, y2, x1, y1));
-    }
+    let line = (x, y, side, hor) => svgLine(x * side, y * side, hor ? (x + 1) * side : x * side, hor ? y * side : (y + 1) * side, "yellow");
 
     var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     for(let x = 0; x < width; x++) {
         for(let y = 0; y < height; y++) {
             g.appendChild(rect(x, y, side));
-            if (!has(x, y, x - 1, y)) {
+            if (!edgeExists(x, y, x - 1, y)) {
                 g.appendChild(line(x, y, side, false));
             }
-            if (!has(x, y, x + 1, y)) {
+            if (!edgeExists(x, y, x + 1, y)) {
                 g.appendChild(line(x + 1, y, side, false));
             }
-            if (!has(x, y, x, y - 1)) {
+            if (!edgeExists(x, y, x, y - 1)) {
                 g.appendChild(line(x, y, side, true));
             }
-            if (!has(x, y, x, y + 1)) {
+            if (!edgeExists(x, y, x, y + 1)) {
                 g.appendChild(line(x, y + 1, side, true));
             }
         }

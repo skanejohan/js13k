@@ -1,26 +1,34 @@
-let dirX = 0;
-let dirY = 0;
+let left = false;
+let right = false;
+let up = false;
+let down = false;
 
 document.addEventListener('keydown', e => {
     if (e.code == "ArrowLeft") {
-        dirX = -1;
+        left = true;
     }
     if (e.code == "ArrowRight") {
-        dirX = 1;
+        right = true;
     }
     if (e.code == "ArrowUp") {
-        dirY = -1;
+        up = true;
     }
     if (e.code == "ArrowDown") {
-        dirY = 1;
+        down = true;
     }
 }, false);
 
 document.addEventListener('keyup', e => {
-    if ((e.code == "ArrowLeft" && dirX == -1)|| (e.code == "ArrowRight" && dirX == 1)) {
-        dirX = 0;
+    if (e.code == "ArrowLeft") {
+        left = false;
     }
-    if ((e.code == "ArrowUp" && dirY == -1)|| (e.code == "ArrowDown" && dirY == 1)) {
-        dirY = 0;
+    if (e.code == "ArrowRight") {
+        right = false;
+    }
+    if (e.code == "ArrowUp") {
+        up = false;
+    }
+    if (e.code == "ArrowDown") {
+        down = false;
     }
 }, false);

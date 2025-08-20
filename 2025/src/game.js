@@ -1,6 +1,8 @@
 let edges = generateMaze(50, 50);
 let mazeSvg = getMazeSvg(50, 50, edges);
 svg.appendChild(mazeSvg);
+let avatar = svgCircle(750, 750, 18, "blue");
+svg.appendChild(avatar);
 
 var lastTime = Date.now();
 

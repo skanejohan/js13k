@@ -5,11 +5,20 @@ let h = 1500;
 let svg = document.getElementById("svg");
 let zoom = 0;
 let zoomTarget = 500;
+let opponents = [];
 
 let avatarCell = { x : 20, y : 20 };
 let targetDir = undefined;
 
 let avatarPos = () => { return { x : avatarCell.x, y : 3 } };
+
+function addOpponent(x, y) {
+    let displayX = side * (x + 0.5);
+    let displayY = side * (y + 0.5);
+    let opponent = svgCircle(displayX, displayY, 18, "red");
+    svg.appendChild(opponent);
+    opponents.push({ x: displayX, y: displayY, element: opponent, cell: { x : x, y : y }, dir: undefined });
+}
 
 function updateView(dt) {
 
@@ -67,6 +76,72 @@ function updateView(dt) {
         y = side * (avatarCell.y + 0.5);
     }
 
+    for (let i = 0; i < opponents.length; i++) {
+        let opponent = opponents[i];
+        if (!opponent.dir) {
+            let rnd = Math.floor(Math.random() * 4);
+            if (rnd == 0 && edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x + 1, opponent.cell.y)) {
+                opponent.dir = { x : 1, y : 0 };
+            }
+            else if (rnd == 1 && edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x, opponent.cell.y + 1)) {
+                opponent.dir = { x : 0, y : 1 };
+            }
+            else if (rnd == 2 && edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x - 1, opponent.cell.y)) {
+                opponent.dir = { x : -1, y : 0 };
+            }
+            else if (rnd == 3 && edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x, opponent.cell.y - 1)) {
+                opponent.dir = { x : 0, y : -1 };
+            }
+        }
+
+        if (opponent.dir) {
+            if (opponent.dir.x == 1) {
+                opponent.x += dt * 0.5;
+                if (opponent.x >= side * (opponent.cell.x + 1.5)) {
+                    opponent.x = side * (opponent.cell.x + 1.5);
+                    opponent.cell = { x : opponent.cell.x + 1, y : opponent.cell.y };
+                    if (!edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x + 1, opponent.cell.y)) {
+                        opponent.dir = undefined;
+                    }
+                }
+            }
+            else if (opponent.dir.y == 1) {
+                opponent.y += dt * 0.5;
+                if (opponent.y >= side * (opponent.cell.y + 1.5)) {
+                    opponent.y = side * (opponent.cell.y + 1.5);
+                    opponent.cell = { x : opponent.cell.x, y : opponent.cell.y + 1 };
+                    if (!edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x, opponent.cell.y + 1)) {
+                        opponent.dir = undefined;
+                    }
+                }
+            }
+            else if (opponent.dir.x == -1) {
+                opponent.x -= dt * 0.5;
+                if (opponent.x <= side * (opponent.cell.x - 0.5)) {
+                    opponent.x = side * (opponent.cell.x - 0.5);
+                    opponent.cell = { x : opponent.cell.x - 1, y : opponent.cell.y };
+                    if (!edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x - 1, opponent.cell.y)) {
+                        opponent.dir = undefined;
+                    }
+                }
+            }
+            else if (opponent.dir.y == -1) {
+                opponent.y -= dt * 0.5;
+                if (opponent.y <= side * (opponent.cell.y - 0.5)) {
+                    opponent.y = side * (opponent.cell.y - 0.5);
+                    opponent.cell = { x : opponent.cell.x, y : opponent.cell.y - 1 };
+                    if (!edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x, opponent.cell.y - 1)) {
+                        opponent.dir = undefined;
+                    }
+                }
+            }
+        }
+        else {
+            opponent.x = side * (opponent.cell.x + 0.5);
+            opponent.y = side * (opponent.cell.y + 0.5);
+        }
+    }
+
     if (zoom > zoomTarget) {
         zoom -= dt * 0.1;
         zoomTarget = 0;
@@ -78,5 +153,10 @@ function updateView(dt) {
 
     avatar.setAttribute("cx", x);
     avatar.setAttribute("cy", y);
+    for (let i = 0; i < opponents.length; i++) {
+        let opponent = opponents[i];
+        opponent.element.setAttribute("cx", opponent.x);
+        opponent.element.setAttribute("cy", opponent.y);
+    }
     svg.setAttribute("viewBox", `${x+zoom-750} ${y+zoom-750} ${w-zoom-zoom} ${h-zoom-zoom}`);
 }

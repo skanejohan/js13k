@@ -6,6 +6,7 @@ let svg = document.getElementById("svg");
 let zoom = 0;
 let zoomTarget = 500;
 let opponents = [];
+let visibleCellsSvg = [];
 
 let avatarCell = { x : 20, y : 20 };
 let targetDir = undefined;
@@ -18,6 +19,50 @@ function addOpponent(x, y) {
     let opponent = svgCircle(displayX, displayY, 18, "red");
     svg.appendChild(opponent);
     opponents.push({ x: displayX, y: displayY, element: opponent, cell: { x : x, y : y }, dir: undefined });
+}
+
+function visibleFrom(x, y) {
+    let cells = new Set();
+
+    var i = 0;
+    while(edgeExists(x + i, y, x + i + 1, y)) {
+        cells.add({ x : x + i + 1, y : y });
+        i++;
+    } 
+
+    i = 0;
+    while(edgeExists(x - i, y, x - i - 1, y)) {
+        cells.add({ x : x - i - 1, y : y });
+        i++;
+    } 
+
+    i = 0;
+    while(edgeExists(x, y + i, x, y + i + 1)) {
+        cells.add({ x : x, y : y + i + 1 });
+        i++;
+    } 
+
+    i = 0;
+    while(edgeExists(x, y - i, x, y - i - 1)) {
+        cells.add({ x : x, y : y - i - 1 });
+        i++;
+    } 
+
+    return cells;
+}
+
+function updateVisibleCells() {
+    for(let i = 0; i < visibleCellsSvg.length; i++) {
+        svg.removeChild(visibleCellsSvg[i]);
+    }
+    visibleCellsSvg = [];
+
+    let visibleCells = visibleFrom(avatarCell.x, avatarCell.y);
+    for (let cell of visibleCells) {
+        let svgCell = svgRect(cell.x * side, cell.y * side, side, side, "rgba(255, 255, 255, 0.15)");
+        visibleCellsSvg.push(svgCell);
+        svg.appendChild(svgCell);
+    }
 }
 
 function updateView(dt) {
@@ -43,6 +88,7 @@ function updateView(dt) {
             if (x >= side * (avatarCell.x + 1.5)) {
                 x = side * (avatarCell.x + 1.5);
                 avatarCell = { x : avatarCell.x + 1, y : avatarCell.y };
+                updateVisibleCells();
                 targetDir = undefined;
             }
         }
@@ -51,6 +97,7 @@ function updateView(dt) {
             if (y >= side * (avatarCell.y + 1.5)) {
                 y = side * (avatarCell.y + 1.5);
                 avatarCell = { x : avatarCell.x, y : avatarCell.y + 1 };
+                updateVisibleCells();
                 targetDir = undefined;
             }
         }
@@ -59,6 +106,7 @@ function updateView(dt) {
             if (x <= side * (avatarCell.x - 0.5)) {
                 x = side * (avatarCell.x - 0.5);
                 avatarCell = { x : avatarCell.x - 1, y : avatarCell.y };
+                updateVisibleCells();
                 targetDir = undefined;
             }
         }
@@ -67,6 +115,7 @@ function updateView(dt) {
             if (y <= side * (avatarCell.y - 0.5)) {
                 y = side * (avatarCell.y - 0.5);
                 avatarCell = { x : avatarCell.x, y : avatarCell.y - 1 };
+                updateVisibleCells();
                 targetDir = undefined;
             }
         }

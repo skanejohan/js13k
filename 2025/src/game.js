@@ -7,6 +7,10 @@ addOpponent(15, 15);
 addOpponent(25, 25);
 addOpponent(15, 25);
 addOpponent(25, 15);
+addOpponent(18, 18);
+addOpponent(22, 22);
+addOpponent(18, 22);
+addOpponent(22, 18);
 updateVisibleCells();
 
 var lastTime = Date.now();

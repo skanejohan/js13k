@@ -4,14 +4,13 @@ let w = 1500;
 let h = 1500;
 let svg = document.getElementById("svg");
 let zoom = 0;
-let zoomTarget = 500;
+let zoomTarget = 0;
 let opponents = [];
+let visibleCells = [];
 let visibleCellsSvg = [];
 
 let avatarCell = { x : 20, y : 20 };
 let targetDir = undefined;
-
-let avatarPos = () => { return { x : avatarCell.x, y : 3 } };
 
 function addOpponent(x, y) {
     let displayX = side * (x + 0.5);
@@ -51,13 +50,25 @@ function visibleFrom(x, y) {
     return cells;
 }
 
+function noOfVisibleOpponents() {
+    let count = 0;
+    for (let opponent of opponents) {
+        for (let cell of visibleCells) {
+            if (opponent.cell.x == cell.x && opponent.cell.y == cell.y) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
 function updateVisibleCells() {
     for(let i = 0; i < visibleCellsSvg.length; i++) {
         svg.removeChild(visibleCellsSvg[i]);
     }
     visibleCellsSvg = [];
 
-    let visibleCells = visibleFrom(avatarCell.x, avatarCell.y);
+    visibleCells = visibleFrom(avatarCell.x, avatarCell.y);
     for (let cell of visibleCells) {
         let svgCell = svgRect(cell.x * side, cell.y * side, side, side, "rgba(255, 255, 255, 0.15)");
         visibleCellsSvg.push(svgCell);
@@ -193,11 +204,24 @@ function updateView(dt) {
 
     if (zoom > zoomTarget) {
         zoom -= dt * 0.1;
-        zoomTarget = 0;
     }
     if (zoom < zoomTarget) {
         zoom += dt * 0.1;
-        zoomTarget = 500;
+    }
+
+    let visible = noOfVisibleOpponents();
+    if (visible == 0) {
+        zoomTarget -= 5;
+    }
+    else {
+        zoomTarget += visible * 20;
+    }
+
+    if (zoomTarget < 0) {
+        zoomTarget = 0;
+    }
+    if (zoomTarget > 700) {
+        zoomTarget = 700;
     }
 
     avatar.setAttribute("cx", x);

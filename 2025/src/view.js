@@ -5,19 +5,59 @@ let h = 1500;
 let svg = document.getElementById("svg");
 let zoom = 0;
 let zoomTarget = 0;
+let portals = [];
+let badLucks = [];
+let goodLucks = [];
 let opponents = [];
 let visibleCells = [];
 let visibleCellsSvg = [];
 
-let avatarCell = { x : 20, y : 20 };
+let avatarCell = { x : 0, y : 0 };
 let targetDir = undefined;
 
-function addOpponent(x, y) {
+function initAvatar() {
+    avatarCell.x = Math.floor(Math.random() * width);
+    avatarCell.y = Math.floor(Math.random() * height);
+}
+
+function addBadLuck() {
+    let x = Math.floor(Math.random() * width);
+    let y = Math.floor(Math.random() * height);
+    let displayX = side * (x + 0.5);
+    let displayY = side * (y + 0.5);    
+    let badLuck = svgCircle(displayX, displayY, 18, "red");
+    svg.appendChild(badLuck);
+    badLucks.push( {x : x, y : y, element: badLuck });
+}
+
+function addGoodLuck() {
+    let x = Math.floor(Math.random() * width);
+    let y = Math.floor(Math.random() * height);
+    let displayX = side * (x + 0.5);
+    let displayY = side * (y + 0.5);    
+    let goodLuck = svgCircle(displayX, displayY, 18, "white");
+    svg.appendChild(goodLuck);
+    goodLucks.push( {x : x, y : y, element: goodLuck });
+}
+
+function addOpponent() {
+    let x = Math.floor(Math.random() * width);
+    let y = Math.floor(Math.random() * height);
     let displayX = side * (x + 0.5);
     let displayY = side * (y + 0.5);
-    let opponent = svgCircle(displayX, displayY, 18, "red");
+    let opponent = svgCircle(displayX, displayY, 18, "black");
     svg.appendChild(opponent);
     opponents.push({ x: displayX, y: displayY, element: opponent, cell: { x : x, y : y }, dir: undefined });
+}
+
+function addPortal() {
+    let x = Math.floor(Math.random() * width);
+    let y = Math.floor(Math.random() * height);
+    let displayX = side * (x + 0.5);
+    let displayY = side * (y + 0.5);    
+    let portal = svgCircle(displayX, displayY, 18, "yellow");
+    svg.appendChild(portal);
+    portals.push( {x : x, y : y });
 }
 
 function visibleFrom(x, y) {
@@ -76,6 +116,22 @@ function updateVisibleCells() {
     }
 }
 
+function checkCollision() {
+    if (portals.find(p => p.x == avatarCell.x && p.y == avatarCell.y)) {
+        avatarCell = { x : Math.floor(Math.random() * width), y : Math.floor(Math.random() * height) };
+    }
+    let goodLuck = goodLucks.find(p => p.x == avatarCell.x && p.y == avatarCell.y);
+    if (goodLuck) {
+        svg.removeChild(goodLuck.element);
+        goodLucks = goodLucks.filter(p => p != goodLuck);
+    }
+    let badLuck = badLucks.find(p => p.x == avatarCell.x && p.y == avatarCell.y);
+    if (badLuck) {
+        svg.removeChild(badLuck.element);
+        badLucks = badLucks.filter(p => p != badLuck);
+    }
+}
+
 function updateView(dt) {
 
     if (!targetDir) {
@@ -99,6 +155,7 @@ function updateView(dt) {
             if (x >= side * (avatarCell.x + 1.5)) {
                 x = side * (avatarCell.x + 1.5);
                 avatarCell = { x : avatarCell.x + 1, y : avatarCell.y };
+                checkCollision();
                 updateVisibleCells();
                 targetDir = undefined;
             }
@@ -108,6 +165,7 @@ function updateView(dt) {
             if (y >= side * (avatarCell.y + 1.5)) {
                 y = side * (avatarCell.y + 1.5);
                 avatarCell = { x : avatarCell.x, y : avatarCell.y + 1 };
+                checkCollision();
                 updateVisibleCells();
                 targetDir = undefined;
             }
@@ -117,6 +175,7 @@ function updateView(dt) {
             if (x <= side * (avatarCell.x - 0.5)) {
                 x = side * (avatarCell.x - 0.5);
                 avatarCell = { x : avatarCell.x - 1, y : avatarCell.y };
+                checkCollision();
                 updateVisibleCells();
                 targetDir = undefined;
             }
@@ -126,6 +185,7 @@ function updateView(dt) {
             if (y <= side * (avatarCell.y - 0.5)) {
                 y = side * (avatarCell.y - 0.5);
                 avatarCell = { x : avatarCell.x, y : avatarCell.y - 1 };
+                checkCollision();
                 updateVisibleCells();
                 targetDir = undefined;
             }

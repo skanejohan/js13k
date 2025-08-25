@@ -1,16 +1,26 @@
-let edges = generateMaze(50, 50);
-let mazeSvg = getMazeSvg(50, 50, edges);
+let width = 20;
+let height = 20;
+
+let edges = generateMaze(width, height);
+let mazeSvg = getMazeSvg(width, height);
 svg.appendChild(mazeSvg);
 let avatar = svgCircle(750, 750, 18, "blue");
 svg.appendChild(avatar);
-addOpponent(15, 15);
-addOpponent(25, 25);
-addOpponent(15, 25);
-addOpponent(25, 15);
-addOpponent(18, 18);
-addOpponent(22, 22);
-addOpponent(18, 22);
-addOpponent(22, 18);
+
+for(let i = 0; i < 10; i++) {
+    addOpponent();
+}
+for(let i = 0; i < 8; i++) {
+    addPortal();
+}
+for(let i = 0; i < 8; i++) {
+    addGoodLuck();
+}
+for(let i = 0; i < 8; i++) {
+    addBadLuck();
+}
+initAvatar();
+
 updateVisibleCells();
 
 var lastTime = Date.now();

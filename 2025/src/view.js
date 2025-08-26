@@ -15,6 +15,43 @@ let visibleCellsSvg = [];
 let avatarCell = { x : 0, y : 0 };
 let targetDir = undefined;
 
+let maze = {};
+
+function c(x, y) {
+    return `x${x}y${y}`;
+}
+
+function generateCell(x, y, g) {
+    let cell = { x: x, y : y };
+    if (!edgeExists(x, y, x + 1, y)) { // Add right edge
+        cell.r = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, "yellow");
+        g.appendChild(cell.r);
+    }
+    if (!edgeExists(x, y, x, y + 1)) { // Add bottom edge
+        cell.b = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, "yellow");
+        g.appendChild(cell.b);
+    }
+    if (!edgeExists(x, y, x - 1, y)) { // Add left edge
+        cell.l = svgLine(x * side, y * side, x * side, (y + 1) * side, "yellow");
+        g.appendChild(cell.l);
+    }
+    if (!edgeExists(x, y, x, y - 1)) { // Add top edge
+        cell.t = svgLine(x * side, y * side, (x + 1) * side, y * side, "yellow");
+        g.appendChild(cell.t);
+    }
+    return cell;
+}
+
+function generateLevel(width, height) {
+    maze = { g : document.createElementNS("http://www.w3.org/2000/svg", "g") };
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            let cell = generateCell(x, y, maze.g);
+            maze[c(x, y)] = cell;
+        }
+    }
+}
+
 function initAvatar() {
     avatarCell.x = Math.floor(Math.random() * width);
     avatarCell.y = Math.floor(Math.random() * height);
@@ -64,25 +101,25 @@ function visibleFrom(x, y) {
     let cells = new Set();
 
     var i = 0;
-    while(edgeExists(x + i, y, x + i + 1, y)) {
+    while(!maze[c(x + i, y)].r) {
         cells.add({ x : x + i + 1, y : y });
         i++;
     } 
 
     i = 0;
-    while(edgeExists(x - i, y, x - i - 1, y)) {
+    while(!maze[c(x - i, y)].l) {
         cells.add({ x : x - i - 1, y : y });
         i++;
     } 
 
     i = 0;
-    while(edgeExists(x, y + i, x, y + i + 1)) {
+    while(!maze[c(x, y + i)].b) {
         cells.add({ x : x, y : y + i + 1 });
         i++;
     } 
 
     i = 0;
-    while(edgeExists(x, y - i, x, y - i - 1)) {
+    while(!maze[c(x, y - i)].t) {
         cells.add({ x : x, y : y - i - 1 });
         i++;
     } 
@@ -124,6 +161,40 @@ function checkCollision() {
     if (goodLuck) {
         svg.removeChild(goodLuck.element);
         goodLucks = goodLucks.filter(p => p != goodLuck);
+        for (let i = 0; i < 5; i++) {
+            var x = Math.floor(Math.random() * (width - 2)) + 1;
+            var y = Math.floor(Math.random() * (height - 2)) + 1;
+            let cell = maze[c(x, y)];
+            console.log(c(x, y));
+            if (cell.r) {
+                maze.g.removeChild(cell.r);
+                cell.r = undefined;
+                let cell2 = maze[c(x + 1, y)];
+                maze.g.removeChild(cell2.l);
+                cell2.l = undefined;
+            }
+            if (cell.b) {
+                maze.g.removeChild(cell.b);
+                cell.b = undefined;
+                let cell2 = maze[c(x, y + 1)];
+                maze.g.removeChild(cell2.t);
+                cell2.t = undefined;
+            }
+            if (cell.l) {
+                maze.g.removeChild(cell.l);
+                cell.l = undefined;
+                let cell2 = maze[c(x - 1, y)];
+                maze.g.removeChild(cell2.r);
+                cell2.r = undefined;
+            }
+            if (cell.t) {
+                maze.g.removeChild(cell.t);
+                cell.t = undefined;
+                let cell2 = maze[c(x, y - 1)];
+                maze.g.removeChild(cell2.b);
+                cell2.b = undefined;
+            }
+        }
     }
     let badLuck = badLucks.find(p => p.x == avatarCell.x && p.y == avatarCell.y);
     if (badLuck) {
@@ -135,16 +206,17 @@ function checkCollision() {
 function updateView(dt) {
 
     if (!targetDir) {
-        if (right && edgeExists(avatarCell.x, avatarCell.y, avatarCell.x + 1, avatarCell.y)) {
+        let cell = maze[c(avatarCell.x, avatarCell.y)];
+        if (right && !cell.r) {
             targetDir = { x : 1, y : 0 };
         }
-        else if (down && edgeExists(avatarCell.x, avatarCell.y, avatarCell.x, avatarCell.y + 1)) {
+        else if (down && !cell.b) {
             targetDir = { x : 0, y : 1 };
         }
-        else if (left && edgeExists(avatarCell.x, avatarCell.y, avatarCell.x - 1, avatarCell.y)) {
+        else if (left && !cell.l) {
             targetDir = { x : -1, y : 0 };
         }
-        else if (up && edgeExists(avatarCell.x, avatarCell.y, avatarCell.x, avatarCell.y - 1)) {
+        else if (up && !cell.t) {
             targetDir = { x : 0, y : -1 };
         }
     }
@@ -199,17 +271,18 @@ function updateView(dt) {
     for (let i = 0; i < opponents.length; i++) {
         let opponent = opponents[i];
         if (!opponent.dir) {
+            let cell = maze[c(opponent.cell.x, opponent.cell.y)];
             let rnd = Math.floor(Math.random() * 4);
-            if (rnd == 0 && edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x + 1, opponent.cell.y)) {
+            if (rnd == 0 && !cell.r) {
                 opponent.dir = { x : 1, y : 0 };
             }
-            else if (rnd == 1 && edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x, opponent.cell.y + 1)) {
+            else if (rnd == 1 && !cell.b) {
                 opponent.dir = { x : 0, y : 1 };
             }
-            else if (rnd == 2 && edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x - 1, opponent.cell.y)) {
+            else if (rnd == 2 && !cell.l) {
                 opponent.dir = { x : -1, y : 0 };
             }
-            else if (rnd == 3 && edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x, opponent.cell.y - 1)) {
+            else if (rnd == 3 && !cell.t) {
                 opponent.dir = { x : 0, y : -1 };
             }
         }
@@ -220,7 +293,7 @@ function updateView(dt) {
                 if (opponent.x >= side * (opponent.cell.x + 1.5)) {
                     opponent.x = side * (opponent.cell.x + 1.5);
                     opponent.cell = { x : opponent.cell.x + 1, y : opponent.cell.y };
-                    if (!edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x + 1, opponent.cell.y)) {
+                    if (maze[c(opponent.cell.x, opponent.cell.y)].r) {
                         opponent.dir = undefined;
                     }
                 }
@@ -230,7 +303,7 @@ function updateView(dt) {
                 if (opponent.y >= side * (opponent.cell.y + 1.5)) {
                     opponent.y = side * (opponent.cell.y + 1.5);
                     opponent.cell = { x : opponent.cell.x, y : opponent.cell.y + 1 };
-                    if (!edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x, opponent.cell.y + 1)) {
+                    if (maze[c(opponent.cell.x, opponent.cell.y)].b) {
                         opponent.dir = undefined;
                     }
                 }
@@ -240,7 +313,7 @@ function updateView(dt) {
                 if (opponent.x <= side * (opponent.cell.x - 0.5)) {
                     opponent.x = side * (opponent.cell.x - 0.5);
                     opponent.cell = { x : opponent.cell.x - 1, y : opponent.cell.y };
-                    if (!edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x - 1, opponent.cell.y)) {
+                    if (maze[c(opponent.cell.x, opponent.cell.y)].l) {
                         opponent.dir = undefined;
                     }
                 }
@@ -250,7 +323,7 @@ function updateView(dt) {
                 if (opponent.y <= side * (opponent.cell.y - 0.5)) {
                     opponent.y = side * (opponent.cell.y - 0.5);
                     opponent.cell = { x : opponent.cell.x, y : opponent.cell.y - 1 };
-                    if (!edgeExists(opponent.cell.x, opponent.cell.y, opponent.cell.x, opponent.cell.y - 1)) {
+                    if (maze[c(opponent.cell.x, opponent.cell.y)].t) {
                         opponent.dir = undefined;
                     }
                 }

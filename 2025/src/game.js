@@ -2,8 +2,8 @@ let width = 20;
 let height = 20;
 
 let edges = generateMaze(width, height);
-let mazeSvg = getMazeSvg(width, height);
-svg.appendChild(mazeSvg);
+generateLevel(width, height);
+svg.appendChild(maze.g);
 let avatar = svgCircle(750, 750, 18, "blue");
 svg.appendChild(avatar);
 

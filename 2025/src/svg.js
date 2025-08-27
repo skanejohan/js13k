@@ -27,3 +27,14 @@ function svgCircle(cx, cy, r, fill) {
     return c;
 }
 
+function svgGroup() {
+    return document.createElementNS("http://www.w3.org/2000/svg", "g");
+}
+
+function svgAvatar(x, y) {
+    return svgCircle(x, y, 18, "blue");
+}
+
+function svgCat(x, y) {
+    return svgCircle(x, y, 18, "black");
+}

@@ -1,15 +1,12 @@
 let width = 20;
 let height = 20;
+let side = 40;
 
-let edges = generateMaze(width, height);
-generateLevel(width, height);
-svg.appendChild(maze.g);
-let avatar = svgCircle(750, 750, 18, "blue");
-svg.appendChild(avatar);
+let level = undefined;
 
-for(let i = 0; i < 10; i++) {
-    addOpponent();
-}
+level = generateLevel(width, height, 10);
+svg.appendChild(level.g);
+
 for(let i = 0; i < 8; i++) {
     addPortal();
 }
@@ -19,7 +16,6 @@ for(let i = 0; i < 8; i++) {
 for(let i = 0; i < 8; i++) {
     addBadLuck();
 }
-initAvatar();
 
 updateVisibleCells();
 

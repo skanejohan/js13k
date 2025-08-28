@@ -1,8 +1,11 @@
-function generateLevel(width, height, cats) {
+function generateLevel(width, height, cats, portals, badLucks, goodLucks) {
     level = { 
         g : svgGroup(), 
         width: width, 
         height: height,
+        portals: [],
+        badLucks: [],
+        goodLucks: [],
         cats: [] 
     };
 
@@ -12,9 +15,20 @@ function generateLevel(width, height, cats) {
             level[c(x, y)] = _generateCell(x, y, level.g, openings);
         }
     }
-    level.avatar = _addObject(svgAvatar);
+
+    let occupiedCells = [];
+    level.avatar = _addObject(svgAvatar, occupiedCells);
     for(let i = 0; i < cats; i++) {
-        level.cats.push(_addObject(svgCat));
+        level.cats.push(_addObject(svgCat, occupiedCells));
+    }
+    for(let i = 0; i < portals; i++) {
+        level.portals.push(_addObject(svgPortal, occupiedCells));
+    }
+    for(let i = 0; i < badLucks; i++) {
+        level.badLucks.push(_addObject(svgBadLuck, occupiedCells));
+    }
+    for(let i = 0; i < goodLucks; i++) {
+        level.goodLucks.push(_addObject(svgGoodLuck, occupiedCells));
     }
     return level;
 }
@@ -83,11 +97,20 @@ function _openingExists(x1, y1, x2, y2, openings) {
     return openings.has(_s4(x1, y1, x2, y2)) || openings.has(_s4(x2, y2, x1, y1));
 }
 
-function _addObject(svgFunction) {
-    let cellX = Math.floor(Math.random() * width);
-    let cellY = Math.floor(Math.random() * height);
-    let displayX = side * (x + 0.5);
-    let displayY = side * (y + 0.5);
+function _addObject(svgFunction, occupiedCells) {
+    let cellX;
+    let cellY;
+    freeCellFound = false;
+    while (!freeCellFound) {
+        cellX = Math.floor(Math.random() * width);
+        cellY = Math.floor(Math.random() * height);
+        if (!occupiedCells.find(c => c.x == cellX && c.y == cellY)) {
+            freeCellFound = true;
+            occupiedCells.push({ x: cellX, y: cellY });
+        }
+    }
+    let displayX = side * (cellX + 0.5);
+    let displayY = side * (cellY + 0.5);
     let element = svgFunction(displayX, displayY);
     level.g.appendChild(element);
     return { 

@@ -1,13 +1,8 @@
-let x = 0;
-let y = 0;
 let w = 1500;
 let h = 1500;
 let svg = document.getElementById("svg");
 let zoom = 0;
 let zoomTarget = 0;
-let portals = [];
-let badLucks = [];
-let goodLucks = [];
 let visibleCells = [];
 let visibleCellsSvg = [];
 
@@ -15,36 +10,6 @@ let targetDir = undefined;
 
 function c(x, y) {
     return `x${x}y${y}`;
-}
-
-function addBadLuck() {
-    let x = Math.floor(Math.random() * width);
-    let y = Math.floor(Math.random() * height);
-    let displayX = side * (x + 0.5);
-    let displayY = side * (y + 0.5);    
-    let badLuck = svgCircle(displayX, displayY, 18, "red");
-    svg.appendChild(badLuck);
-    badLucks.push( {x : x, y : y, element: badLuck });
-}
-
-function addGoodLuck() {
-    let x = Math.floor(Math.random() * width);
-    let y = Math.floor(Math.random() * height);
-    let displayX = side * (x + 0.5);
-    let displayY = side * (y + 0.5);    
-    let goodLuck = svgCircle(displayX, displayY, 18, "white");
-    svg.appendChild(goodLuck);
-    goodLucks.push( {x : x, y : y, element: goodLuck });
-}
-
-function addPortal() {
-    let x = Math.floor(Math.random() * width);
-    let y = Math.floor(Math.random() * height);
-    let displayX = side * (x + 0.5);
-    let displayY = side * (y + 0.5);    
-    let portal = svgCircle(displayX, displayY, 18, "yellow");
-    svg.appendChild(portal);
-    portals.push( {x : x, y : y });
 }
 
 function visibleFrom(x, y) {
@@ -103,20 +68,25 @@ function updateVisibleCells() {
     }
 }
 
+function consumeObject(list, set) {
+    let obj = list.find(o => o.cellX == level.avatar.cellX && o.cellY == level.avatar.cellY);
+    if (obj) {
+        set(list.filter(o => o != obj));
+        level.g.removeChild(obj.element);
+    }
+    return obj;
+}
 function checkCollision() {
-    if (portals.find(p => p.x == level.avatar.cellX && p.y == level.avatar.cellY)) {
+    if (consumeObject(level.portals, l => level.portals = l)) {
         level.avatar.cellX = Math.floor(Math.random() * width);
         level.avatar.cellY = Math.floor(Math.random() * height);
     }
-    let goodLuck = goodLucks.find(p => p.x == level.avatar.cellX && p.y == level.avatar.cellY);
-    if (goodLuck) {
-        svg.removeChild(goodLuck.element);
-        goodLucks = goodLucks.filter(p => p != goodLuck);
+
+    if (consumeObject(level.goodLucks, l => level.goodLucks = l)) {
         for (let i = 0; i < 5; i++) {
             var x = Math.floor(Math.random() * (width - 2)) + 1;
             var y = Math.floor(Math.random() * (height - 2)) + 1;
             let cell = level[c(x, y)];
-            console.log(c(x, y));
             if (cell.r) {
                 level.g.removeChild(cell.r);
                 cell.r = undefined;
@@ -147,10 +117,41 @@ function checkCollision() {
             }
         }
     }
-    let badLuck = badLucks.find(p => p.x == level.avatar.cellX && p.y == level.avatar.cellY);
-    if (badLuck) {
-        svg.removeChild(badLuck.element);
-        badLucks = badLucks.filter(p => p != badLuck);
+
+    if (consumeObject(level.badLucks, l => level.badLucks = l)) {
+        for (let i = 0; i < 5; i++) {
+            var x = Math.floor(Math.random() * (width - 2)) + 1;
+            var y = Math.floor(Math.random() * (height - 2)) + 1;
+            let cell = level[c(x, y)];
+            if (!cell.r) {
+                cell.r = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, "yellow");
+                level.g.appendChild(cell.r);
+                let cell2 = level[c(x + 1, y)];
+                cell2.l = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, "yellow");
+                level.g.appendChild(cell2.l);
+            }
+            else if (!cell.b) {
+                cell.b = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, "yellow");
+                level.g.appendChild(cell.b);
+                let cell2 = level[c(x, y + 1)];
+                cell2.t = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, "yellow");
+                level.g.appendChild(cell2.t);
+            }
+            else if (!cell.l) {
+                cell.l = svgLine(x * side, y * side, x * side, (y + 1) * side, "yellow");
+                level.g.appendChild(cell.l);
+                let cell2 = level[c(x - 1, y)];
+                cell2.r = svgLine(x * side, y * side, x * side, (y + 1) * side, "yellow");
+                level.g.appendChild(cell2.r);
+            }
+            else if (!cell.t) {
+                cell.t = svgLine(x * side, y * side, (x + 1) * side, y * side, "yellow");
+                level.g.appendChild(cell.t);
+                let cell2 = level[c(x, y - 1)];
+                cell2.b = svgLine(x * side, y * side, (x + 1) * side, y * side, "yellow");
+                level.g.appendChild(cell2.b);
+            }
+        }
     }
 }
 

@@ -38,3 +38,15 @@ function svgAvatar(x, y) {
 function svgCat(x, y) {
     return svgCircle(x, y, 18, "black");
 }
+
+function svgPortal(x, y) {
+    return svgCircle(x, y, 18, "yellow");
+}
+
+function svgBadLuck(x, y) {
+    return svgCircle(x, y, 18, "red");
+}
+
+function svgGoodLuck(x, y) {
+    return svgCircle(x, y, 18, "white");
+}

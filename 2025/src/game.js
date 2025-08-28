@@ -4,18 +4,8 @@ let side = 40;
 
 let level = undefined;
 
-level = generateLevel(width, height, 10);
+level = generateLevel(width, height, 10, 8, 8, 8);
 svg.appendChild(level.g);
-
-for(let i = 0; i < 8; i++) {
-    addPortal();
-}
-for(let i = 0; i < 8; i++) {
-    addGoodLuck();
-}
-for(let i = 0; i < 8; i++) {
-    addBadLuck();
-}
 
 updateVisibleCells();
 

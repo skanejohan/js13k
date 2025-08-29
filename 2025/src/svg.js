@@ -50,3 +50,7 @@ function svgBadLuck(x, y) {
 function svgGoodLuck(x, y) {
     return svgCircle(x, y, 18, "white");
 }
+
+function svgHorseshoe(x, y) {
+    return svgCircle(x, y, 18, "green");
+}

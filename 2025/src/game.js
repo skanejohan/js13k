@@ -4,8 +4,7 @@ let side = 40;
 
 let level = undefined;
 
-level = generateLevel(width, height, 10, 8, 8, 8);
-svg.appendChild(level.g);
+nextLevel();
 
 updateVisibleCells();
 

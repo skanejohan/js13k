@@ -8,6 +8,14 @@ let visibleCellsSvg = [];
 
 let targetDir = undefined;
 
+function nextLevel() {
+    if (level && level.g) {
+        svg.removeChild(level.g);
+    }
+    level = generateLevel(width, height, 10, 8, 8, 8);
+    svg.appendChild(level.g);
+}
+
 function c(x, y) {
     return `x${x}y${y}`;
 }
@@ -152,6 +160,10 @@ function checkCollision() {
                 level.g.appendChild(cell2.b);
             }
         }
+    }
+
+    if (level.horseshoe.cellX == level.avatar.cellX && level.horseshoe.cellY == level.avatar.cellY) {
+        nextLevel();
     }
 }
 

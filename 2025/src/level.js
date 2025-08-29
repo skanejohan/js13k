@@ -30,6 +30,7 @@ function generateLevel(width, height, cats, portals, badLucks, goodLucks) {
     for(let i = 0; i < goodLucks; i++) {
         level.goodLucks.push(_addObject(svgGoodLuck, occupiedCells));
     }
+    level.horseshoe = _addObject(svgHorseshoe, occupiedCells);
     return level;
 }
 

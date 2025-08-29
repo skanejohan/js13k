@@ -88,6 +88,10 @@ function checkCollision() {
     if (consumeObject(level.portals, l => level.portals = l)) {
         level.avatar.cellX = Math.floor(Math.random() * width);
         level.avatar.cellY = Math.floor(Math.random() * height);
+        left = false;
+        right = false;
+        up = false;
+        down = false;
     }
 
     if (consumeObject(level.goodLucks, l => level.goodLucks = l)) {

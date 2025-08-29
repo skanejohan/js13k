@@ -1,8 +1,15 @@
-function generateLevel(width, height, cats, portals, badLucks, goodLucks) {
+function noOfLevel() {
+    return _levels.length;
+}
+
+function generateLevel(levelIndex) {
+    let lvl = _levels[levelIndex];
+
     level = { 
         g : svgGroup(), 
-        width: width, 
-        height: height,
+        index: levelIndex,
+        width: lvl.width, 
+        height: lvl.height,
         portals: [],
         badLucks: [],
         goodLucks: [],
@@ -10,29 +17,39 @@ function generateLevel(width, height, cats, portals, badLucks, goodLucks) {
     };
 
     let openings = _generateMaze();
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
+    for (let y = 0; y < lvl.height; y++) {
+        for (let x = 0; x < lvl.width; x++) {
             level[c(x, y)] = _generateCell(x, y, level.g, openings);
         }
     }
 
     let occupiedCells = [];
-    level.avatar = _addObject(svgAvatar, occupiedCells, width, height);
-    for(let i = 0; i < cats; i++) {
-        level.cats.push(_addObject(svgCat, occupiedCells, width, height));
+    level.avatar = _addObject(svgAvatar, occupiedCells, lvl.width, lvl.height);
+    for(let i = 0; i < lvl.cats; i++) {
+        level.cats.push(_addObject(svgCat, occupiedCells, lvl.width, lvl.height));
     }
-    for(let i = 0; i < portals; i++) {
-        level.portals.push(_addObject(svgPortal, occupiedCells, width, height));
+    for(let i = 0; i < lvl.portals; i++) {
+        level.portals.push(_addObject(svgPortal, occupiedCells, lvl.width, lvl.height));
     }
-    for(let i = 0; i < badLucks; i++) {
-        level.badLucks.push(_addObject(svgBadLuck, occupiedCells, width, height));
+    for(let i = 0; i < lvl.badLucks; i++) {
+        level.badLucks.push(_addObject(svgBadLuck, occupiedCells, lvl.width, lvl.height));
     }
-    for(let i = 0; i < goodLucks; i++) {
-        level.goodLucks.push(_addObject(svgGoodLuck, occupiedCells, width, height));
+    for(let i = 0; i < lvl.goodLucks; i++) {
+        level.goodLucks.push(_addObject(svgGoodLuck, occupiedCells, lvl.width, lvl.height));
     }
-    level.horseshoe = _addObject(svgHorseshoe, occupiedCells, width, height);
+    level.horseshoe = _addObject(svgHorseshoe, occupiedCells, lvl.width, lvl.height);
     return level;
 }
+
+let _levels = [
+    { width : 10, height: 10, cats: 5, portals: 8, badLucks: 8, goodLucks: 8},
+    { width : 12, height: 12, cats: 5, portals: 8, badLucks: 8, goodLucks: 8},
+    { width : 14, height: 14, cats: 7, portals: 8, badLucks: 8, goodLucks: 8},
+    { width : 16, height: 8, cats: 8, portals: 8, badLucks: 8, goodLucks: 10},
+    { width : 8, height: 20, cats: 12, portals: 10, badLucks: 10, goodLucks: 10},
+    { width : 15, height: 15, cats: 12, portals: 10, badLucks: 10, goodLucks: 10},
+    { width : 15, height: 15, cats: 15, portals: 10, badLucks: 10, goodLucks: 10},
+];
 
 function _generateCell(x, y, g, openings) {
     let cell = { x: x, y : y };

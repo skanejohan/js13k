@@ -12,8 +12,11 @@ function nextLevel() {
     if (level && level.g) {
         svg.removeChild(level.g);
     }
-    level = generateLevel(20, 20, 10, 8, 8, 8);
+    let levelIndex = level ? level.index + 1 : 0;
+    level = generateLevel(levelIndex);
     svg.appendChild(level.g);
+    zoom = 0;
+    zoomTarget = 0;
 }
 
 function c(x, y) {

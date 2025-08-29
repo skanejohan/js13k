@@ -117,8 +117,9 @@ function consumeObjectAtAvatarPosition(list, set) {
 
 function checkCollision() {
     if (consumeObjectAtAvatarPosition(level.portals, l => level.portals = l)) {
-        level.avatar.cellX = Math.floor(Math.random() * level.width);
-        level.avatar.cellY = Math.floor(Math.random() * level.height);
+        var {x, y} = getFreeCell();
+        level.avatar.cellX = x;
+        level.avatar.cellY = y;
         left = false;
         right = false;
         up = false;

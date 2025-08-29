@@ -88,9 +88,12 @@ let _levels = [
     { width : 12, height: 12, cats: 5, portals: 8, badLucks: 8, goodLucks: 8},
     { width : 14, height: 14, cats: 7, portals: 8, badLucks: 8, goodLucks: 8},
     { width : 16, height: 8, cats: 8, portals: 8, badLucks: 8, goodLucks: 10},
-    { width : 8, height: 20, cats: 12, portals: 10, badLucks: 10, goodLucks: 10},
-    { width : 15, height: 15, cats: 12, portals: 10, badLucks: 10, goodLucks: 10},
-    { width : 15, height: 15, cats: 15, portals: 10, badLucks: 10, goodLucks: 10},
+    { width : 8, height: 20, cats: 12, portals: 10, badLucks: 12, goodLucks: 10},
+    { width : 15, height: 15, cats: 12, portals: 10, badLucks: 12, goodLucks: 10},
+    { width : 15, height: 15, cats: 15, portals: 10, badLucks: 14, goodLucks: 10},
+    { width : 17, height: 17, cats: 17, portals: 10, badLucks: 18, goodLucks: 12},
+    { width : 18, height: 18, cats: 20, portals: 12, badLucks: 22, goodLucks: 12},
+    { width : 20, height: 20, cats: 25, portals: 15, badLucks: 25, goodLucks: 15},
 ];
 
 function _generateCell(x, y, g, openings) {
@@ -157,7 +160,7 @@ function _openingExists(x1, y1, x2, y2, openings) {
     return openings.has(_s4(x1, y1, x2, y2)) || openings.has(_s4(x2, y2, x1, y1));
 }
 
-function _addObject(svgFunction, width, height) {
+function _addObject(svgFunction) {
     let cell = getFreeCell();
     _occupiedCells.push({ x: cell.x, y: cell.y });
     let displayX = side * (cell.x + 0.5);

@@ -23,22 +23,64 @@ function generateLevel(levelIndex) {
         }
     }
 
-    let occupiedCells = [];
-    level.avatar = _addObject(svgAvatar, occupiedCells, lvl.width, lvl.height);
+    _occupiedCells = [];
+    level.avatar = _addObject(svgAvatar,  lvl.width, lvl.height);
     for(let i = 0; i < lvl.cats; i++) {
-        level.cats.push(_addObject(svgCat, occupiedCells, lvl.width, lvl.height));
+        level.cats.push(_addObject(svgCat, lvl.width, lvl.height));
     }
     for(let i = 0; i < lvl.portals; i++) {
-        level.portals.push(_addObject(svgPortal, occupiedCells, lvl.width, lvl.height));
+        level.portals.push(_addObject(svgPortal, lvl.width, lvl.height));
     }
     for(let i = 0; i < lvl.badLucks; i++) {
-        level.badLucks.push(_addObject(svgBadLuck, occupiedCells, lvl.width, lvl.height));
+        level.badLucks.push(_addObject(svgBadLuck, lvl.width, lvl.height));
     }
     for(let i = 0; i < lvl.goodLucks; i++) {
-        level.goodLucks.push(_addObject(svgGoodLuck, occupiedCells, lvl.width, lvl.height));
+        level.goodLucks.push(_addObject(svgGoodLuck, lvl.width, lvl.height));
     }
-    level.horseshoe = _addObject(svgHorseshoe, occupiedCells, lvl.width, lvl.height);
+    level.horseshoe = _addObject(svgHorseshoe, lvl.width, lvl.height);
     return level;
+}
+
+function catAt(x, y) {
+    return _objectAt(x, y, level.cats);
+}
+
+function portalAt(x, y) {
+    return _objectAt(x, y, level.portals);
+}
+
+function goodLuckAt(x, y) {
+    return _objectAt(x, y, level.goodLucks);
+}
+
+function badLuckAt(x, y) {
+    return _objectAt(x, y, level.badLucks);
+}
+
+function consumeObjectAt(x, y, list, set) {
+    let obj = _objectAt(x, y, list);
+    if (obj) {
+        set(list.filter(o => o != obj));
+        level.g.removeChild(obj.element);
+    }
+    return obj;
+}
+
+function getFreeCell() {
+    let cellX;
+    let cellY;
+    freeCellFound = false;
+    while (!freeCellFound) {
+        cellX = Math.floor(Math.random() * level.width);
+        cellY = Math.floor(Math.random() * level.height);
+        if (!_occupiedCells.find(c => c.x == cellX && c.y == cellY)) {
+            return ({ x: cellX, y: cellY })
+        }
+    }
+}
+
+function _objectAt(x, y, list) {
+    return list.find(o => o.cellX == x && o.cellY == y);
 }
 
 let _levels = [
@@ -115,25 +157,16 @@ function _openingExists(x1, y1, x2, y2, openings) {
     return openings.has(_s4(x1, y1, x2, y2)) || openings.has(_s4(x2, y2, x1, y1));
 }
 
-function _addObject(svgFunction, occupiedCells, width, height) {
-    let cellX;
-    let cellY;
-    freeCellFound = false;
-    while (!freeCellFound) {
-        cellX = Math.floor(Math.random() * width);
-        cellY = Math.floor(Math.random() * height);
-        if (!occupiedCells.find(c => c.x == cellX && c.y == cellY)) {
-            freeCellFound = true;
-            occupiedCells.push({ x: cellX, y: cellY });
-        }
-    }
-    let displayX = side * (cellX + 0.5);
-    let displayY = side * (cellY + 0.5);
+function _addObject(svgFunction, width, height) {
+    let cell = getFreeCell();
+    _occupiedCells.push({ x: cell.x, y: cell.y });
+    let displayX = side * (cell.x + 0.5);
+    let displayY = side * (cell.y + 0.5);
     let element = svgFunction(displayX, displayY);
     level.g.appendChild(element);
     return { 
-        cellX: cellX, 
-        cellY: cellY,
+        cellX: cell.x, 
+        cellY: cell.y,
         displayX: displayX, 
         displayY: displayY, 
         element: element
@@ -147,3 +180,5 @@ function _s2(x, y) {
 function _s4(x1, y1, x2, y2) {
     return `${x1},${y1},${x2},${y2}`;
 }
+
+let _occupiedCells = [];

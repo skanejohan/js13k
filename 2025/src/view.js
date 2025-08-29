@@ -8,6 +8,38 @@ let visibleCellsSvg = [];
 
 let targetDir = undefined;
 
+function winnable() {
+    let stack = [];
+    let visited = new Set();
+    stack.push([level.avatar.cellX, level.avatar.cellY]);
+    visited.add(`${level.avatar.cellX},${level.avatar.cellY}`);
+    while (stack.length > 0) {
+        let [x, y] = stack.pop();
+        if ((x == level.horseshoe.cellX && y == level.horseshoe.cellY) || portalAt(x, y) || goodLuckAt(x, y)) {
+            console.log(`Found path to (${x}, ${y})`);
+            return true;
+        }
+        let cell = level[c(x, y)];
+        if (!cell.r && !visited.has(`${x+1},${y}`)) {
+            visited.add(`${x+1},${y}`);
+            stack.push([x+1, y]);
+        }
+        if (!cell.b && !visited.has(`${x},${y+1}`)) {
+            visited.add(`${x},${y+1}`);
+            stack.push([x, y+1]);
+        }
+        if (!cell.l && !visited.has(`${x-1},${y}`)) {
+            visited.add(`${x-1},${y}`);
+            stack.push([x-1, y]);
+        }
+        if (!cell.t && !visited.has(`${x},${y-1}`)) {
+            visited.add(`${x},${y-1}`);
+            stack.push([x, y-1]);
+        }
+    }
+    return false;
+}
+
 function nextLevel() {
     if (level && level.g) {
         svg.removeChild(level.g);
@@ -79,25 +111,24 @@ function updateVisibleCells() {
     }
 }
 
-function consumeObject(list, set) {
-    let obj = list.find(o => o.cellX == level.avatar.cellX && o.cellY == level.avatar.cellY);
-    if (obj) {
-        set(list.filter(o => o != obj));
-        level.g.removeChild(obj.element);
-    }
-    return obj;
+function consumeObjectAtAvatarPosition(list, set) {
+    return consumeObjectAt(level.avatar.cellX, level.avatar.cellY, list, set);
 }
+
 function checkCollision() {
-    if (consumeObject(level.portals, l => level.portals = l)) {
+    if (consumeObjectAtAvatarPosition(level.portals, l => level.portals = l)) {
         level.avatar.cellX = Math.floor(Math.random() * level.width);
         level.avatar.cellY = Math.floor(Math.random() * level.height);
         left = false;
         right = false;
         up = false;
         down = false;
+        if (!winnable()) {
+            console.log("Not winnable");
+        }
     }
 
-    if (consumeObject(level.goodLucks, l => level.goodLucks = l)) {
+    if (consumeObjectAtAvatarPosition(level.goodLucks, l => level.goodLucks = l)) {
         for (let i = 0; i < 5; i++) {
             var x = Math.floor(Math.random() * (level.width - 2)) + 1;
             var y = Math.floor(Math.random() * (level.height - 2)) + 1;
@@ -131,9 +162,12 @@ function checkCollision() {
                 cell2.b = undefined;
             }
         }
+        if (!winnable()) {
+            console.log("Not winnable");
+        }
     }
 
-    if (consumeObject(level.badLucks, l => level.badLucks = l)) {
+    if (consumeObjectAtAvatarPosition(level.badLucks, l => level.badLucks = l)) {
         for (let i = 0; i < 5; i++) {
             var x = Math.floor(Math.random() * (level.width - 2)) + 1;
             var y = Math.floor(Math.random() * (level.height - 2)) + 1;
@@ -166,6 +200,9 @@ function checkCollision() {
                 cell2.b = svgLine(x * side, y * side, (x + 1) * side, y * side, "yellow");
                 level.g.appendChild(cell2.b);
             }
+        }
+        if (!winnable()) {
+            console.log("Not winnable");
         }
     }
 

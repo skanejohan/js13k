@@ -1,5 +1,3 @@
-let width = 20;
-let height = 20;
 let side = 40;
 
 let level = undefined;

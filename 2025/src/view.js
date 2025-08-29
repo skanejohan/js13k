@@ -12,7 +12,7 @@ function nextLevel() {
     if (level && level.g) {
         svg.removeChild(level.g);
     }
-    level = generateLevel(width, height, 10, 8, 8, 8);
+    level = generateLevel(20, 20, 10, 8, 8, 8);
     svg.appendChild(level.g);
 }
 
@@ -86,8 +86,8 @@ function consumeObject(list, set) {
 }
 function checkCollision() {
     if (consumeObject(level.portals, l => level.portals = l)) {
-        level.avatar.cellX = Math.floor(Math.random() * width);
-        level.avatar.cellY = Math.floor(Math.random() * height);
+        level.avatar.cellX = Math.floor(Math.random() * level.width);
+        level.avatar.cellY = Math.floor(Math.random() * level.height);
         left = false;
         right = false;
         up = false;
@@ -96,8 +96,8 @@ function checkCollision() {
 
     if (consumeObject(level.goodLucks, l => level.goodLucks = l)) {
         for (let i = 0; i < 5; i++) {
-            var x = Math.floor(Math.random() * (width - 2)) + 1;
-            var y = Math.floor(Math.random() * (height - 2)) + 1;
+            var x = Math.floor(Math.random() * (level.width - 2)) + 1;
+            var y = Math.floor(Math.random() * (level.height - 2)) + 1;
             let cell = level[c(x, y)];
             if (cell.r) {
                 level.g.removeChild(cell.r);
@@ -132,8 +132,8 @@ function checkCollision() {
 
     if (consumeObject(level.badLucks, l => level.badLucks = l)) {
         for (let i = 0; i < 5; i++) {
-            var x = Math.floor(Math.random() * (width - 2)) + 1;
-            var y = Math.floor(Math.random() * (height - 2)) + 1;
+            var x = Math.floor(Math.random() * (level.width - 2)) + 1;
+            var y = Math.floor(Math.random() * (level.height - 2)) + 1;
             let cell = level[c(x, y)];
             if (!cell.r) {
                 cell.r = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, "yellow");

@@ -17,20 +17,20 @@ function generateLevel(width, height, cats, portals, badLucks, goodLucks) {
     }
 
     let occupiedCells = [];
-    level.avatar = _addObject(svgAvatar, occupiedCells);
+    level.avatar = _addObject(svgAvatar, occupiedCells, width, height);
     for(let i = 0; i < cats; i++) {
-        level.cats.push(_addObject(svgCat, occupiedCells));
+        level.cats.push(_addObject(svgCat, occupiedCells, width, height));
     }
     for(let i = 0; i < portals; i++) {
-        level.portals.push(_addObject(svgPortal, occupiedCells));
+        level.portals.push(_addObject(svgPortal, occupiedCells, width, height));
     }
     for(let i = 0; i < badLucks; i++) {
-        level.badLucks.push(_addObject(svgBadLuck, occupiedCells));
+        level.badLucks.push(_addObject(svgBadLuck, occupiedCells, width, height));
     }
     for(let i = 0; i < goodLucks; i++) {
-        level.goodLucks.push(_addObject(svgGoodLuck, occupiedCells));
+        level.goodLucks.push(_addObject(svgGoodLuck, occupiedCells, width, height));
     }
-    level.horseshoe = _addObject(svgHorseshoe, occupiedCells);
+    level.horseshoe = _addObject(svgHorseshoe, occupiedCells, width, height);
     return level;
 }
 
@@ -98,7 +98,7 @@ function _openingExists(x1, y1, x2, y2, openings) {
     return openings.has(_s4(x1, y1, x2, y2)) || openings.has(_s4(x2, y2, x1, y1));
 }
 
-function _addObject(svgFunction, occupiedCells) {
+function _addObject(svgFunction, occupiedCells, width, height) {
     let cellX;
     let cellY;
     freeCellFound = false;

@@ -113,6 +113,7 @@ function consumeObjectAtAvatarPosition(list, set) {
 
 function checkCollision() {
     if (consumeObjectAtAvatarPosition(level.portals, l => level.portals = l)) {
+        play(portalSound);
         var {x, y} = getFreeCell();
         level.avatar.cellX = x;
         level.avatar.cellY = y;
@@ -126,6 +127,7 @@ function checkCollision() {
     }
 
     if (consumeObjectAtAvatarPosition(level.goodLucks, l => level.goodLucks = l)) {
+        play(goodLuckSound);
         for (let i = 0; i < 5; i++) {
             var x = Math.floor(Math.random() * (level.width - 2)) + 1;
             var y = Math.floor(Math.random() * (level.height - 2)) + 1;
@@ -165,6 +167,7 @@ function checkCollision() {
     }
 
     if (consumeObjectAtAvatarPosition(level.badLucks, l => level.badLucks = l)) {
+        play(badLuckSound);
         for (let i = 0; i < 5; i++) {
             var x = Math.floor(Math.random() * (level.width - 2)) + 1;
             var y = Math.floor(Math.random() * (level.height - 2)) + 1;
@@ -201,15 +204,18 @@ function checkCollision() {
             level.g.appendChild(level.tower);
         }
         if (!winnable()) {
+            play(levelLostSound);
             _endMaze(GSLEVELLOST);
         }
     }
 
     if (level.horseshoe.cellX == level.avatar.cellX && level.horseshoe.cellY == level.avatar.cellY) {
         if (level.index == _levels.length - 1) {
+            play(escapedSound);
             _endGame();
         }
         else {
+            play(levelWonSound);
             _endMaze(GSLEVELWON);
         }
     }

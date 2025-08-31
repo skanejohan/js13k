@@ -8,6 +8,7 @@ function displayMenu() {
     menu.appendChild(svgText("the horseshoe... your way out", 400, 660));
     menu.appendChild(svgText("escape the tower... escape the terror!", 400, 800));
     menu.appendChild(svgText("Click to start", 400, 1000, 20, "white"));
+    menu.appendChild(svgText("Uses pl_synth (https://github.com/phoboslab/pl_synth)", 400, 1200, 20, "white"));
     svg.appendChild(menu);
     svg.addEventListener("click", _startGame);
 }
@@ -18,6 +19,7 @@ function _startGame(e) {
     menu = undefined;
     startLevel(0);
     gameState = GSPLAYING;
+    play(songBuffer, true);
 }
 
 let menu = undefined;

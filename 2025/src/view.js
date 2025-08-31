@@ -16,7 +16,6 @@ function winnable() {
     while (stack.length > 0) {
         let [x, y] = stack.pop();
         if ((x == level.horseshoe.cellX && y == level.horseshoe.cellY) || portalAt(x, y) || goodLuckAt(x, y)) {
-            console.log(`Found path to (${x}, ${y})`);
             return true;
         }
         let cell = level[c(x, y)];
@@ -45,6 +44,7 @@ function startLevel(levelIndex) {
     svg.appendChild(level.g);
     zoom = 0;
     zoomTarget = 0;
+    level.floor.setAttribute("transform", `translate(0 ${levelIndex * 50})`);
 }
 
 function c(x, y) {
@@ -197,6 +197,8 @@ function checkCollision() {
                 cell2.b = svgLine(x * side, y * side, (x + 1) * side, y * side, "yellow");
                 level.g.appendChild(cell2.b);
             }
+            level.g.removeChild(level.tower);
+            level.g.appendChild(level.tower);
         }
         if (!winnable()) {
             _endMaze(GSLEVELLOST);
@@ -204,7 +206,12 @@ function checkCollision() {
     }
 
     if (level.horseshoe.cellX == level.avatar.cellX && level.horseshoe.cellY == level.avatar.cellY) {
-        _endMaze(GSLEVELWON);
+        if (level.index == _levels.length - 1) {
+            _endGame();
+        }
+        else {
+            _endMaze(GSLEVELWON);
+        }
     }
 }
 
@@ -214,11 +221,27 @@ function _endMaze(newGameState) {
     gameState = newGameState;
     let text = svgText(gameState == GSLEVELWON ? "one maze closer to freedom..." : "you failed...", 400, 400);
     svg.appendChild(text);
+    svg.removeAttribute("viewBox");
     setTimeout(() => {
         svg.removeChild(text);
-        startLevel(GSLEVELWON ? level.index + 1 : level.index);
+        startLevel(gameState == GSLEVELWON ? level.index + 1 : level.index);
         gameState = GSPLAYING;
     }, 1500);
+}
+
+function _endGame() {
+    zoom = 0;
+    svg.removeChild(level.g);
+    gameState = GSGAMEOVER;
+    let text = svgText("you have escaped!", 400, 400);
+    svg.appendChild(text);
+    svg.removeAttribute("viewBox");
+    setTimeout(() => {
+        svg.removeChild(text);
+        svg.removeAttribute("viewBox");
+        gameState = GSMENU;
+        displayMenu();    
+    }, 3000);
 }
 
 function updateView(dt) {
@@ -381,6 +404,7 @@ function updateView(dt) {
 
     level.avatar.element.setAttribute("cx", x);
     level.avatar.element.setAttribute("cy", y);
+    level.tower.setAttribute("transform", `translate(${x + 300} ${y - 500})`);
     for (let i = 0; i < level.cats.length; i++) {
         let opponent = level.cats[i];
         opponent.element.setAttribute("cx", opponent.displayX);

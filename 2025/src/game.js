@@ -2,9 +2,14 @@ let side = 40;
 
 let level = undefined;
 
-nextLevel();
+const GSMENU = 0;
+const GSPLAYING = 1;
+const GSLEVELWON = 2;
+const GSLEVELLOST = 3;
+const GSGAMEOVER = 4;
 
-updateVisibleCells();
+let gameState = GSMENU;
+displayMenu();
 
 var lastTime = Date.now();
 

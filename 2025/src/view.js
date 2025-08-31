@@ -40,11 +40,7 @@ function winnable() {
     return false;
 }
 
-function nextLevel() {
-    if (level && level.g) {
-        svg.removeChild(level.g);
-    }
-    let levelIndex = level ? level.index + 1 : 0;
+function startLevel(levelIndex) {
     level = generateLevel(levelIndex);
     svg.appendChild(level.g);
     zoom = 0;
@@ -98,17 +94,17 @@ function noOfVisibleOpponents() {
 }
 
 function updateVisibleCells() {
-    for(let i = 0; i < visibleCellsSvg.length; i++) {
-        svg.removeChild(visibleCellsSvg[i]);
-    }
-    visibleCellsSvg = [];
+    // for(let i = 0; i < visibleCellsSvg.length; i++) {
+    //     svg.removeChild(visibleCellsSvg[i]);
+    // }
+    // visibleCellsSvg = [];
 
     visibleCells = visibleFrom(level.avatar.cellX, level.avatar.cellY);
-    for (let cell of visibleCells) {
-        let svgCell = svgRect(cell.x * side, cell.y * side, side, side, "rgba(255, 255, 255, 0.15)");
-        visibleCellsSvg.push(svgCell);
-        svg.appendChild(svgCell);
-    }
+    // for (let cell of visibleCells) {
+    //     let svgCell = svgRect(cell.x * side, cell.y * side, side, side, "rgba(255, 255, 255, 0.15)");
+    //     visibleCellsSvg.push(svgCell);
+    //     svg.appendChild(svgCell);
+    // }
 }
 
 function consumeObjectAtAvatarPosition(list, set) {
@@ -125,7 +121,7 @@ function checkCollision() {
         up = false;
         down = false;
         if (!winnable()) {
-            console.log("Not winnable");
+            _endMaze(GSLEVELLOST);
         }
     }
 
@@ -164,7 +160,7 @@ function checkCollision() {
             }
         }
         if (!winnable()) {
-            console.log("Not winnable");
+            _endMaze(GSLEVELLOST);
         }
     }
 
@@ -203,16 +199,33 @@ function checkCollision() {
             }
         }
         if (!winnable()) {
-            console.log("Not winnable");
+            _endMaze(GSLEVELLOST);
         }
     }
 
     if (level.horseshoe.cellX == level.avatar.cellX && level.horseshoe.cellY == level.avatar.cellY) {
-        nextLevel();
+        _endMaze(GSLEVELWON);
     }
 }
 
+function _endMaze(newGameState) {
+    zoom = 0;
+    svg.removeChild(level.g);
+    gameState = newGameState;
+    let text = svgText(gameState == GSLEVELWON ? "one maze closer to freedom..." : "you failed...", 400, 400);
+    svg.appendChild(text);
+    setTimeout(() => {
+        svg.removeChild(text);
+        startLevel(GSLEVELWON ? level.index + 1 : level.index);
+        gameState = GSPLAYING;
+    }, 1500);
+}
+
 function updateView(dt) {
+
+    if (gameState != GSPLAYING) {
+        return;
+    }
 
     if (!targetDir) {
         let cell = level[c(level.avatar.cellX, level.avatar.cellY)];

@@ -27,6 +27,17 @@ function svgCircle(cx, cy, r, fill) {
     return c;
 }
 
+function svgText(txt, x, y) {
+    let t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.setAttribute("x", x);
+    t.setAttribute("y", y);
+    t.setAttribute("fill", "black");
+    t.setAttribute("font-family", "Arial");
+    t.setAttribute("font-size", "20");
+    t.textContent = txt;
+    return t;
+}
+
 function svgGroup() {
     return document.createElementNS("http://www.w3.org/2000/svg", "g");
 }

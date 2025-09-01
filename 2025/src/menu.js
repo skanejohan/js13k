@@ -1,14 +1,6 @@
 function displayMenu() {
     menu = svgGroup();
-    menu.appendChild(svgCircle(80, 100, 80, "red"));
-    for (let i = 0; i < towerLevels.length; i++) {
-        let l = towerLevels[i][0] - 60;
-        let r = towerLevels[i][1] - 60;
-        let t = i * 30 + 19;
-        let b = t + 31;
-        let s = `M ${l} ${t} L ${r} ${t} L ${r} ${b} L ${l} ${b} Z`;
-        menu.appendChild(svgPath(s, "#080001"));
-    }
+    menu.appendChild(svgTower(0, 0));
     menu.appendChild(svgText("TOWER OF TERROR", 200, 100, "red", "Arial", 60));
     menu.appendChild(svgGoodLuck(300, 195));
     menu.appendChild(svgText("the lucky number is on your side", 330, 200, "red"));
@@ -35,28 +27,5 @@ function _startGame(e) {
     gameState = GSPLAYING;
     play(songBuffer, true);
 }
-
-let towerLevels = [
-    [40, 130],
-    [40, 140],
-    [40, 140],
-    [45, 135],
-    [40, 140],
-    [45, 145],
-    [40, 140],
-    [40, 140],
-    [40, 140],
-    [45, 145],
-    [45, 145],
-    [40, 150],
-    [35, 150],
-    [30, 155],
-    [30, 155],
-    [25, 155],
-    [20, 160],
-    [15, 165],
-    [10, 170],
-    [5, 175]
-]
 
 let menu = undefined;

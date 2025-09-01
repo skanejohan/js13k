@@ -1,4 +1,4 @@
-let side = 40;
+let side = 80;
 
 let level = undefined;
 

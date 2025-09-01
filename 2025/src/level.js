@@ -16,6 +16,8 @@ function generateLevel(levelIndex) {
         cats: [] 
     };
 
+    _level.g.appendChild(svgRect(0, 0, lvl.width * side, lvl.height * side, "#36332d"));
+
     let openings = _generateMaze();
     for (let y = 0; y < lvl.height; y++) {
         for (let x = 0; x < lvl.width; x++) {
@@ -39,10 +41,7 @@ function generateLevel(levelIndex) {
     }
     _level.horseshoe = _addObject(svgHorseshoe, lvl.width, lvl.height);
     _level.floor = svgRect(0, 0, 100, 50, "yellow");
-    _level.tower = svgGroup();
-    _level.tower.appendChild(svgRect(0, 0, 100, 1000, "brown"));
-    _level.tower.appendChild(_level.floor);
-    _level.tower.setAttribute("opacity", 0.3);
+    _level.tower = svgTower(0, 0, levelIndex, 0.5);
     _level.g.appendChild(_level.tower)
     return _level;
 }
@@ -115,19 +114,19 @@ let _levels = [
 function _generateCell(x, y, g, openings) {
     let cell = { x: x, y : y };
     if (!_openingExists(x, y, x + 1, y, openings)) { // Add right edge
-        cell.r = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, "yellow");
+        cell.r = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, wallColor, wallThickness);
         g.appendChild(cell.r);
     }
     if (!_openingExists(x, y, x, y + 1, openings)) { // Add bottom edge
-        cell.b = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, "yellow");
+        cell.b = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, wallColor, wallThickness);
         g.appendChild(cell.b);
     }
     if (!_openingExists(x, y, x - 1, y, openings)) { // Add left edge
-        cell.l = svgLine(x * side, y * side, x * side, (y + 1) * side, "yellow");
+        cell.l = svgLine(x * side, y * side, x * side, (y + 1) * side, wallColor, wallThickness);
         g.appendChild(cell.l);
     }
     if (!_openingExists(x, y, x, y - 1, openings)) { // Add top edge
-        cell.t = svgLine(x * side, y * side, (x + 1) * side, y * side, "yellow");
+        cell.t = svgLine(x * side, y * side, (x + 1) * side, y * side, wallColor, wallThickness);
         g.appendChild(cell.t);
     }
     return cell;

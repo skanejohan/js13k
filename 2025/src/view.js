@@ -5,6 +5,8 @@ let zoom = 0;
 let zoomTarget = 0;
 let visibleCells = [];
 let visibleCellsSvg = [];
+let wallThickness = 30;
+let wallColor = "#1a1815";
 
 let targetDir = undefined;
 
@@ -173,31 +175,31 @@ function checkCollision() {
             var y = Math.floor(Math.random() * (level.height - 2)) + 1;
             let cell = level[c(x, y)];
             if (!cell.r) {
-                cell.r = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, "yellow");
+                cell.r = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, wallColor, wallThickness);
                 level.g.appendChild(cell.r);
                 let cell2 = level[c(x + 1, y)];
-                cell2.l = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, "yellow");
+                cell2.l = svgLine((x + 1) * side, y * side, (x + 1) * side, (y + 1) * side, wallColor, wallThickness);
                 level.g.appendChild(cell2.l);
             }
             else if (!cell.b) {
-                cell.b = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, "yellow");
+                cell.b = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, wallColor, wallThickness);
                 level.g.appendChild(cell.b);
                 let cell2 = level[c(x, y + 1)];
-                cell2.t = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, "yellow");
+                cell2.t = svgLine(x * side, (y + 1) * side, (x + 1) * side, (y + 1) * side, wallColor, wallThickness);
                 level.g.appendChild(cell2.t);
             }
             else if (!cell.l) {
-                cell.l = svgLine(x * side, y * side, x * side, (y + 1) * side, "yellow");
+                cell.l = svgLine(x * side, y * side, x * side, (y + 1) * side, wallColor, wallThickness);
                 level.g.appendChild(cell.l);
                 let cell2 = level[c(x - 1, y)];
-                cell2.r = svgLine(x * side, y * side, x * side, (y + 1) * side, "yellow");
+                cell2.r = svgLine(x * side, y * side, x * side, (y + 1) * side, wallColor, wallThickness);
                 level.g.appendChild(cell2.r);
             }
             else if (!cell.t) {
-                cell.t = svgLine(x * side, y * side, (x + 1) * side, y * side, "yellow");
+                cell.t = svgLine(x * side, y * side, (x + 1) * side, y * side, wallColor, wallThickness);
                 level.g.appendChild(cell.t);
                 let cell2 = level[c(x, y - 1)];
-                cell2.b = svgLine(x * side, y * side, (x + 1) * side, y * side, "yellow");
+                cell2.b = svgLine(x * side, y * side, (x + 1) * side, y * side, wallColor, wallThickness);
                 level.g.appendChild(cell2.b);
             }
             level.g.removeChild(level.tower);

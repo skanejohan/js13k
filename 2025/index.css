@@ -11,3 +11,7 @@ html, body {
   align-items: center;
   height: 100%;
 }
+
+#svg {
+    background: linear-gradient(to bottom,  #010212 0%, #020421 100%);
+}

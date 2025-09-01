@@ -21,4 +21,5 @@ let gameLoop = () => {
     lastTime = now;
 }
 
+initSound();
 gameLoop();

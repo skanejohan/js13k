@@ -27,15 +27,22 @@ function svgCircle(cx, cy, r, fill) {
     return c;
 }
 
-function svgText(txt, x, y) {
+function svgText(txt, x, y, color = "black", font = "Arial", size = 20) {
     let t = document.createElementNS("http://www.w3.org/2000/svg", "text");
     t.setAttribute("x", x);
     t.setAttribute("y", y);
-    t.setAttribute("fill", "black");
-    t.setAttribute("font-family", "Arial");
-    t.setAttribute("font-size", "20");
+    t.setAttribute("fill", color);
+    t.setAttribute("font-family", font);
+    t.setAttribute("font-size", size);
     t.textContent = txt;
     return t;
+}
+
+function svgPath(path, color) {
+    let p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", path);
+    p.setAttribute("fill", color);
+    return p;
 }
 
 function svgGroup() {

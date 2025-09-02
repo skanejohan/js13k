@@ -46,6 +46,13 @@ function svgPath(path, color) {
     return p;
 }
 
+function svgUse(href, x, y, scale = 1.0) {
+    let u = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    u.setAttributeNS("http://www.w3.org/1999/xlink", "href", `#${href}`);
+    u.setAttribute("transform", `translate(${x} ${y}) scale(${scale})`);
+    return u;
+}
+
 function svgGroup() {
     return document.createElementNS("http://www.w3.org/2000/svg", "g");
 }
@@ -59,19 +66,19 @@ function svgCat(x, y) {
 }
 
 function svgPortal(x, y) {
-    return svgCircle(x, y, 18, "yellow");
+    return svgUse("portal", x, y);
 }
 
 function svgBadLuck(x, y) {
-    return svgCircle(x, y, 18, "red");
+    return svgUse("badluck", x, y);
 }
 
 function svgGoodLuck(x, y) {
-    return svgCircle(x, y, 18, "white");
+    return svgUse("goodluck", x, y);
 }
 
 function svgHorseshoe(x, y) {
-    return svgCircle(x, y, 18, "green");
+    return svgUse("horseshoe", x, y);
 }
 
 function svgTower(x, y, activeLevel, opacity = 1.0) {

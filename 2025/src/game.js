@@ -9,7 +9,11 @@ const GSLEVELLOST = 3;
 const GSGAMEOVER = 4;
 
 let gameState = GSMENU;
-displayMenu();
+
+let waitScreen = svgGroup();
+waitScreen.appendChild(svgText("...please wait... preparing the tower...", 250, 200, "red"));
+svg.setAttribute("viewBox", "0 0 800 600");
+svg.appendChild(waitScreen);
 
 var lastTime = Date.now();
 
@@ -21,5 +25,9 @@ let gameLoop = () => {
     lastTime = now;
 }
 
-initSound();
-gameLoop();
+setTimeout(() => {
+    initSound();
+    svg.removeChild(waitScreen);
+    displayMenu();
+    gameLoop();
+}, 100);

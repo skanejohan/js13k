@@ -77,7 +77,6 @@ function svgHorseshoe(x, y) {
 function svgTower(x, y, activeLevel, opacity = 1.0) {
     let tower = svgGroup();
     let moon = svgCircle(x + 80, x + 100, 80, "red");
-    moon.setAttribute("opacity", opacity);
     tower.appendChild(moon);
     for (let i = 0; i < _towerLevels.length; i++) {
         let l = x + _towerLevels[i][0] - 60;
@@ -87,9 +86,9 @@ function svgTower(x, y, activeLevel, opacity = 1.0) {
         let s = `M ${l} ${t} L ${r} ${t} L ${r} ${b} L ${l} ${b} Z`;
         let color = (i === activeLevel) ? "yellow" : "#080001";
         let floor = svgPath(s, color);
-        floor.setAttribute("opacity", opacity);
         tower.appendChild(floor);
     }
+    tower.setAttribute("opacity", opacity);
     return tower;
 }
 

@@ -224,167 +224,154 @@ function checkCollision() {
 }
 
 function _endMaze(newGameState) {
-    zoom = 0;
-    svg.removeChild(level.g);
+    zoomTarget = 0;
     gameState = newGameState;
-    let text = svgText(gameState == GSLEVELWON ? "one maze closer to freedom..." : "you failed...", 400, 400);
-    svg.appendChild(text);
-    svg.removeAttribute("viewBox");
-    setTimeout(() => {
-        svg.removeChild(text);
-        startLevel(gameState == GSLEVELWON ? level.index + 1 : level.index);
-        gameState = GSPLAYING;
-    }, 1500);
+    popupText = svgText(gameState == GSLEVELWON ? "one maze closer to freedom..." : "you failed...", 0, 0, "white");
+    svg.appendChild(popupText);
 }
 
 function _endGame() {
-    zoom = 0;
-    svg.removeChild(level.g);
+    zoomTarget = 0;
     gameState = GSGAMEOVER;
-    let text = svgText("you have escaped!", 400, 400);
-    svg.appendChild(text);
-    svg.removeAttribute("viewBox");
-    setTimeout(() => {
-        svg.removeChild(text);
-        svg.removeAttribute("viewBox");
-        gameState = GSMENU;
-        displayMenu();    
-    }, 3000);
+    popupText = svgText("you have escaped!", 0, 0, "white");
+    svg.appendChild(popupText);
 }
 
 function updateView(dt) {
 
-    if (gameState != GSPLAYING) {
+    if (gameState == GSMENU) {
         return;
     }
 
-    if (!targetDir) {
-        let cell = level[c(level.avatar.cellX, level.avatar.cellY)];
-        if (right && !cell.r) {
-            targetDir = { x : 1, y : 0 };
-        }
-        else if (down && !cell.b) {
-            targetDir = { x : 0, y : 1 };
-        }
-        else if (left && !cell.l) {
-            targetDir = { x : -1, y : 0 };
-        }
-        else if (up && !cell.t) {
-            targetDir = { x : 0, y : -1 };
-        }
-    }
-
-    if (targetDir) {
-        if (targetDir.x == 1) {
-            x += dt * 0.5;
-            if (x >= side * (level.avatar.cellX + 1.5)) {
-                x = side * (level.avatar.cellX + 1.5);
-                level.avatar.cellX++;
-                checkCollision();
-                updateVisibleCells();
-                targetDir = undefined;
+    if (gameState == GSPLAYING) {
+        if (!targetDir) {
+            let cell = level[c(level.avatar.cellX, level.avatar.cellY)];
+            if (right && !cell.r) {
+                targetDir = { x : 1, y : 0 };
             }
-        }
-        else if (targetDir.y == 1) {
-            y += dt * 0.5;
-            if (y >= side * (level.avatar.cellY + 1.5)) {
-                y = side * (level.avatar.cellY + 1.5);
-                level.avatar.cellY++;
-                checkCollision();
-                updateVisibleCells();
-                targetDir = undefined;
+            else if (down && !cell.b) {
+                targetDir = { x : 0, y : 1 };
             }
-        }
-        else if (targetDir.x == -1) {
-            x -= dt * 0.5;
-            if (x <= side * (level.avatar.cellX - 0.5)) {
-                x = side * (level.avatar.cellX - 0.5);
-                level.avatar.cellX--;
-                checkCollision();
-                updateVisibleCells();
-                targetDir = undefined;
+            else if (left && !cell.l) {
+                targetDir = { x : -1, y : 0 };
             }
-        }
-        else if (targetDir.y == -1) {
-            y -= dt * 0.5;
-            if (y <= side * (level.avatar.cellY - 0.5)) {
-                y = side * (level.avatar.cellY - 0.5);
-                level.avatar.cellY--;
-                checkCollision();
-                updateVisibleCells();
-                targetDir = undefined;
-            }
-        }
-    }
-    else {
-        x = side * (level.avatar.cellX + 0.5);
-        y = side * (level.avatar.cellY + 0.5);
-    }
-
-    for (let i = 0; i < level.cats.length; i++) {
-        let opponent = level.cats[i];
-        if (!opponent.dir) {
-            let cell = level[c(opponent.cellX, opponent.cellY)];
-            let rnd = Math.floor(Math.random() * 4);
-            if (rnd == 0 && !cell.r) {
-                opponent.dir = { x : 1, y : 0 };
-            }
-            else if (rnd == 1 && !cell.b) {
-                opponent.dir = { x : 0, y : 1 };
-            }
-            else if (rnd == 2 && !cell.l) {
-                opponent.dir = { x : -1, y : 0 };
-            }
-            else if (rnd == 3 && !cell.t) {
-                opponent.dir = { x : 0, y : -1 };
+            else if (up && !cell.t) {
+                targetDir = { x : 0, y : -1 };
             }
         }
 
-        if (opponent.dir) {
-            if (opponent.dir.x == 1) {
-                opponent.displayX += dt * 0.5;
-                if (opponent.displayX >= side * (opponent.cellX + 1.5)) {
-                    opponent.displayX = side * (opponent.cellX + 1.5);
-                    opponent.cellX++;
-                    if (level[c(opponent.cellX, opponent.cellY)].r) {
-                        opponent.dir = undefined;
-                    }
+        if (targetDir) {
+            if (targetDir.x == 1) {
+                x += dt * 0.5;
+                if (x >= side * (level.avatar.cellX + 1.5)) {
+                    x = side * (level.avatar.cellX + 1.5);
+                    level.avatar.cellX++;
+                    checkCollision();
+                    updateVisibleCells();
+                    targetDir = undefined;
                 }
             }
-            else if (opponent.dir.y == 1) {
-                opponent.displayY += dt * 0.5;
-                if (opponent.displayY >= side * (opponent.cellY + 1.5)) {
-                    opponent.displayY = side * (opponent.cellY + 1.5);
-                    opponent.cellY++;
-                    if (level[c(opponent.cellX, opponent.cellY)].b) {
-                        opponent.dir = undefined;
-                    }
+            else if (targetDir.y == 1) {
+                y += dt * 0.5;
+                if (y >= side * (level.avatar.cellY + 1.5)) {
+                    y = side * (level.avatar.cellY + 1.5);
+                    level.avatar.cellY++;
+                    checkCollision();
+                    updateVisibleCells();
+                    targetDir = undefined;
                 }
             }
-            else if (opponent.dir.x == -1) {
-                opponent.displayX -= dt * 0.5;
-                if (opponent.displayX <= side * (opponent.cellX - 0.5)) {
-                    opponent.displayX = side * (opponent.cellX - 0.5);
-                    opponent.cellX--;
-                    if (level[c(opponent.cellX, opponent.cellY)].l) {
-                        opponent.dir = undefined;
-                    }
+            else if (targetDir.x == -1) {
+                x -= dt * 0.5;
+                if (x <= side * (level.avatar.cellX - 0.5)) {
+                    x = side * (level.avatar.cellX - 0.5);
+                    level.avatar.cellX--;
+                    checkCollision();
+                    updateVisibleCells();
+                    targetDir = undefined;
                 }
             }
-            else if (opponent.dir.y == -1) {
-                opponent.displayY -= dt * 0.5;
-                if (opponent.displayY <= side * (opponent.cellY - 0.5)) {
-                    opponent.displayY = side * (opponent.cellY - 0.5);
-                    opponent.cellY--;
-                    if (level[c(opponent.cellX, opponent.cellY)].t) {
-                        opponent.dir = undefined;
-                    }
+            else if (targetDir.y == -1) {
+                y -= dt * 0.5;
+                if (y <= side * (level.avatar.cellY - 0.5)) {
+                    y = side * (level.avatar.cellY - 0.5);
+                    level.avatar.cellY--;
+                    checkCollision();
+                    updateVisibleCells();
+                    targetDir = undefined;
                 }
             }
         }
         else {
-            opponent.displayX = side * (opponent.cellX + 0.5);
-            opponent.displayY = side * (opponent.cellY + 0.5);
+            x = side * (level.avatar.cellX + 0.5);
+            y = side * (level.avatar.cellY + 0.5);
+        }
+
+        for (let i = 0; i < level.cats.length; i++) {
+            let opponent = level.cats[i];
+            if (!opponent.dir) {
+                let cell = level[c(opponent.cellX, opponent.cellY)];
+                let rnd = Math.floor(Math.random() * 4);
+                if (rnd == 0 && !cell.r) {
+                    opponent.dir = { x : 1, y : 0 };
+                }
+                else if (rnd == 1 && !cell.b) {
+                    opponent.dir = { x : 0, y : 1 };
+                }
+                else if (rnd == 2 && !cell.l) {
+                    opponent.dir = { x : -1, y : 0 };
+                }
+                else if (rnd == 3 && !cell.t) {
+                    opponent.dir = { x : 0, y : -1 };
+                }
+            }
+
+            if (opponent.dir) {
+                if (opponent.dir.x == 1) {
+                    opponent.displayX += dt * 0.5;
+                    if (opponent.displayX >= side * (opponent.cellX + 1.5)) {
+                        opponent.displayX = side * (opponent.cellX + 1.5);
+                        opponent.cellX++;
+                        if (level[c(opponent.cellX, opponent.cellY)].r) {
+                            opponent.dir = undefined;
+                        }
+                    }
+                }
+                else if (opponent.dir.y == 1) {
+                    opponent.displayY += dt * 0.5;
+                    if (opponent.displayY >= side * (opponent.cellY + 1.5)) {
+                        opponent.displayY = side * (opponent.cellY + 1.5);
+                        opponent.cellY++;
+                        if (level[c(opponent.cellX, opponent.cellY)].b) {
+                            opponent.dir = undefined;
+                        }
+                    }
+                }
+                else if (opponent.dir.x == -1) {
+                    opponent.displayX -= dt * 0.5;
+                    if (opponent.displayX <= side * (opponent.cellX - 0.5)) {
+                        opponent.displayX = side * (opponent.cellX - 0.5);
+                        opponent.cellX--;
+                        if (level[c(opponent.cellX, opponent.cellY)].l) {
+                            opponent.dir = undefined;
+                        }
+                    }
+                }
+                else if (opponent.dir.y == -1) {
+                    opponent.displayY -= dt * 0.5;
+                    if (opponent.displayY <= side * (opponent.cellY - 0.5)) {
+                        opponent.displayY = side * (opponent.cellY - 0.5);
+                        opponent.cellY--;
+                        if (level[c(opponent.cellX, opponent.cellY)].t) {
+                            opponent.dir = undefined;
+                        }
+                    }
+                }
+            }
+            else {
+                opponent.displayX = side * (opponent.cellX + 0.5);
+                opponent.displayY = side * (opponent.cellY + 0.5);
+            }
         }
     }
 
@@ -395,12 +382,14 @@ function updateView(dt) {
         zoom += dt * 0.1;
     }
 
-    let visible = noOfVisibleOpponents();
-    if (visible == 0) {
-        zoomTarget -= 5;
-    }
-    else {
-        zoomTarget += visible * 20;
+    if (gameState == GSPLAYING) {
+        let visible = noOfVisibleOpponents();
+        if (visible == 0) {
+            zoomTarget -= 5;
+        }
+        else {
+            zoomTarget += visible * 20;
+        }
     }
 
     if (zoomTarget < 0) {
@@ -412,11 +401,36 @@ function updateView(dt) {
 
     level.avatar.element.setAttribute("cx", x);
     level.avatar.element.setAttribute("cy", y);
-    level.tower.setAttribute("transform", `translate(${x + 300} ${y - 500})`);
+    level.tower.setAttribute("transform", `translate(${x + 300} ${y - 780}) scale(2.5)`);
+    if (popupText) {
+        popupText.setAttribute("x", x - 100);
+        popupText.setAttribute("y", y - 200);
+    }
     for (let i = 0; i < level.cats.length; i++) {
         let opponent = level.cats[i];
         opponent.element.setAttribute("cx", opponent.displayX);
         opponent.element.setAttribute("cy", opponent.displayY);
     }
     svg.setAttribute("viewBox", `${x+zoom-750} ${y+zoom-750} ${w-zoom-zoom} ${h-zoom-zoom}`);
+
+    if (popupText && (zoom < 10) && !timeOutSet) {
+        timeOutSet = true;
+        setTimeout(() => {
+            svg.removeChild(popupText);
+            svg.removeChild(level.g);
+            popupText = undefined;
+            if (gameState == GSGAMEOVER) {
+                gameState = GSMENU;
+                displayMenu();    
+            }
+            else {
+                startLevel(gameState == GSLEVELWON ? level.index + 1 : level.index);
+                gameState = GSPLAYING;
+            }
+            timeOutSet = false;
+        }, 1500);
+    }
 }
+
+let popupText = undefined;
+let timeOutSet = false;

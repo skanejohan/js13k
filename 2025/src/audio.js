@@ -30,5 +30,6 @@ function play(sound, loop = false) {
         source.loop = loop;
         source.connect(audioContext.destination);
         source.start();
+        return source;
     }
 }

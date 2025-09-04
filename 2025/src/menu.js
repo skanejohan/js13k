@@ -25,7 +25,10 @@ function _startGame(e) {
     menu = undefined;
     startLevel(0);
     gameState = GSPLAYING;
-    play(songBuffer, true);
+    if (!songNode) {
+        songNode = play(songBuffer, true);
+    }
 }
 
+let songNode = undefined;
 let menu = undefined;

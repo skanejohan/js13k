@@ -399,8 +399,15 @@ function updateView(dt) {
         zoomTarget = 700;
     }
 
-    level.avatar.element.setAttribute("cx", x);
-    level.avatar.element.setAttribute("cy", y);
+    level.avatar.head1.setAttribute("transform", `translate(${x} ${y}) scale(1, 1)`);
+    level.avatar.head1.style.display = zoom < 10 && gameState == GSPLAYING ? "" : "none";
+    level.avatar.head2.setAttribute("transform", `translate(${x} ${y}) scale(1.2, 1.2)`);
+    level.avatar.head2.style.display = zoom >= 10 && zoom < 200 && gameState == GSPLAYING ? "" : "none";
+    level.avatar.head3.setAttribute("transform", `translate(${x} ${y}) scale(1.4, 1.4)`);
+    level.avatar.head3.style.display = zoom >= 200 && zoom < 500 && gameState == GSPLAYING ? "" : "none";
+    level.avatar.head4.setAttribute("transform", `translate(${x} ${y}) scale(1.6, 1.6)`);
+    level.avatar.head4.style.display = zoom > 500 && gameState == GSPLAYING ? "" : "none";
+
     level.tower.setAttribute("transform", `translate(${x + 300} ${y - 780}) scale(2.5)`);
     if (popupText) {
         popupText.setAttribute("x", x - 100);

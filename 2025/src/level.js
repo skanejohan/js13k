@@ -26,7 +26,18 @@ function generateLevel(levelIndex) {
     }
 
     _occupiedCells = [];
-    _level.avatar = _addObject(svgAvatar,  lvl.width, lvl.height);
+    _level.avatar = _addObject(() => svgUse("head1", 0, 0),  lvl.width, lvl.height);
+    _level.avatar.head1 = _level.avatar.element;
+    _level.avatar.head2 = svgUse("head2",0, 0);
+    _level.g.appendChild(_level.avatar.head2);
+    _level.avatar.head2.style.display = "none";
+    _level.avatar.head3 = svgUse("head3",0, 0);
+    _level.g.appendChild(_level.avatar.head3);
+    _level.avatar.head3.style.display = "none";
+    _level.avatar.head4 = svgUse("head4",0, 0);
+    _level.g.appendChild(_level.avatar.head4);
+    _level.avatar.head4.style.display = "none";
+
     for(let i = 0; i < lvl.cats; i++) {
         _level.cats.push(_addObject(svgCat, lvl.width, lvl.height));
     }

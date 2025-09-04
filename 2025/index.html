@@ -30,6 +30,49 @@
                     <line x1="-10" y1="1" x2="-9" y2="-15" stroke="gray" stroke-width="10"></line>
                     <line x1="10" y1="1" x2="9" y2="-15" stroke="gray" stroke-width="10"></line>
                 </g>
+                <g id="head1">
+                    <circle cx="0" cy="0" r="18" fill="#d6b45c"></circle>
+                    <path d="M -18 0 A 8 8 0 1 1 18 0" fill="none" stroke="#381e06" stroke-width="6" />
+                    <circle cx="-8" cy="-2" r="2" fill="#4d4020"></circle>
+                    <circle cx="8" cy="-2" r="2" fill="#4d4020"></circle>
+                    <path d="M -10 5 A 8 4 0 1 0 10 5" fill="none" stroke="#965518" stroke-width="3" />
+                </g>
+                <line id="head2hair" x1="0" y1="0" x2="2" y2="-10" stroke="#381e06" stroke-width="5" ></line>
+                <g id="head2">
+                    <circle cx="0" cy="0" r="18" fill="#d6b45c"></circle>
+                    <path d="M -17 0 A 8 8 0 1 1 17 0" fill="none" stroke="#381e06" stroke-width="6" />
+                    <circle cx="-7" cy="-2" r="3" fill="#4d4020"></circle>
+                    <circle cx="7" cy="-2" r="3" fill="#4d4020"></circle>
+                    <line x1="0" y1="13" x2="0" y2="5" stroke="#965518" stroke-width="8" ></line>
+                    <use href="#head3hair" x="-14" y="-7"></use>
+                    <use href="#head3hair" x="-5" y="-14"></use>
+                    <use href="#head3hair" x="5" y="-14"></use>
+                    <use href="#head3hair" x="14" y="-7"></use>
+                </g>
+                <line id="head3hair" x1="0" y1="0" x2="1" y2="-7" stroke="#381e06" stroke-width="5" ></line>
+                <g id="head3">
+                    <circle cx="0" cy="0" r="18" fill="#d6b45c"></circle>
+                    <path d="M -16 0 A 8 8 0 1 1 16 0" fill="none" stroke="#381e06" stroke-width="6" />
+                    <circle cx="-7" cy="-2" r="3" fill="#4d4020"></circle>
+                    <circle cx="7" cy="-2" r="3" fill="#4d4020"></circle>
+                    <line x1="0" y1="14" x2="0" y2="4" stroke="#965518" stroke-width="8" ></line>
+                    <use href="#head2hair" x="-14" y="-7"></use>
+                    <use href="#head2hair" x="-5" y="-14"></use>
+                    <use href="#head2hair" x="5" y="-14"></use>
+                    <use href="#head2hair" x="14" y="-7"></use>
+                </g>
+                <line id="head4hair" x1="0" y1="0" x2="3" y2="-15" stroke="#381e06" stroke-width="5" ></line>
+                <g id="head4">
+                    <circle cx="0" cy="0" r="18" fill="#d6b45c"></circle>
+                    <path d="M -15 0 A 8 8 0 1 1 15 0" fill="none" stroke="#381e06" stroke-width="6" />
+                    <circle cx="-7" cy="-2" r="4" fill="#4d4020"></circle>
+                    <circle cx="7" cy="-2" r="4" fill="#4d4020"></circle>
+                    <line x1="0" y1="15" x2="0" y2="3" stroke="#965518" stroke-width="8" ></line>
+                    <use href="#head4hair" x="-14" y="-7"></use>
+                    <use href="#head4hair" x="-5" y="-14"></use>
+                    <use href="#head4hair" x="5" y="-14"></use>
+                    <use href="#head4hair" x="14" y="-7"></use>
+                </g>
             </defs>
         </svg>
         <script src="src/svg.js"></script>

@@ -225,9 +225,9 @@ function checkCollision() {
 function _endMaze(newGameState) {
     let message;
     if (newGameState == GSLEVELWON) {
-        message = "one maze closer to freedom...";
         play(levelWonSound);
         lives++;
+        message = `one maze closer to freedom... you now have ${lives} ${lives == 1 ? "life" : "lives"}`;
     }
     else {
         if (lives < 1) {
@@ -236,7 +236,7 @@ function _endMaze(newGameState) {
         }
         else {
             lives--;
-            message = (heartAttack > 100 ? "your heart collapsed from the stress" : "you got stuck in the maze") + "... but you get another attempt...";
+            message = (heartAttack > 100 ? "your heart collapsed from the stress" : "you got stuck in the maze") + `... but you get another attempt... you have ${lives} ${lives == 1 ? "life" : "lives"} left`;
         }
         play(levelLostSound);
     }
@@ -425,7 +425,7 @@ function updateView(dt) {
     level.avatar.head4.style.display = zoom > 500 && gameState == GSPLAYING ? "" : "none";
 
     if (level.avatar.head4.style.display == "") { // biggest zoom, increased risk of heart attack
-        heartAttack += dt * 0.05;
+        heartAttack += dt * 0.03;
         if (heartAttack > 100) {
             _endMaze(GSLEVELLOST);
         }
@@ -439,7 +439,7 @@ function updateView(dt) {
         }
     } 
     else { // not biggest zoom, decreased risk of heart attack
-        heartAttack -= dt * 0.05;
+        heartAttack -= dt * 0.2;
         if (heartAttack < 0) {
             heartAttack = 0;
         }

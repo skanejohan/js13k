@@ -58,7 +58,7 @@ function svgGroup() {
 }
 
 function svgCat(x, y) {
-    return svgCircle(x, y, 18, "black");
+    return svgUse("cat", x, y);
 }
 
 function svgPortal(x, y) {

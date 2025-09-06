@@ -414,9 +414,8 @@ function updateView(dt) {
         popupText.setAttribute("y", y - 200);
     }
     for (let i = 0; i < level.cats.length; i++) {
-        let opponent = level.cats[i];
-        opponent.element.setAttribute("cx", opponent.displayX);
-        opponent.element.setAttribute("cy", opponent.displayY);
+        let cat = level.cats[i];
+        cat.element.setAttribute("transform", `translate(${cat.displayX} ${cat.displayY}) scale(2)`);
     }
     svg.setAttribute("viewBox", `${x+zoom-750} ${y+zoom-750} ${w-zoom-zoom} ${h-zoom-zoom}`);
 

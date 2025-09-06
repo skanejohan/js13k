@@ -12,6 +12,7 @@ function displayMenu() {
     menu.appendChild(svgText("the black cats... your biggest fear... the horror makes you sweat and clouds your vision", 150, 320, "red"));
     menu.appendChild(svgHorseshoe(320, 355));
     menu.appendChild(svgText("the horseshoe is your way out", 350, 360, "red"));
+    menu.appendChild(svgText("don't get stuck in the maze... and make sure your heart can take the horror of the black cats...", 130, 460, "red"));
     menu.appendChild(svgText("click to escape the tower... and the terror!", 300, 500, "red"));
     menu.appendChild(svgText("uses pl_synth (https://github.com/phoboslab/pl_synth) for audio", -150, 590, "blue"));
     svg.setAttribute("viewBox", "0 0 800 600");

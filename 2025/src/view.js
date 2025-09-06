@@ -7,6 +7,7 @@ let visibleCells = [];
 let visibleCellsSvg = [];
 let wallThickness = 30;
 let wallColor = "#1a1815";
+let heartAttack = 0;
 
 let targetDir = undefined;
 
@@ -235,7 +236,7 @@ function _endMaze(newGameState) {
         }
         else {
             lives--;
-            message = "you failed... but you get another attempt...";
+            message = (heartAttack > 100 ? "your heart collapsed from the stress" : "you got stuck in the maze") + "... but you get another attempt...";
         }
         play(levelLostSound);
     }
@@ -422,6 +423,27 @@ function updateView(dt) {
     level.avatar.head3.style.display = zoom >= 200 && zoom < 500 && gameState == GSPLAYING ? "" : "none";
     level.avatar.head4.setAttribute("transform", `translate(${x} ${y}) scale(1.6, 1.6)`);
     level.avatar.head4.style.display = zoom > 500 && gameState == GSPLAYING ? "" : "none";
+
+    if (level.avatar.head4.style.display == "") { // biggest zoom, increased risk of heart attack
+        heartAttack += dt * 0.05;
+        if (heartAttack > 100) {
+            _endMaze(GSLEVELLOST);
+        }
+        else if (Math.floor(Math.random() * 100) < heartAttack) {
+            let red = svgRect(0, 0, w, h, "red");
+            red.setAttribute("opacity", "0.5");
+            svg.appendChild(red);
+            setTimeout(() => {
+                svg.removeChild(red);
+            }, 50);
+        }
+    } 
+    else { // not biggest zoom, decreased risk of heart attack
+        heartAttack -= dt * 0.05;
+        if (heartAttack < 0) {
+            heartAttack = 0;
+        }
+    }
 
     level.tower.setAttribute("transform", `translate(${x + 300} ${y - 780}) scale(2.5)`);
     if (popupText) {

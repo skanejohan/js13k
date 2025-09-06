@@ -6,8 +6,10 @@ const GSMENU = 0;
 const GSPLAYING = 1;
 const GSLEVELWON = 2;
 const GSLEVELLOST = 3;
-const GSGAMEOVER = 4;
+const GSGAMEWON = 4;
+const GSGAMELOST = 5;
 
+let lives = 0;
 let gameState = GSMENU;
 
 let waitScreen = svgGroup();

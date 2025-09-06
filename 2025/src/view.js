@@ -206,7 +206,6 @@ function checkCollision() {
             level.g.appendChild(level.tower);
         }
         if (!winnable()) {
-            play(levelLostSound);
             _endMaze(GSLEVELLOST);
         }
     }
@@ -217,22 +216,38 @@ function checkCollision() {
             _endGame();
         }
         else {
-            play(levelWonSound);
             _endMaze(GSLEVELWON);
         }
     }
 }
 
 function _endMaze(newGameState) {
+    let message;
+    if (newGameState == GSLEVELWON) {
+        message = "one maze closer to freedom...";
+        play(levelWonSound);
+        lives++;
+    }
+    else {
+        if (lives < 1) {
+            message = "you failed...";
+            newGameState = GSGAMELOST;
+        }
+        else {
+            lives--;
+            message = "you failed... but you get another attempt...";
+        }
+        play(levelLostSound);
+    }
     zoomTarget = 0;
     gameState = newGameState;
-    popupText = svgText(gameState == GSLEVELWON ? "one maze closer to freedom..." : "you failed...", 0, 0, "white");
+    popupText = svgText(message, 0, 0, "white");
     svg.appendChild(popupText);
 }
 
 function _endGame() {
     zoomTarget = 0;
-    gameState = GSGAMEOVER;
+    gameState = GSGAMEWON;
     popupText = svgText("you have escaped!", 0, 0, "white");
     svg.appendChild(popupText);
 }
@@ -419,13 +434,13 @@ function updateView(dt) {
     }
     svg.setAttribute("viewBox", `${x+zoom-750} ${y+zoom-750} ${w-zoom-zoom} ${h-zoom-zoom}`);
 
-    if (popupText && (zoom < 10) && !timeOutSet) {
+    if (popupText && gameState != GSGAMEWON && (zoom < 10) && !timeOutSet) {
         timeOutSet = true;
         setTimeout(() => {
             svg.removeChild(popupText);
             svg.removeChild(level.g);
             popupText = undefined;
-            if (gameState == GSGAMEOVER) {
+            if (gameState == GSGAMELOST) {
                 gameState = GSMENU;
                 displayMenu();    
             }

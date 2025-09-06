@@ -54,6 +54,13 @@ function generateLevel(levelIndex) {
     _level.floor = svgRect(0, 0, 100, 50, "yellow");
     _level.tower = svgTower(0, 0, levelIndex, 0.5);
     _level.g.appendChild(_level.tower)
+
+    _level.lives = svgGroup();
+    for (let i = 0; i < lives; i++) {
+        _level.lives.appendChild(svgUse("head1", -100, i * 50));
+    }
+    _level.lives.setAttribute("opacity", 0.5);
+    _level.g.appendChild(_level.lives)
     return _level;
 }
 

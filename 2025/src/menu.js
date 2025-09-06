@@ -23,6 +23,7 @@ function _startGame(e) {
     svg.removeEventListener("click", _startGame);
     svg.removeChild(menu);
     menu = undefined;
+    lives = 0;
     startLevel(0);
     gameState = GSPLAYING;
     if (!songNode) {
